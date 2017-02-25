@@ -1,0 +1,232 @@
+﻿html, body {
+	height: 100%;
+	width: 100%;
+	margin: 0;
+	background: #f1f1f1;
+}
+
+.everything {
+	width: 100%;
+	height: 100%;
+	display: inline-block;
+}
+
+#div_everything {
+	opacity: 0;
+}
+
+#div_header {
+	display: inline-block;
+	width: 100%;
+	height: 8%;
+	background: white;
+	box-shadow: 0 3px 3px #E0E0E0;
+	position: relative;
+}
+
+#div_body {
+	display: inline-block;
+	width: 100%;
+	height: 70.5%;
+	padding-top: .5%;
+}
+
+#div_footer {
+	display: inline-block;
+	height: 19.5%;
+	width: 90%;
+	margin-left: 5%;
+	margin-right: 5%;
+}
+
+.shadow {
+	box-shadow: 5px 5px 5px #E0E0E0;
+}
+
+#div_player {
+	width: 100%;
+	height: 79%;
+}
+
+#div_current_content_info {
+	display: flex;
+	justify-content: center; /* align horizontal */
+	align-items: center; /* align vertical */
+	background: white;
+	height: 20.1%;
+	width: 100%;
+}
+
+#div_current_content {
+	vertical-align: top;
+	display: inline-block;
+	width: 55%;
+	height: 100%;
+	margin-left: 5%;
+	margin-right: .75%;
+}
+
+#div_info {
+	display: inline-block;
+	position: relative;
+	width: 34.25%;
+	height: 100%;
+	margin-left: 0;
+	margin-right: 5%;
+	background: white;
+	text-align: center;
+}
+
+.div_content {
+	background: white;
+	display: inline-block;
+	width: 15.6%;
+	height: 80%;
+	margin-right: 3%;
+}
+	
+.img_queue_item {
+	width: 100%;
+	height: 100%;
+}
+
+#div_search_results {
+	display: none;
+	position: absolute;
+	right: 39.9%;
+	width: 55.1%;
+	top: 6%;
+	padding-left: .5%;
+	background: white;
+}
+
+.div_search_result {
+	font-family: 'Josefin Sans';
+	cursor: pointer;
+}
+
+.div_search_result > * {
+	cursor: pointer;
+}
+
+.div_search_result > p {
+	margin: 0;
+	font-size: 24px;
+	margin-bottom: 2%;
+}
+
+#div_users_list {
+	display: inline-block;
+	width: 39.9%;
+	height: 100%;
+}
+
+.div_user_info {
+	position: absolute;
+	background: white;
+	top: 100%;
+}
+
+.div_user_info > p {
+	background: white;
+}
+
+#input_search {
+	display: inline-block;
+	float: left;
+	margin-left: 5.1%;
+	width: 54.65%;
+	border: 1px solid #CCCCCC;
+	font-size: 18px;
+	font-family: "Source Code Pro";
+}
+
+.current_content_info {
+	display: block;
+	font-family: 'Josefin Sans';
+}
+
+#div_info_holder {
+	width: 50%;
+	text-align: center;
+}
+
+.p_user {
+	color: white;
+	font-family: 'Josefin Sans';
+}
+
+.div_user {
+	cursor: pointer;
+	display: flex;
+	justify-content: center; /* align horizontal */
+	align-items: center; /* align vertical */
+	height: 100%; 
+	width: 12.5%; 
+	float: right;
+	position: relative;
+	text-align: center;
+}
+
+.p_user {}
+
+.chat_input {
+	width: 70%;
+	border: 0;	
+	border-bottom: 1px solid black;
+	background: transparent;
+	text-align: center;
+	position: absolute;
+	outline: none;
+	font-size: 24px;
+	top: 50%; left: 50%;
+ 	font-family: 'Josefin Sans';   
+ 	transform: translate(-50%,-50%);
+}
+
+#chat_input {
+	display: none;
+	top: 95%;
+}
+
+#ul_chat {
+	text-align: center;
+	padding: 0;
+}
+
+#ul_chat span {
+	font-family: 'Josefin Sans';
+}
+j
+#ul_chat li {
+	list-style: none;
+}
+
+/* Tooltip container */
+.tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    margin-right: 5%;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 6px;
+    top: 10%;
+    right: 105%; 
+ 
+    /* Position the tooltip text - see examples below! */
+    position: absolute;
+    z-index: 1;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+}

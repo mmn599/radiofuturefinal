@@ -1,0 +1,57 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>@ViewData["roomName"]</title>
+    <link rel="stylesheet" href="~/css/musicroom.css">
+    <link href="https://fonts.googleapis.com/css?family=Josefin+Sans&amp;subset=latin,latin-ext" rel="stylesheet" type="text/css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="https://cdn.socket.io/socket.io-1.0.0.js?onload=socketioLoad"></script><!-- drawer.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/drawer/3.2.0/css/drawer.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/iScroll/5.1.3/iscroll.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/drawer/3.2.0/js/drawer.min.js"></script>
+    <script src="~/js/musicroom.js"></script>
+    <script src="~/js/spin.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Cousine" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:300" rel="stylesheet" type="text/css">
+    <script src="https://apis.google.com/js/client.js?onload=youtubeAPIInit"></script>
+    <script src="https://www.youtube.com/iframe_api"></script>
+</head>
+<body class="drawer drawer--left">
+    <div class="everything" id="div_loading"></div>
+    <div class="everything" id="div_everything">
+        <div class="div_root" id="div_header" role="banner">
+            <button class="drawer-toggle drawer-hamburger" type="button"><span class="sr-only">toggle navigation</span><span class="drawer-hamburger-icon"></span></button>
+            <nav class="drawer-nav" role="navigation">
+                <ul class="drawer-menu">
+                    <li><a class="drawer-brand" href="#">Secret things</a></li>
+                    <li><a class="drawer-menu-item" href="#">Thing 1</a></li>
+                    <li><a class="drawer-menu-item" href="#">Thing 2</a></li>
+                </ul>
+            </nav>
+            <input id="input_search" placeholder="type in an artist and song name and press enter">
+            <div id="div_search_results"></div>
+            <div id="div_users_list"></div>
+        </div>
+        <div class="div_root" id="div_body">
+            <!--player-->
+            <div id="div_current_content">
+                <div id="div_player"></div>
+                <div class="shadow" id="div_current_content_info">
+                    <img src="../images/arrows-1.png" style="margin-right: 15%; cursor: pointer" onclick="previousVideoInQueue()">
+                    <div id="div_info_holder">
+                        <div class="current_content_info" id="p_current_content_info"></div><br>
+                        <div class="current_content_info" id="p_current_recommender_info"></div>
+                    </div><img src="../images/arrows.png" style="margin-left: 15%; cursor: pointer" onclick="nextVideoInQueue()">
+                </div>
+            </div>
+            <!--info-->
+            <div class="shadow" id="div_info">
+                <ul id="ul_chat"></ul>
+                <input class="chat_input" id="name_input" placeholder="enter your name">
+                <input class="chat_input" id="chat_input" placeholder="thoughts? press enter">
+            </div>
+        </div>
+        <div class="div_root" id="div_footer"></div>
+    </div>
+</body>
+</html>
