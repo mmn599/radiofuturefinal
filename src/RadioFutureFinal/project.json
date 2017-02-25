@@ -1,4 +1,4 @@
-﻿{
+{
   "userSecretsId": "aspnet-RadioFutureFinal-b60b423f-ccea-424f-a385-303e752222a0",
 
   "dependencies": {
@@ -43,7 +43,8 @@
     "Microsoft.VisualStudio.Web.CodeGenerators.Mvc": {
       "version": "1.0.0-preview2-final",
       "type": "build"
-    }
+    },
+    "Microsoft.AspNetCore.WebSockets": "1.0.0"
   },
 
   "tools": {

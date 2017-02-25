@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using RadioFutureFinal.Data;
 using RadioFutureFinal.Models;
 using RadioFutureFinal.Services;
+using RadioFutureFinal.WebSockets;
 
 namespace RadioFutureFinal
 {
@@ -72,6 +73,8 @@ namespace RadioFutureFinal
             }
 
             app.UseStaticFiles();
+
+            app.Map("/ws", SocketHandler.Map);
 
             app.UseIdentity();
 
