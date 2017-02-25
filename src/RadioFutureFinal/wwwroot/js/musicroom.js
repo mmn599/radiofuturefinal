@@ -6,12 +6,18 @@
 
 $(document).ready(function () {
 
+    console.log('poooooooop');
+
     var pathname = window.location.pathname;
     var roomName = null;
     if (pathname.indexOf('\/rooms\/') > -1) {
         roomName = pathname.replace('\/rooms/', '');
     }
 
+    var uri = "ws://" + window.location.host + "/ws";
+    var socket = doConnect(uri);
+
+    /*
     mGlobals.ui.div_loading = $("#div_loading");
     mGlobals.ui.div_everything = $("#div_everything");
 
@@ -89,9 +95,25 @@ $(document).ready(function () {
 		}
 	});
 	*/
-    $('.drawer').drawer();
+
+    //$('.drawer').drawer();
+
 
 });
+
+function doConnect(uri) {
+    var socket = new WebSocket(uri);
+    socket.onopen = function (e) { alert("opened " + uri); doSend(socket, "test echo"); };
+    socket.onclose = function (e) { alert("closed"); };
+    socket.onmessage = function (e) { alert("Received: " + e.data); socket.close(); };
+    socket.onerror = function (e) { alert("Error: " + e.data); };
+    return socket;
+}
+
+function doSend(socket, text) {
+    alert("Sending: " + text);
+    socket.send(text);
+}
 
 
 //==================================================================
