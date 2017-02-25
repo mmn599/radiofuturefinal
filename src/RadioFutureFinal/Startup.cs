@@ -13,6 +13,7 @@ using RadioFutureFinal.Data;
 using RadioFutureFinal.Models;
 using RadioFutureFinal.Services;
 using RadioFutureFinal.WebSockets;
+using RadioFutureFinal.DAL;
 
 namespace RadioFutureFinal
 {
@@ -49,6 +50,8 @@ namespace RadioFutureFinal
                 .AddDefaultTokenProviders();
 
             services.AddMvc();
+
+            services.AddSingleton<IDbRepository, DbRepository>();
 
             // Add application services.
             services.AddTransient<IEmailSender, AuthMessageSender>();
