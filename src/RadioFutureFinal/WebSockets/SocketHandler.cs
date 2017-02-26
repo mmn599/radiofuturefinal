@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Threading.Tasks;
+using RadioFutureFinal.DAL;
 
 namespace RadioFutureFinal.WebSockets
 {
@@ -11,11 +12,13 @@ namespace RadioFutureFinal.WebSockets
     {
         public const int BufferSize = 4096;
 
-        WebSocket socket;
+        WebSocket _socket;
+        IDbRepository _db;
 
-        public SocketHandler(WebSocket socket)
+        public SocketHandler(WebSocket socket, IDbRepository db)
         {
-            this.socket = socket;
+            _socket = socket;
+            _db = db;
         }
 
         private async Task EchoLoop()
@@ -23,11 +26,11 @@ namespace RadioFutureFinal.WebSockets
             var buffer = new byte[BufferSize];
             var seg = new ArraySegment<byte>(buffer);
 
-            while(this.socket.State == WebSocketState.Open)
+            while(_socket.State == WebSocketState.Open)
             {
-                var incoming = await this.socket.ReceiveAsync(seg, CancellationToken.None);
+                var incoming = await _socket.ReceiveAsync(seg, CancellationToken.None);
                 var outgoing = new ArraySegment<byte>(buffer, 0, incoming.Count);
-                await this.socket.SendAsync(outgoing, WebSocketMessageType.Text, true, CancellationToken.None);
+                await _socket.SendAsync(outgoing, WebSocketMessageType.Text, true, CancellationToken.None);
             }
         }
 
