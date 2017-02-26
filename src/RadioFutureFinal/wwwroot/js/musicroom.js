@@ -6,21 +6,14 @@
 
 $(document).ready(function () {
 
-    console.log('poooooooop');
-
     var pathname = window.location.pathname;
     var roomName = null;
     if (pathname.indexOf('\/rooms\/') > -1) {
         roomName = pathname.replace('\/rooms/', '');
     }
 
-    var uri = "ws://" + window.location.host + "/ws";
-    var socket = doConnect(uri);
-
-    /*
     mGlobals.ui.div_loading = $("#div_loading");
     mGlobals.ui.div_everything = $("#div_everything");
-
 
     var opts = {
         lines: 13 // The number of lines to draw
@@ -60,7 +53,7 @@ $(document).ready(function () {
     });
 
     mGlobals.ui.input_search.keypress(function (e) {
-        if (e.which == 13) {
+        if (e.which === 13) {
             searchEnterPressed(mGlobals.ui.input_search);
         }
     });
@@ -83,7 +76,7 @@ $(document).ready(function () {
             mGlobals.input_search.val("");
         }
     }, true);
-    /*
+
 	$("#chat_input").keypress(function(e) {
 		if(e.which==13) {
 			sendChatMessage();		
@@ -94,11 +87,8 @@ $(document).ready(function () {
 			emailQueue();
 		}
 	});
-	*/
-
-    //$('.drawer').drawer();
-
-
+	
+    $('.drawer').drawer();
 });
 
 function doConnect(uri) {
@@ -404,16 +394,6 @@ function saveUserVideoState() {
     }
 }
 
-function setupSocketEvents() {
-    //receives the newest user and session objects from database
-    mGlobals.socket.on('updateUser', updateUser);
-    mGlobals.socket.on('sessionReady', sessionReady);
-    mGlobals.socket.on('updateUsersList', updateUsersList);
-    mGlobals.socket.on('updateQueue', updateQueue);
-    mGlobals.socket.on('clientChatMessage', receivedChatMessage);
-    mGlobals.socket.on('foundGenreJam', foundGenreJam);
-}
-
 function receivedChatMessage(data) {
     var msg = data.msg;
     var user = data.user;
@@ -473,9 +453,42 @@ function sessionReady(data) {
     mGlobals.sessionInitialized = true;
 }
 
-function setupSockets() {
-    mGlobals.socket = io();
-    setupSocketEvents();
+function setupSockets(sessionName) {
+    var pathname = window.location.pathname;
+    var uri = "ws://" + window.location.host + "/ws";
+
+    console.log('Setting up socket to: ' + uri);
+
+    var socket = new WebSocket(uri);
+
+    socket.onopen = function (event) {
+        console.log("Opened connection to " + uri);
+        socket.send("Yeeting around");
+        socket.send("Yeeting around 2");
+        socket.send("Yeeting around 3");
+    };
+
+    socket.onclose = function (event) {
+        console.log("Closed connection from " + uri);
+    }
+
+    socket.onmessage = function (event) {
+        alert(event.data);
+    };
+
+    socket.onerror = function (event) {
+        alert("error: " + event.data);
+    }
+
+    /*
+    //receives the newest user and session objects from database
+    mGlobals.socket.on('updateUser', updateUser);
+    mGlobals.socket.on('sessionReady', sessionReady);
+    mGlobals.socket.on('updateUsersList', updateUsersList);
+    mGlobals.socket.on('updateQueue', updateQueue);
+    mGlobals.socket.on('clientChatMessage', receivedChatMessage);
+    mGlobals.socket.on('foundGenreJam', foundGenreJam);
+    */
 }
 
 function foundGenreJam(data) {
@@ -491,7 +504,7 @@ function setupJamSession(urlName) {
         mGlobals.entered_jam = true;
     }
 
-    setupSockets();
+    setupSockets(urlName);
 
     joinJamSession(urlName);
 }

@@ -1,7 +1,6 @@
 ﻿/// <autosync enabled="true" />
 /// <reference path="js/homepage.js" />
 /// <reference path="js/musicroom.js" />
-/// <reference path="js/socket.io.js" />
 /// <reference path="js/spin.js" />
 /// <reference path="lib/bootstrap/dist/js/bootstrap.js" />
 /// <reference path="lib/jquery/dist/jquery.js" />

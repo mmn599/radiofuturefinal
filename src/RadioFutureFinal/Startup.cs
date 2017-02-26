@@ -14,6 +14,8 @@ using RadioFutureFinal.Models;
 using RadioFutureFinal.Services;
 using RadioFutureFinal.WebSockets;
 using RadioFutureFinal.DAL;
+using Microsoft.AspNetCore.Http;
+using System.Reflection;
 
 namespace RadioFutureFinal
 {
@@ -51,15 +53,16 @@ namespace RadioFutureFinal
 
             services.AddMvc();
 
+            services.AddWebSocketManager();
             services.AddSingleton<IDbRepository, DbRepository>();
 
             // Add application services.
             services.AddTransient<IEmailSender, AuthMessageSender>();
             services.AddTransient<ISmsSender, AuthMessageSender>();
         }
-
+        
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IServiceProvider serviceProvider, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
@@ -77,7 +80,8 @@ namespace RadioFutureFinal
 
             app.UseStaticFiles();
 
-            app.Map("/ws", SocketHandler.Map);
+            app.UseWebSockets();
+            app.Map("/ws", (_app) => _app.UseMiddleware<WebSocketManager>(serviceProvider.GetService<WebSocketHandler>()));
 
             app.UseIdentity();
 
@@ -95,5 +99,6 @@ namespace RadioFutureFinal
                 defaults: new { controller = "Room", action = "EnterRoom" });
             });
         }
+
     }
 }

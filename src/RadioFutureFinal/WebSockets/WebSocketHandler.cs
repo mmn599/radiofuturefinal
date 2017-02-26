@@ -9,25 +9,25 @@ using System.Threading.Tasks;
 
 namespace RadioFutureFinal.WebSockets
 {
-    public abstract class WebSocketHandler
+    public class WebSocketHandler
     {
-        protected WebSocketConnectionManager WebSocketConnectionManager { get; set; }
-        protected IDbRepository DbRepository { get; set; }
+        protected WebSocketConnectionManager _wsConnectionManager { get; set; }
+        protected IDbRepository _db { get; set; }
 
         public WebSocketHandler(IDbRepository db, WebSocketConnectionManager webSocketConnectionManager)
         {
-            WebSocketConnectionManager = webSocketConnectionManager;
-            DbRepository = db;
+            _wsConnectionManager = webSocketConnectionManager;
+            _db = db;
         }
 
-        public virtual async Task OnConnected(WebSocket socket)
+        public void OnConnected(WebSocket socket)
         {
-            WebSocketConnectionManager.AddSocket(socket);
+            _wsConnectionManager.AddSocket(socket);
         }
 
         public virtual async Task OnDisconnected(WebSocket socket)
         {
-            await WebSocketConnectionManager.RemoveSocket(WebSocketConnectionManager.GetId(socket));
+            await _wsConnectionManager.RemoveSocket(socket);
         }
 
         public async Task SendMessageAsync(WebSocket socket, string message)
@@ -43,20 +43,26 @@ namespace RadioFutureFinal.WebSockets
                                    cancellationToken: CancellationToken.None);
         }
 
-        public async Task SendMessageAsync(string socketId, string message)
-        {
-            await SendMessageAsync(WebSocketConnectionManager.GetSocketById(socketId), message);
-        }
-
         public async Task SendMessageToAllAsync(string message)
         {
-            foreach (var pair in WebSocketConnectionManager.GetAll())
+            foreach (var pair in _wsConnectionManager.GetAll())
             {
-                if (pair.Value.State == WebSocketState.Open)
-                    await SendMessageAsync(pair.Value, message);
+                await SendMessageAsync(pair.Value.WebSocket, message);
             }
         }
 
-        public abstract Task ReceiveAsync(WebSocket socket, WebSocketReceiveResult result, byte[] buffer);
+        public async Task SendMessageToSession(string message, int sessionId)
+        {
+            foreach(var socket in _wsConnectionManager.GetSocketsInSession(sessionId))
+            {
+                await SendMessageAsync(socket.WebSocket, message);
+            }
+        }
+
+        public async Task ReceiveAsync(WebSocket socket, WebSocketReceiveResult result, byte[] buffer)
+        {
+            var message = Encoding.UTF8.GetString(buffer, 0, result.Count);
+            await SendMessageToAllAsync(message);
+        }
     }
 }

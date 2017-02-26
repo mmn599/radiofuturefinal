@@ -24,11 +24,12 @@ namespace RadioFutureFinal.WebSockets
         {
             if (!context.WebSockets.IsWebSocketRequest)
             {
-                return;
+                await _next.Invoke(context);
             }
 
+            var roomName = context.Request.PathBase;
             var socket = await context.WebSockets.AcceptWebSocketAsync();
-            await _webSocketHandler.OnConnected(socket);
+            _webSocketHandler.OnConnected(socket);
 
             await Receive(socket, async (result, buffer) =>
             {
@@ -43,11 +44,7 @@ namespace RadioFutureFinal.WebSockets
                     await _webSocketHandler.OnDisconnected(socket);
                     return;
                 }
-
             });
-
-            //TODO - investigate the Kestrel exception thrown when this is the last middleware
-            //await _next.Invoke(context);
         }
 
         private async Task Receive(WebSocket socket, Action<WebSocketReceiveResult, byte[]> handleMessage)
