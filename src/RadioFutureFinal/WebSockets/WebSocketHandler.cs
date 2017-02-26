@@ -1,4 +1,6 @@
-﻿using RadioFutureFinal.DAL;
+﻿using Newtonsoft.Json;
+using RadioFutureFinal.Contracts;
+using RadioFutureFinal.DAL;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,10 +61,71 @@ namespace RadioFutureFinal.WebSockets
             }
         }
 
+        private void JoinSession(WsMessage message)
+        {
+        }
+        private void AddMediaToSession(WsMessage message)
+        {
+        }
+        private void DeleteMediaFromSession(WsMessage message)
+        {
+        }
+        private void SaveUserVideoState(WsMessage message)
+        {
+        }
+        private void SaveUserNameChange(WsMessage message)
+        {
+        }
+        private void ChatMessage(WsMessage message)
+        {
+        }
+        private void SynchronizeSession(WsMessage message)
+        {
+        }
+
+        // TODO: how neccesary is this being async?
         public async Task ReceiveAsync(WebSocket socket, WebSocketReceiveResult result, byte[] buffer)
         {
-            var message = Encoding.UTF8.GetString(buffer, 0, result.Count);
-            await SendMessageToAllAsync(message);
+            var strMessage = Encoding.UTF8.GetString(buffer, 0, result.Count);
+            var wsMessage = JsonConvert.DeserializeObject<WsMessage>(strMessage);
+
+            // TODO: smoother way to do this
+            Action<WsMessage> action = null;
+            if(wsMessage.Action == "JoinSession")
+            {
+                action = JoinSession;
+            }
+            else if(wsMessage.Action == "AddMediaToSession")
+            {
+                action = AddMediaToSession;
+            }
+            else if(wsMessage.Action == "DeleteMediaFromSession")
+            {
+                action = DeleteMediaFromSession;
+            }
+            else if(wsMessage.Action == "SaveUserVideoState")
+            {
+                action = SaveUserVideoState;
+            }
+            else if(wsMessage.Action == "SaveUserNameChange")
+            {
+                action = SaveUserNameChange;
+            }
+            else if(wsMessage.Action == "ChatMessage")
+            {
+                action = ChatMessage;
+            }
+            else if(wsMessage.Action == "SynchronizeSession")
+            {
+                action = SynchronizeSession;
+            }
+            else
+            {
+                // TODO: exception handling
+            }
+
+            // TODO: barely understand what I'm doing here
+            await Task.Run(() => action);
         }
     }
 }

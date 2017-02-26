@@ -16,22 +16,22 @@ namespace RadioFutureFinal.DAL
             _context = context;
         }
 
-        public void AddUser(User user)
+        public async Task AddUserAsync(User user)
         {
             _context.User.Add(user);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public void RemoveUser(User user)
+        public async Task RemoveUserAsync(User user)
         {
             _context.User.Remove(user);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public void UpdateUser(User user)
+        public async Task UpdateUserAsync(User user)
         {
             _context.User.Update(user);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
         public User GetUser(int userId)
@@ -44,20 +44,20 @@ namespace RadioFutureFinal.DAL
             return _context.User.ToList();
         }
 
-        public void AddSession(Session session)
+        public async Task AddSessionAsync(Session session)
         {
             _context.Session.Add(session);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
-        public void RemoveSession(Session session)
+        public async Task RemoveSessionAsync(Session session)
         {
             _context.Session.Remove(session);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
-        public void UpdateSession(Session session)
+        public async Task UpdateSessionAsync(Session session)
         {
             _context.Session.Update(session);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
         public Session GetSession(int sessionId)
         {
@@ -68,20 +68,20 @@ namespace RadioFutureFinal.DAL
             return _context.Session.ToList();
         }
 
-        public void AddMedia(Media media)
+        public async Task AddMediaAsync(Media media)
         {
             _context.Media.Add(media);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
-        public void RemoveMedia(Media media)
+        public async Task RemoveMediaAsync(Media media)
         {
             _context.Media.Remove(media);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
-        public void UpdateMedia(Media media)
+        public async Task UpdateMediaAsync(Media media)
         {
             _context.Media.Update(media);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
         public Media GetMedia(int mediaId)
         {
