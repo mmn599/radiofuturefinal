@@ -9,6 +9,9 @@ namespace RadioFutureFinal.Contracts
     public class MediaV1
     {
         [JsonProperty]
+        public int MediaID { get; set; }
+
+        [JsonProperty]
         public int UserID { get; set; }
 
         [JsonProperty]

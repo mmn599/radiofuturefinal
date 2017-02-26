@@ -3,10 +3,13 @@
     "noImplicitAny": true,
     "noEmitOnError": true,
     "sourceMap": true,
-    "target": "es5"
+    "target": "es5",
+    "module": "commonjs",
+    "allowSyntheticDefaultImports" :  true
   },
   "files": [
-    "./tsscripts/tsmusicroom.ts"
+    "./tsscripts/tsmusicroom.ts",
+    "./tsscripts/DefinitelyTyped/jquery.d.ts"
   ],
   "compileOnSave": true
 }

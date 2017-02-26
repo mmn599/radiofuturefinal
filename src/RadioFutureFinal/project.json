@@ -48,8 +48,8 @@
     },
     "Newtonsoft.Json": "9.0.1",
     "Microsoft.TypeScript.MSBuild": "2.2.1",
-    "Microsoft.TypeScript.Compiler": "2.2.1"
-  },
+    "Microsoft.TypeScript.Compiler": "2.2.1",
+    "jquery.TypeScript.DefinitelyTyped": "3.1.2"  },
 
   "tools": {
     "BundlerMinifier.Core": "2.3.327",
