@@ -12,6 +12,7 @@ class Session {
 class User {
     userId: number;
     userName: string;
+    color: string;
     videoTime: number;
     queuePosition: number;
     ytPlayerState: number;
@@ -20,6 +21,7 @@ class User {
 
 class Media {
     mediaId: number;
+    mediaTitle: string;
     userId: number;
     userName: string;
     ytVideoId: string;
@@ -35,6 +37,7 @@ class WsMessage {
     user: User;
 }
 
+
 $(document).ready(function () {
 
     var pathname = window.location.pathname;
@@ -43,98 +46,55 @@ $(document).ready(function () {
         roomName = pathname.replace('\/rooms/', '');
     }
 
-    mGlobals.ui.div_loading = $("#div_loading");
-    mGlobals.ui.div_everything = $("#div_everything");
-
-    var opts = {
-        lines: 13 // The number of lines to draw
-        , length: 28 // The length of each line
-        , width: 14 // The line thickness
-        , radius: 42 // The radius of the inner circle
-        , scale: 1 // Scales overall size of the spinner
-        , corners: 1 // Corner roundness (0..1)
-        , color: '#000' // #rgb or #rrggbb or array of colors
-        , opacity: 0.25 // Opacity of the lines
-        , rotate: 0 // The rotation offset
-        , direction: 1 // 1: clockwise, -1: counterclockwise
-        , speed: 1 // Rounds per second
-        , trail: 60 // Afterglow percentage
-        , fps: 20 // Frames per second when using setTimeout() as a fallback for CSS
-        , zIndex: 2e9 // The z-index (defaults to 2000000000)
-        , className: 'spinner' // The CSS class to assign to the spinner
-        , top: '50%' // Top position relative to parent
-        , left: '50%' // Left position relative to parent
-        , shadow: false // Whether to render a shadow
-        , hwaccel: false // Whether to use hardware acceleration
-        , position: 'absolute' // Element positioning
-    };
-    var target = document.getElementById('div_loading');
-    mGlobals.ui.spinner = new Spinner(opts).spin(target);
-
-    mGlobals.url_room = roomName;
-
-    mGlobals.ui.input_search = $("#input_search");
-    mGlobals.ui.input_name = $("#name_input");
-    mGlobals.ui.input_chat = $("#chat_input");
-    mGlobals.ui.ul_chat = $("#ul_chat");
-    mGlobals.ui.div_search_results = $("#div_search_results");
-
-    mGlobals.ui.input_search.bind("propertychange input paste", function (event) {
-        searchTextChanged($("#input_search").val());
+    var input_search = $("#input_search");
+    input_search.bind("propertychange input paste", function (event) {
+        searchTextChanged(input_search.val());
     });
-
-    mGlobals.ui.input_search.keypress(function (e) {
-        if (e.which === 13) {
-            searchEnterPressed(mGlobals.ui.input_search);
+    input_search.keypress(function (e) {
+        if (e.which == 13) {
+            searchEnterPressed(input_search.val());
         }
     });
 
-    mGlobals.ui.input_name.keypress(function (e) {
-        if (e.which === 13) {
-            userNameChange(mGlobals.ui.input_name);
+    var input_chat = $("#input_chat");
+    input_chat.keypress(function (e) {
+        if (e.which == 13) {
+            sendChatMessage(input_chat);
         }
     });
 
-    mGlobals.ui.input_chat.keypress(function (e) {
-        if (e.which === 13) {
-            sendChatMessage(mGlobals.ui.input_chat);
+    var input_name = $("#input_name");
+    input_name.keypress(function (e) {
+        if (e.which == 13) {
+            var newName = input_name.val();
+            saveUserNameChange(name);
+            input_name.hide();
+            input_chat.fadeIn();
         }
     });
 
     document.body.addEventListener('click', function () {
-        mGlobals.ui.div_search_results.fadeOut();
-        if (mGlobals.input_search) {
-            mGlobals.input_search.val("");
+        $("#div_search_results").fadeOut();
+        if (input_search) {
+            input_search.val("");
         }
     }, true);
 
-    $("#chat_input").keypress(function (e) {
-        if (e.which === 13) {
-            sendChatMessage();
-        }
-    });
-    $("#txt_email").keypress(function (e) {
-        if (e.which === 13) {
-            emailQueue();
-        }
-    });
+	/*
+	$("#chat_input").keypress(function(e) {
+		if(e.which==13) {
+			sendChatMessage();		
+		}
+	});
+	$("#txt_email").keypress(function(e) {
+		if(e.which==13) {
+			emailQueue();
+		}
+	});
+	*/
 
     $('.drawer').drawer();
 });
-
-function doConnect(uri) {
-    var socket = new WebSocket(uri);
-    socket.onopen = function (e) { alert("opened " + uri); doSend(socket, "test echo"); };
-    socket.onclose = function (e) { alert("closed"); };
-    socket.onmessage = function (e) { alert("Received: " + e.data); socket.close(); };
-    socket.onerror = function (e) { alert("Error: " + e.data); };
-    return socket;
-}
-
-function doSend(socket, text) {
-    alert("Sending: " + text);
-    socket.send(text);
-}
 
 
 //==================================================================
@@ -146,35 +106,28 @@ var mConstants = {
 };
 
 var mGlobals = {
-    sessionInitialized: false,
-    player_ready: false,
-    url_room: null,
-    youtube_api_ready: false,
-    entered_jam: false,
-    socket: {},
-    player: {},
-    user: {},
-    session: {},
-    queue: [],
-    current_users: [],
-    ui: {}
+    playerReady: false,
+    yt_api_ready: false,
+    sessionReady: false,
+    user: new User(),
+    session: new Session()
 };
 
 //==================================================================
 // UI Functions
 //==================================================================
 
-function searchTextChanged(text) {
+function searchTextChanged(text: string) {
     var divResults = $("#div_search_results");
-    if (text.length === 0) {
+    if (text.length == 0) {
         divResults.fadeOut();
     }
 }
 
-function searchEnterPressed(input_search) {
+function searchEnterPressed(query: string) {
     var divResults = $("#div_search_results");
     divResults.html("");
-    searchVideos(input_search.val(), function (response) {
+    searchVideos(query, function (response: Object) {
         $.each(response.items, function (index, item) {
             divResults.html(divResults.html() + "<div class='div_search_result' onClick='queueSelectedVideo(this)' data-videoId='" + item.id.videoId + "' data-thumb_URL='" + item.snippet.thumbnails.medium.url + "'>" + '<p class="text_search_result">' + item.snippet.title + '</p></div>');
         });
@@ -184,50 +137,43 @@ function searchEnterPressed(input_search) {
     }
 }
 
-function sessionReadyUI(roomName) {
-    mGlobals.ui.div_loading.hide();
-    mGlobals.ui.spinner.stop();
-    mGlobals.ui.div_everything.animate({ opacity: 1 }, 'fast');
+function sessionReadyUI() {
+    $("#div_loading").hide();
+    $("#div_everything").animate({ opacity: 1 }, 'fast');
 }
 
-function genreClicked(event) {
-    setupJamSession({ genreName: $(event.target).text() });
-}
-
-function onPlayerReady(event) {
-    mGlobals.player_ready = true;
-    if (mGlobals.url_room && mGlobals.youtube_api_ready) {
-        setupJamSession({ urlName: mGlobals.url_room });
+function onPlayerReady(event: Event) {
+    mGlobals.playerReady = true;
+    if (mGlobals.yt_api_ready) {
+        setupJamSession();
     }
 }
 
-function queueRollover(item) {
+function queueRollover(item: HTMLElement) {
     $(item).attr('src', '../images/cross.jpg');
-    //TODO: can place statically
-    $(item).attr('onclick', "deleteVideoInQueue(" + item.getAttribute('data-queue_position') + ")");
+    $(item).attr('onclick', "deleteVideoInQueue(" + item.getAttribute('data-queuePosition') + ")");
 }
 
-function queueRolloff(item) {
+function queueRolloff(item: HTMLElement) {
     $(item).attr('src', item.getAttribute('data-thumb_URL'));
 }
 
-function updateQueueUI(starting_queue_position) {
-    var queue = mGlobals.queue;
-    var i = starting_queue_position;
+function updateQueueUI(starting_queuePosition: number) {
+    var queue = mGlobals.session.queue;
+    var i = starting_queuePosition;
     var j = 0;
     //TODO: make robust
     var end = 5;
     var div_queue = $("#div_footer");
     div_queue.html("");
     while (i < queue.length) {
-        var recommendation = queue[i];
-        var innertht;
+        var media = queue[i];
+        var innerht = "";
         if ((j + 1) % 5 === 0) {
-            innerht = "<div class='div_content' style='margin-right: 0'><img class='img_queue_item' data-queue_position='" + i + "' data-thumb_URL='" + recommendation.thumb_URL + "' onmouseover='queueRollover(this)' onmouseout='queueRolloff(this)' src='" + recommendation.thumb_URL + "'></img></div>";
+            innerht = "<div class='div_content' style='margin-right: 0'><img class='img_queue_item' data-queuePosition='" + i + "' data-thumb_URL='" + media.thumb_URL + "' onmouseover='queueRollover(this)' onmouseout='queueRolloff(this)' src='" + media.thumb_URL + "'></img></div>";
         }
         else {
-            innerht = "<div class='div_content'><img class='img_queue_item' data-queue_position='" + i + "' data-thumb_URL='" + recommendation.thumb_URL + "' onmouseover='queueRollover(this)' onmouseout='queueRolloff(this)' src='" + recommendation.thumb_URL + "'></img></div>";
-
+            innerht = "<div class='div_content'><img class='img_queue_item' data-queuePosition='" + i + "' data-thumb_URL='" + media.thumb_URL + "' onmouseover='queueRollover(this)' onmouseout='queueRolloff(this)' src='" + media.thumb_URL + "'></img></div>";
         }
         div_queue.html(div_queue.html() + innerht);
         i++;
@@ -236,11 +182,12 @@ function updateQueueUI(starting_queue_position) {
 }
 
 function emailQueue() {
-    mGlobals.socket.emit('emailQueue', { email: $("#txt_email").val(), queue: mGlobals.queue });
-    $("#txt_email").fadeOut();
+    //mGlobals.socket.emit('emailQueue', { email: $("#txt_email").val(), queue: mGlobals.queue });
+    //$("#txt_email").fadeOut();
 }
 
-function updateUsersListUI(users) {
+function updateUsersListUI(users: Array<User>) {
+
     var usersList = document.getElementById('div_users_list');
 
     usersList.innerHTML = "";
@@ -248,13 +195,14 @@ function updateUsersListUI(users) {
     for (var i = 0; i < users.length; i++) {
         var user = users[i];
         //uses local user data instead of what is currently in the server
-        if (user._id === mGlobals.user._id) {
+        if (user.userId === mGlobals.user.userId) {
             user = mGlobals.user;
         }
         var color = user.color;
-        var queue_position = user.queue_position;
-        if (queue_position !== -1) {
-            current_video_title = mGlobals.queue[queue_position].title;
+        var queuePosition = user.queuePosition;
+        var current_video_title = "";
+        if (queuePosition != -1) {
+            mGlobals.session.queue[queuePosition].mediaTitle;
         }
         else {
             current_video_title = "Nothing";
@@ -263,17 +211,17 @@ function updateUsersListUI(users) {
         var div_user = document.createElement('div');
         div_user.style.background = user.color;
         div_user.className = "div_user tooltip";
-        div_user.setAttribute('data-username', user.name);
+        div_user.setAttribute('data-username', user.userName);
 
         var p_user = document.createElement('p');
         p_user.className = "p_user";
-        p_user.setAttribute('data-username', user.name);
-        p_user.appendChild(document.createTextNode(user.name.charAt(0)));
+        p_user.setAttribute('data-username', user.userName);
+        p_user.appendChild(document.createTextNode(user.userName.charAt(0)));
 
         var span_tooltip = document.createElement('span');
         span_tooltip.className = "tooltiptext";
-        span_tooltip.setAttribute('data-username', user.name);
-        span_tooltip.innerHTML = "Click to sync with " + user.name + "!";
+        span_tooltip.setAttribute('data-username', user.userName);
+        span_tooltip.innerHTML = "Click to sync with " + user.userName + "!";
 
         div_user.appendChild(p_user);
         div_user.appendChild(span_tooltip);
@@ -281,56 +229,31 @@ function updateUsersListUI(users) {
 
         divarr.push(div_user);
     }
-    for (var idx = 0; idx < divarr.length; idx++) {
-        var mydiv = divarr[idx];
-        $(mydiv).click(function () {
-            var username = event.target.getAttribute('data-username');
+    for (var i = 0; i < divarr.length; i++) {
+        var mydiv = divarr[i];
+        $(mydiv).click(function (event: Event) {
+            var username = event.srcElement.getAttribute('data-username');
             syncWithUser(username);
         });
     }
-    /*var usersList = document.getElementById('div_users_list');
-	usersList.innerHTML = "";
-	for(var i=0;i<users.length;i++) {
-		var user = users[i];
-		//uses local user data instead of what is currently in the server
-		if(user._id===mGlobals.user._id) {
-			user = mGlobals.user;
-		}
-		var color = user.color;
-		var queue_position = user.queue_position;
-		if(queue_position!=-1) {
-			current_video_title = mGlobals.queue[queue_position].title;
-		}
-		else {
-			current_video_title = "Nothing";
-		}
-		mGlobals.queue[user.queue_position]
-		var innerht = '<p class="p_user" style="white-space: nowrap;">' + '<span class="span_user" onclick="syncWithUserUI(this.getAttribute(\'data-username\'))" data-username="' + user.name +'" style="border-bottom:1px solid '+color+'; cursor: pointer;">'+user.name +  '</span>' + '</span><br><br>' + '</p>';//+ ' is listening to ' + '<span style="font-weight: bold;">' + current_video_title + '</span>' + '</span><br><br>' + '</p>';
-		usersList.innerHTML += innerht;
-	}*/
 }
 
 function setupVideo() {
-    if (mGlobals.user.queue_position !== -1) {
-        var recommendation = mGlobals.queue[mGlobals.user.queue_position];
-        updateQueueUI(mGlobals.user.queue_position + 1);
-        updatePlayerUI(recommendation.videoId, mGlobals.user.video_time, recommendation.recommender_name, recommendation.title);
+    if (mGlobals.user.queuePosition != -1) {
+        var media = mGlobals.session.queue[mGlobals.user.queuePosition];
+        updateQueueUI(mGlobals.user.queuePosition + 1);
+        updatePlayerUI(media.ytVideoId, mGlobals.user.videoTime, media.userName, media.mediaTitle);
     }
-}
-
-function userNameChange(name_input) {
-    name_input.hide();
-    mGlobals.ui.input_chat.fadeIn();
-    saveUserNameChange(name_input.val());
 }
 
 //==================================================================
 // Backend video and queue control functions
 //==================================================================
-function deleteVideoInQueue(queue_position) {
-    var id = mGlobals.queue[queue_position]._id;
-    mGlobals.queue.splice(queue_position, 1);
-    updateQueueUI(mGlobals.user.queue_position + 1);
+function deleteVideoInQueue(queuePosition: number) {
+    var queue = mGlobals.session.queue;
+    var id = queue[queuePosition].ytVideoId;
+    queue.splice(queuePosition, 1);
+    updateQueueUI(mGlobals.user.queuePosition + 1);
     var data = {
         recommendationId: id
     };
@@ -338,20 +261,20 @@ function deleteVideoInQueue(queue_position) {
 }
 
 function previousVideoInQueue() {
-    mGlobals.user.video_time = 0;
-    var queue = mGlobals.queue;
-    if (mGlobals.user.queue_position > 0) {
-        var queue_position = mGlobals.user.queue_position = mGlobals.user.queue_position - 1;
+    mGlobals.user.videoTime = 0;
+    var queue = mGlobals.session.queue;
+    if (mGlobals.user.queuePosition > 0) {
+        var queuePosition = mGlobals.user.queuePosition = mGlobals.user.queuePosition - 1;
         setupVideo();
         mGlobals.user.waiting = false;
     }
 }
 
 function nextVideoInQueue() {
-    mGlobals.user.video_time = 0;
-    var queue = mGlobals.queue;
-    if (mGlobals.user.queue_position + 1 < queue.length) {
-        var queue_position = mGlobals.user.queue_position = mGlobals.user.queue_position + 1;
+    mGlobals.user.videoTime = 0;
+    var queue = mGlobals.session.queue;
+    if ((mGlobals.user.queuePosition + 1) < queue.length) {
+        var queuePosition = mGlobals.user.queuePosition = mGlobals.user.queuePosition + 1;
         setupVideo();
         mGlobals.user.waiting = false;
     }
@@ -360,15 +283,15 @@ function nextVideoInQueue() {
     }
 }
 
-function queueSelectedVideo(elmnt) {
-    mGlobals.ui.div_search_results.fadeOut();
-    mGlobals.ui.input_search.val("");
+function queueSelectedVideo(elmnt: Element) {
+    $("#div_search_results").fadeOut();
+    $("#input_search").val("");
     var videoId = elmnt.getAttribute('data-videoId');
-    var title = elmnt.innerText || element.textContent;
+    var title = elmnt.textContent || elmnt.textContent;
     var thumb_url = elmnt.getAttribute('data-thumb_URL');
-    var recommendation = createRecommendation(title, videoId, thumb_url, mGlobals.user._id, mGlobals.user.name);
+    var recommendation = createRecommendation(title, videoId, thumb_url, mGlobals.user.userId, mGlobals.user.userName);
     var data = {
-        sessionId: mGlobals.sessionId,
+        sessionId: mGlobals.session.sessionId,
         recommendation: recommendation
     };
     //TODO: local add recommendation
@@ -380,25 +303,29 @@ function queueSelectedVideo(elmnt) {
 // Basically all the hard stuff
 //==================================================================
 
-function syncWithUser(username) {
-    var myuser = {};
-    for (var i = 0; i < mGlobals.current_users.length; i++) {
-        if (mGlobals.current_users[i].name === username) {
-            myuser = mGlobals.current_users[i];
+// TODO: use id instead of name
+function syncWithUser(userId: number) {
+    var myuser = new User();
+    var currentUsers = mGlobals.session.users;
+    for (var i = 0; i < currentUsers.length; i++) {
+        if (currentUsers[i].userId === userId) {
+            myuser = currentUsers[i];
         }
     }
-    mGlobals.user.queue_position = myuser.queue_position;
-    mGlobals.user.video_time = myuser.video_time;
-    mGlobals.user.player_state = myuser.player_state;
-    updateQueueUI(mGlobals.user.queue_position + 1);
+    mGlobals.user.queuePosition = myuser.queuePosition;
+    mGlobals.user.videoTime = myuser.videoTime;
+    mGlobals.user.ytPlayerState = myuser.ytPlayerState;
+    updateQueueUI(mGlobals.user.queuePosition + 1);
     setupVideo();
 }
 
-function saveUserNameChange(name) {
-    mGlobals.user.name = name;
-    for (var i = 0; i < mGlobals.current_users; i++) {
-        if (mGlobals.user._id === mGlobals.current_users[i]._id) {
-            mGlobals.current_users[i].name = name;
+function saveUserNameChange(newName: string) {
+    mGlobals.user.userName = newName;
+    // TODO: this is silly
+    var currentUsers = mGlobals.session.users;
+    for (var i = 0; i < currentUsers.length; i++) {
+        if (mGlobals.user.userId === currentUsers[i].userId) {
+            currentUsers[i].userName = newName;
         }
     }
     var data = {
@@ -409,28 +336,28 @@ function saveUserNameChange(name) {
 
 
 function saveUserVideoState() {
-    if (mGlobals.player_ready) {
-        mGlobals.user.video_time = mGlobals.player.getCurrentTime();
-        mGlobals.user.player_state = mGlobals.player.getPlayerState();
+    if (mGlobals.playerReady) {
+        mGlobals.user.videoTime = mGlobals.player.getCurrentTime();
+        mGlobals.user.ytPlayerState = mGlobals.player.getPlayerState();
         mGlobals.socket.emit('saveUserVideoState', mGlobals.user);
-        $.ajax({
-            type: 'POST',
-            url: '/userlist',
-            data: { sessionId: mGlobals.sessionId },
-            dataType: 'json',
-            success: function (data) {
-                mGlobals.current_users = data;
-            }
-        });
     }
 }
 
-function receivedChatMessage(data) {
-    var msg = data.msg;
-    var user = data.user;
-    var innerHTML = mGlobals.ui.ul_chat.html() || "";
-    mGlobals.ui.ul_chat.html(innerHTML + '<li><span style="color: ' + user.color + '">' + user.name + '</span>' + '<span>' + ': ' + msg + '</span></li>');
-    var children = mGlobals.ui.ul_chat.children();
+function setupSocketEvents() {
+    //receives the newest user and session objects from database
+    mGlobals.socket.on('updateUser', updateUser);
+    mGlobals.socket.on('sessionReady', sessionReady);
+    mGlobals.socket.on('updateUsersList', updateUsersList);
+    mGlobals.socket.on('updateQueue', updateQueue);
+    mGlobals.socket.on('clientChatMessage', receivedChatMessage);
+    mGlobals.socket.on('foundGenreJam', foundGenreJam);
+}
+
+function receivedChatMessage(msg: string, user: User) {
+    var ul_chat = $("#ul_chat");
+    var innerHTML = ul_chat.html() || "";
+    ul_chat.html(innerHTML + '<li><span style="color: ' + user.color + '">' + user.userName + '</span>' + '<span>' + ': ' + msg + '</span></li>');
+    var children = ul_chat.children();
     if (children.length > 10) {
         children[0].remove();
     }
@@ -440,19 +367,17 @@ function synchronizeUsers() {
     mGlobals.socket.emit('synchronizeUsers');
 }
 
-function updateUsersList(users) {
-    users = JSON.parse(users);
-    if (mGlobals.sessionInitialized) {
-        mGlobals.current_users = users;
-        updateUsersListUI(mGlobals.current_users);
+function updateUsersList(users: Array<User>) {
+    if (mGlobals.sessionReady) {
+        mGlobals.session.users = users;
+        updateUsersListUI(mGlobals.session.users);
     }
 }
 
-function updateQueue(queue) {
-    queue = JSON.parse(queue);
-    if (mGlobals.sessionInitialized) {
-        mGlobals.queue = queue;
-        updateQueueUI(mGlobals.user.queue_position + 1);
+function updateQueue(queue: Array<Media>) {
+    if (mGlobals.sessionReady) {
+        mGlobals.session.queue = queue;
+        updateQueueUI(mGlobals.user.queuePosition + 1);
         if (mGlobals.user.waiting) {
             nextVideoInQueue();
         }
@@ -474,7 +399,7 @@ function sessionReady(data) {
     }
     saveUserVideoState();
     setInterval(saveUserVideoState, 10000);
-    if (mGlobals.queue.length === 0) {
+    if (mGlobals.queue.length == 0) {
         $("#p_current_content_info").text("Queue up a song!");
         $("#p_current_recommender_info").text("Use the search bar above.");
     }
@@ -484,42 +409,9 @@ function sessionReady(data) {
     mGlobals.sessionInitialized = true;
 }
 
-function setupSockets(sessionName) {
-    var pathname = window.location.pathname;
-    var uri = "ws://" + window.location.host + "/ws";
-
-    console.log('Setting up socket to: ' + uri);
-
-    var socket = new WebSocket(uri);
-
-    socket.onopen = function (event) {
-        console.log("Opened connection to " + uri);
-        socket.send("Yeeting around");
-        socket.send("Yeeting around 2");
-        socket.send("Yeeting around 3");
-    };
-
-    socket.onclose = function (event) {
-        console.log("Closed connection from " + uri);
-    };
-
-    socket.onmessage = function (event) {
-        alert(event.data);
-    };
-
-    socket.onerror = function (event) {
-        alert("error: " + event.data);
-    };
-
-    /*
-    //receives the newest user and session objects from database
-    mGlobals.socket.on('updateUser', updateUser);
-    mGlobals.socket.on('sessionReady', sessionReady);
-    mGlobals.socket.on('updateUsersList', updateUsersList);
-    mGlobals.socket.on('updateQueue', updateQueue);
-    mGlobals.socket.on('clientChatMessage', receivedChatMessage);
-    mGlobals.socket.on('foundGenreJam', foundGenreJam);
-    */
+function setupSockets() {
+    mGlobals.socket = io();
+    setupSocketEvents();
 }
 
 function foundGenreJam(data) {
@@ -535,7 +427,7 @@ function setupJamSession(urlName) {
         mGlobals.entered_jam = true;
     }
 
-    setupSockets(urlName);
+    setupSockets();
 
     joinJamSession(urlName);
 }
@@ -552,7 +444,7 @@ function joinJamSession(encodedSessionName) {
     mGlobals.socket.emit('userJoinSession', data);
 
     setInterval(synchronizeUsers, 5000);
-}
+};
 
 //==================================================================
 // Chat functions
@@ -572,7 +464,7 @@ function youtubeAPIInit() {
     gapi.client.setApiKey("AIzaSyC4A-dsGk-ha_b-eDpbxaVQt5bR7cOUddc");
     gapi.client.load("youtube", "v3", function () {
         mGlobals.youtube_api_ready = true;
-        if (mGlobals.url_room && mGlobals.player_ready) {
+        if (mGlobals.url_room && mGlobals.playerReady) {
             setupJamSession({ urlName: mGlobals.url_room });
         }
     });
@@ -607,11 +499,11 @@ function searchVideos(query, callback) {
 }
 
 function updatePlayerState(state) {
-    if (mGlobals.player_ready) {
-        if (state === mConstants.PLAYING) {
+    if (mGlobals.playerReady) {
+        if (state == mConstants.PLAYING) {
             mGlobals.player.playVideo();
         }
-        else if (state === mConstants.PAUSED) {
+        else if (state == mConstants.PAUSED) {
             mGlobals.player.pauseVideo();
         }
     }
@@ -619,16 +511,16 @@ function updatePlayerState(state) {
 
 function onPlayerStateChange(event) {
     //when video ends
-    if (event.data === 0) {
+    if (event.data == 0) {
         nextVideoInQueue();
     }
 }
 
-function updatePlayerUI(current_video, current_video_time, current_recommender_name, current_video_title) {
-    if (!mGlobals.player_ready) {
-        setTimeout(updatePlayerUI(current_video, current_video_time, current_recommender_name), 1000);
+function updatePlayerUI(current_video, current_videoTime, current_recommender_name, current_video_title) {
+    if (!mGlobals.playerReady) {
+        setTimeout(updatePlayerUI(current_video, current_videoTime, current_recommender_name), 1000);
     }
-    mGlobals.player.loadVideoById(current_video, current_video_time, "large");
+    mGlobals.player.loadVideoById(current_video, current_videoTime, "large");
     $("#p_current_content_info").text(current_video_title);
     $("#p_current_recommender_info").text('Recommended by: ' + current_recommender_name);
     var color = 'black';
@@ -641,41 +533,3 @@ function updatePlayerUI(current_video, current_video_time, current_recommender_n
     }
     synchronizeUsers();
 }
-
-//==================================================================
-// Basically constructors. Probably a better way to do this.
-//==================================================================
-
-function createRecommendation(title, videoId, thumb_url, userId, recommender_name) {
-    var rec = {};
-    rec.videoId = videoId;
-    rec.title = title;
-    rec.thumb_URL = thumb_url;
-    rec.recommender_name = recommender_name;
-    rec.userId = userId;
-    return rec;
-}
-
-function createTempUser(nickname) {
-    var user = {};
-    user.temp = true;
-    user.name = nickname;
-    user.queue_position = -1;
-    user.video_time = -1;
-    user.player_state = -1;
-    user.color = getRandomColor();
-    return user;
-}
-
-//==================================================================
-// Misc
-//==================================================================
-function getRandomColor() {
-    var letters = '0123456789ABCDEF'.split('');
-    var color = '#';
-    for (var i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-}
-

@@ -3,8 +3,9 @@
   "name": "asp.net",
   "private": true,
   "devDependencies": {
-    "@types/jquery": "^2.0.40",
     "del": "2.2.0",
     "gulp": "3.9.0"
+  },
+  "dependencies": {
   }
 }

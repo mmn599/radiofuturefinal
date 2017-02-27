@@ -3,7 +3,6 @@
 /// <reference path="../tsscripts/tsmusicroom.js" />
 /// <reference path="js/homepage.js" />
 /// <reference path="js/musicroom.js" />
-/// <reference path="js/musicroomts.js" />
 /// <reference path="js/spin.js" />
 /// <reference path="js/tsmusicroom.js" />
 /// <reference path="lib/bootstrap/dist/js/bootstrap.js" />
