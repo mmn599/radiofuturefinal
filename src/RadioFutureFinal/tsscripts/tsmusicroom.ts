@@ -3,6 +3,22 @@
 import $ from "jquery";
 declare var gapi: any; // Magic
 
+var mConstants = {
+    "PLAYING": 1,
+    "PAUSED": 2
+};
+
+var mGlobals = {
+    playerReady: false,
+    ytApiReady: false,
+    sessionReady: false,
+    user: new User(),
+    session: null,
+    ytPlayer: null,
+    socket: null
+};
+
+
 class Session {
     sessionId: number;
     sessionName: string;
@@ -111,25 +127,6 @@ $(document).ready(function () {
     $('.drawer').drawer();
 });
 
-
-//==================================================================
-// Global variables
-//==================================================================
-var mConstants = {
-    "PLAYING": 1,
-    "PAUSED": 2
-};
-
-var mGlobals = {
-    playerReady: false,
-    ytApiReady: false,
-    sessionReady: false,
-    user: new User(),
-    session: null,
-    ytPlayer: null,
-    socket: null
-};
-
 //==================================================================
 // UI Functions
 //==================================================================
@@ -160,6 +157,7 @@ function sessionReadyUI() {
 }
 
 function onPlayerReady(eventArgs: YT.EventArgs) {
+    console.log(mGlobals);
     mGlobals.playerReady = true;
     if (mGlobals.ytApiReady) {
         setupJamSession();
@@ -460,6 +458,7 @@ function foundGenreJam(data) {
 
 //three entry points: genre, url, text box
 function setupJamSession() {
+    console.log('setting up jam session!');
     var sessionName = 'sessionName'; //TODO: get session name from url
     if (mGlobals.sessionReady) {
         return;

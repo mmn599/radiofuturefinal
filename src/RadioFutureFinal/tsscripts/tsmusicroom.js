@@ -2,6 +2,19 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var jquery_1 = require("jquery");
+var mConstants = {
+    "PLAYING": 1,
+    "PAUSED": 2
+};
+var mGlobals = {
+    playerReady: false,
+    ytApiReady: false,
+    sessionReady: false,
+    user: new User(),
+    session: null,
+    ytPlayer: null,
+    socket: null
+};
 var Session = (function () {
     function Session() {
     }
@@ -82,22 +95,6 @@ jquery_1.default(document).ready(function () {
     jquery_1.default('.drawer').drawer();
 });
 //==================================================================
-// Global variables
-//==================================================================
-var mConstants = {
-    "PLAYING": 1,
-    "PAUSED": 2
-};
-var mGlobals = {
-    playerReady: false,
-    ytApiReady: false,
-    sessionReady: false,
-    user: new User(),
-    session: null,
-    ytPlayer: null,
-    socket: null
-};
-//==================================================================
 // UI Functions
 //==================================================================
 function searchTextChanged(text) {
@@ -123,6 +120,7 @@ function sessionReadyUI() {
     jquery_1.default("#div_everything").animate({ opacity: 1 }, 'fast');
 }
 function onPlayerReady(eventArgs) {
+    console.log(mGlobals);
     mGlobals.playerReady = true;
     if (mGlobals.ytApiReady) {
         setupJamSession();
@@ -388,6 +386,7 @@ function foundGenreJam(data) {
 }
 //three entry points: genre, url, text box
 function setupJamSession() {
+    console.log('setting up jam session!');
     var sessionName = 'sessionName'; //TODO: get session name from url
     if (mGlobals.sessionReady) {
         return;
