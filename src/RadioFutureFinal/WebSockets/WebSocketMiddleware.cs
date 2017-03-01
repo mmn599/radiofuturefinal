@@ -27,7 +27,6 @@ namespace RadioFutureFinal.WebSockets
                 await _next.Invoke(context);
             }
 
-            var roomName = context.Request.PathBase;
             var socket = await context.WebSockets.AcceptWebSocketAsync();
             _webSocketHandler.OnConnected(socket);
 

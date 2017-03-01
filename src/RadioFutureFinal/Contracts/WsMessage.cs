@@ -4,16 +4,16 @@ namespace RadioFutureFinal.Contracts
 {
     public class WsMessage
     {
-        [JsonProperty]
+        [JsonProperty(Required = Required.Always)]
         public string Action { get; set; }
 
-        [JsonProperty]
+        [JsonProperty(Required = Required.AllowNull)]
         public SessionV1 Session { get; set; }
 
-        [JsonProperty]
+        [JsonProperty(Required = Required.AllowNull)]
         public MediaV1 Media { get; set; }
 
-        [JsonProperty]
+        [JsonProperty(Required = Required.AllowNull)]
         public UserV1 User { get; set; }
     }
 }

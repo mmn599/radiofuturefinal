@@ -6,6 +6,7 @@ window.mobilecheck = function() {
 
 $(document).ready(function(){
 
+    console.log('document is ready');
 	var pathname = window.location.pathname;
 	var roomName = null;
 	if(pathname.indexOf('\/rooms\/')>-1) {
@@ -14,7 +15,6 @@ $(document).ready(function(){
 
 	mGlobals.ui.div_loading = $("#div_loading");
 	mGlobals.ui.div_everything = $("#div_everything");
-
 
 	var opts = {
 	  lines: 13 // The number of lines to draw
@@ -40,8 +40,6 @@ $(document).ready(function(){
 	}
 	var target = document.getElementById('div_loading');
 	mGlobals.ui.spinner = new Spinner(opts).spin(target);
-
-	mGlobals.url_room = roomName;
 
 	mGlobals.ui.input_search = $("#input_search");
 	mGlobals.ui.input_name = $("#name_input");
@@ -108,7 +106,6 @@ var mGlobals = {
 	url_room : null,
 	youtube_api_ready : false,
 	entered_jam : false,
-	socket : {},
 	player : {},
 	user : {},
 	session : {},
@@ -141,21 +138,19 @@ function searchEnterPressed(input_search) {
 	}
 }
 
-function sessionReadyUI(roomName) {
+function sessionReadyUI() {
 	mGlobals.ui.div_loading.hide();
 	mGlobals.ui.spinner.stop();
 	mGlobals.ui.div_everything.animate({opacity: 1}, 'fast');
 } 
 
-function genreClicked(event) {
-	setupJamSession({genreName : $(event.target).text()});
-}
-
 function onPlayerReady(event) {
+    console.log('player ready!');
 	mGlobals.player_ready = true;
-	if(mGlobals.url_room && mGlobals.youtube_api_ready) {
-		setupJamSession({urlName : mGlobals.url_room});
-	}
+    //TODO: fuck get this working
+	// if(mGlobals.youtube_api_ready) {
+    setupJamSession();
+	// }
 }
 
 function queueRollover(item) {
@@ -382,49 +377,14 @@ function saveUserVideoState() {
 	}
 }
 
-function setupSocketEvents() {
-	//receives the newest user and session objects from database
-	mGlobals.socket.on('updateUser', updateUser);
-	mGlobals.socket.on('sessionReady', sessionReady);
-	mGlobals.socket.on('updateUsersList', updateUsersList);
-	mGlobals.socket.on('updateQueue', updateQueue);
-	mGlobals.socket.on('clientChatMessage', receivedChatMessage);
-	mGlobals.socket.on('foundGenreJam', foundGenreJam);
-}
-
-function receivedChatMessage(data) {
-	var msg = data.msg;
-	var user = data.user;
-	var innerHTML = mGlobals.ui.ul_chat.html() || "";
-	mGlobals.ui.ul_chat.html(innerHTML +'<li><span style="color: '+user.color+'">'+user.name+'</span>'+'<span>'+ ': ' + msg+ '</span></li>');
-	var children = mGlobals.ui.ul_chat.children();
-	if(children.length>10) {
-		children[0].remove();
-	}
-}
 
 function synchronizeUsers() {
 	mGlobals.socket.emit('synchronizeUsers');
 }
 
-function updateUsersList(users) {
-	users = JSON.parse(users);
-	if(mGlobals.sessionInitialized) {
-		mGlobals.current_users = users;
-		updateUsersListUI(mGlobals.current_users);	
-	}		
-}
-
-function updateQueue(queue) {
-	queue = JSON.parse(queue);
-	if(mGlobals.sessionInitialized) {
-		mGlobals.queue = queue;
-		updateQueueUI(mGlobals.user.queue_position + 1);
-		if(mGlobals.user.waiting) {
-			nextVideoInQueue();
-		}
-	}
-}
+//==================================================================
+// WebSocket message response functions
+//==================================================================
 
 function updateUser(user) {
 	if(mGlobals.sessionInitialized) {
@@ -451,17 +411,84 @@ function sessionReady(data) {
 	mGlobals.sessionInitialized = true;
 }
 
-function setupSockets() {
-	mGlobals.socket = io();
-	setupSocketEvents();
+function updateUsersList(users) {
+	users = JSON.parse(users);
+	if(mGlobals.sessionInitialized) {
+		mGlobals.current_users = users;
+		updateUsersListUI(mGlobals.current_users);	
+	}		
+}
+
+
+function updateQueue(queue) {
+	queue = JSON.parse(queue);
+	if(mGlobals.sessionInitialized) {
+		mGlobals.queue = queue;
+		updateQueueUI(mGlobals.user.queue_position + 1);
+		if(mGlobals.user.waiting) {
+			nextVideoInQueue();
+		}
+	}
+}
+
+function receivedChatMessage(data) {
+	var msg = data.msg;
+	var user = data.user;
+	var innerHTML = mGlobals.ui.ul_chat.html() || "";
+	mGlobals.ui.ul_chat.html(innerHTML +'<li><span style="color: '+user.color+'">'+user.name+'</span>'+'<span>'+ ': ' + msg+ '</span></li>');
+	var children = mGlobals.ui.ul_chat.children();
+	if(children.length>10) {
+		children[0].remove();
+	}
 }
 
 function foundGenreJam(data) {
 	joinJamSession(data.genreName);
 }
 
-//three entry points: genre, url, text box
-function setupJamSession(urlName) {
+var messageFunctions = {
+    'updateUser': updateUser,
+    'sessionReady': sessionReady,
+    'updateUsersList': updateUsersList,
+    'updateQueue': updateQueue,
+    'clientChatMessage': receivedChatMessage,
+    'foundGenreJam': foundGenreJam
+}
+
+function setupSockets() {
+	var uri = "ws://" + window.location.host + "/ws";
+    var socket = new WebSocket(uri);
+    socket.onopen = function (event) {
+        console.log("opened connection to " + uri);
+    };
+    socket.onclose = function (event) {
+        console.log("closed connection from " + uri);
+    };
+    socket.onmessage = function (event) {
+        var data = event.data;
+        // TODO: break it down!!!
+        console.log('Received websocket message from server:');
+        console.log(data);
+        // messageFunctions[action](msg);
+    };
+    socket.onerror = function (event) {
+        console.log("error: " + event.data);
+    };
+    socket.emit = function (action, data) {
+        console.log('Sending websocket message to server: ' + action);
+        console.log(data);
+        var message = {
+            action: action,
+            data: data
+        }
+        socket.send(message);
+    };
+    mGlobals.socket = socket;
+    console.log('beep');
+}
+
+//TODO: synchronize so multiple entry points don't happen
+function setupJamSession() {
 	if(mGlobals.entered_jam) {
 		return;
 	}
@@ -469,14 +496,19 @@ function setupJamSession(urlName) {
 		mGlobals.entered_jam = true;
 	}
 
-	setupSockets();
+    console.log('setupJamSession');
+	var pathname = window.location.pathname;
+	var encodedSessionName = null;
+	if(pathname.indexOf('\/rooms\/')>-1) {
+		encodedSessionName = pathname.replace('\/rooms/', '');
+	}
 
-	joinJamSession(urlName);
+	setupSockets();
+	setTimeout(function () { joinJamSession(encodedSessionName) }, 50);
 }
 
 function joinJamSession(encodedSessionName) {
 	mGlobals.session.name = decodeURI(encodedSessionName);
-
 	mGlobals.user = createTempUser('Anonymous');
 	
 	var data = {
@@ -484,7 +516,6 @@ function joinJamSession(encodedSessionName) {
 		sessionName : encodedSessionName
 	};
 	mGlobals.socket.emit('userJoinSession', data);
-
 	setInterval(synchronizeUsers, 5000);
 };
 
@@ -505,9 +536,10 @@ function sendChatMessage(chat_input) {
 function youtubeAPIInit() {
 	gapi.client.setApiKey("AIzaSyC4A-dsGk-ha_b-eDpbxaVQt5bR7cOUddc");
 	gapi.client.load("youtube", "v3", function() {
+	    console.log('youtube api loaded');
 		mGlobals.youtube_api_ready = true;
-		if(mGlobals.url_room && mGlobals.player_ready) {
-			setupJamSession({urlName : mGlobals.url_room});
+		if(mGlobals.player_ready) {
+			setupJamSession();
 		}
 	});
 }
