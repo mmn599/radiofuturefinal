@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "noImplicitAny": true,
     "noEmitOnError": true,
     "sourceMap": true,
     "target": "es5",
@@ -9,7 +8,8 @@
   },
   "files": [
     "./tsscripts/tsmusicroom.ts",
-    "./tsscripts/DefinitelyTyped/jquery.d.ts"
+    "./tsscripts/DefinitelyTyped/jquery.d.ts",
+    "./tsscripts/DefinitelyTyped/youtube.d.ts"
   ],
   "compileOnSave": true
 }

@@ -1,6 +1,7 @@
 ﻿/// <reference path="./DefinitelyTyped/jquery.d.ts" />
 
 import $ from "jquery";
+declare var gapi: any; // Magic
 
 class Session {
     sessionId: number;
@@ -17,6 +18,12 @@ class User {
     queuePosition: number;
     ytPlayerState: number;
     waiting: boolean;
+    temp: boolean;
+    // TODO: some variable to indicate user has not been saved
+    constructor() {
+        this.userName = name;
+        this.temp = true;
+    }
 }
 
 class Media {
@@ -27,7 +34,14 @@ class Media {
     ytVideoId: string;
     likes: number;
     dislikes: number;
-    thumbURL: string; 
+    thumbURL: string;
+    constructor(title: string, videoId: string, thumbURL: string, userId: number, userName: string) {
+        this.mediaTitle = title;
+        this.ytVideoId = videoId;
+        this.thumbURL = thumbURL;
+        this.userId = userId;
+        this.userName = userName;
+    }
 }
 
 class WsMessage {
@@ -59,7 +73,8 @@ $(document).ready(function () {
     var input_chat = $("#input_chat");
     input_chat.keypress(function (e) {
         if (e.which == 13) {
-            sendChatMessage(input_chat);
+            sendChatMessage(input_chat.val());
+            input_chat.val("");
         }
     });
 
@@ -107,10 +122,12 @@ var mConstants = {
 
 var mGlobals = {
     playerReady: false,
-    yt_api_ready: false,
+    ytApiReady: false,
     sessionReady: false,
     user: new User(),
-    session: new Session()
+    session: null,
+    ytPlayer: null,
+    socket: null
 };
 
 //==================================================================
@@ -127,7 +144,7 @@ function searchTextChanged(text: string) {
 function searchEnterPressed(query: string) {
     var divResults = $("#div_search_results");
     divResults.html("");
-    searchVideos(query, function (response: Object) {
+    searchVideos(query, function (response) {
         $.each(response.items, function (index, item) {
             divResults.html(divResults.html() + "<div class='div_search_result' onClick='queueSelectedVideo(this)' data-videoId='" + item.id.videoId + "' data-thumb_URL='" + item.snippet.thumbnails.medium.url + "'>" + '<p class="text_search_result">' + item.snippet.title + '</p></div>');
         });
@@ -142,9 +159,9 @@ function sessionReadyUI() {
     $("#div_everything").animate({ opacity: 1 }, 'fast');
 }
 
-function onPlayerReady(event: Event) {
+function onPlayerReady(eventArgs: YT.EventArgs) {
     mGlobals.playerReady = true;
-    if (mGlobals.yt_api_ready) {
+    if (mGlobals.ytApiReady) {
         setupJamSession();
     }
 }
@@ -211,7 +228,7 @@ function updateUsersListUI(users: Array<User>) {
         var div_user = document.createElement('div');
         div_user.style.background = user.color;
         div_user.className = "div_user tooltip";
-        div_user.setAttribute('data-username', user.userName);
+        div_user.setAttribute('data-userId', user.userId.toString());
 
         var p_user = document.createElement('p');
         p_user.className = "p_user";
@@ -232,8 +249,8 @@ function updateUsersListUI(users: Array<User>) {
     for (var i = 0; i < divarr.length; i++) {
         var mydiv = divarr[i];
         $(mydiv).click(function (event: Event) {
-            var username = event.srcElement.getAttribute('data-username');
-            syncWithUser(username);
+            var userId = Number(event.srcElement.getAttribute('data-userId'));
+            syncWithUser(userId);
         });
     }
 }
@@ -289,10 +306,10 @@ function queueSelectedVideo(elmnt: Element) {
     var videoId = elmnt.getAttribute('data-videoId');
     var title = elmnt.textContent || elmnt.textContent;
     var thumb_url = elmnt.getAttribute('data-thumb_URL');
-    var recommendation = createRecommendation(title, videoId, thumb_url, mGlobals.user.userId, mGlobals.user.userName);
+    var media = new Media(title, videoId, thumb_url, mGlobals.user.userId, mGlobals.user.userName);
     var data = {
         sessionId: mGlobals.session.sessionId,
-        recommendation: recommendation
+        media: media
     };
     //TODO: local add recommendation
     mGlobals.socket.emit('addRecommendationToSession', data);
@@ -305,18 +322,17 @@ function queueSelectedVideo(elmnt: Element) {
 
 // TODO: use id instead of name
 function syncWithUser(userId: number) {
-    var myuser = new User();
     var currentUsers = mGlobals.session.users;
     for (var i = 0; i < currentUsers.length; i++) {
         if (currentUsers[i].userId === userId) {
-            myuser = currentUsers[i];
+            var myuser = currentUsers[i];
+            mGlobals.user.queuePosition = myuser.queuePosition;
+            mGlobals.user.videoTime = myuser.videoTime;
+            mGlobals.user.ytPlayerState = myuser.ytPlayerState;
+            updateQueueUI(mGlobals.user.queuePosition + 1);
+            setupVideo();
         }
     }
-    mGlobals.user.queuePosition = myuser.queuePosition;
-    mGlobals.user.videoTime = myuser.videoTime;
-    mGlobals.user.ytPlayerState = myuser.ytPlayerState;
-    updateQueueUI(mGlobals.user.queuePosition + 1);
-    setupVideo();
 }
 
 function saveUserNameChange(newName: string) {
@@ -337,8 +353,8 @@ function saveUserNameChange(newName: string) {
 
 function saveUserVideoState() {
     if (mGlobals.playerReady) {
-        mGlobals.user.videoTime = mGlobals.player.getCurrentTime();
-        mGlobals.user.ytPlayerState = mGlobals.player.getPlayerState();
+        mGlobals.user.videoTime = mGlobals.ytPlayer.getCurrentTime();
+        mGlobals.user.ytPlayerState = mGlobals.ytPlayer.getPlayerState();
         mGlobals.socket.emit('saveUserVideoState', mGlobals.user);
     }
 }
@@ -384,33 +400,57 @@ function updateQueue(queue: Array<Media>) {
     }
 }
 
-function updateUser(user) {
-    if (mGlobals.sessionInitialized) {
+function updateUser(user: User) {
+    if (mGlobals.sessionReady) {
         mGlobals.user = user;
     }
 }
 
-function sessionReady(data) {
-    mGlobals.sessionId = data.sessionId;
-    mGlobals.queue = data.queue;
-    mGlobals.current_users = data.current_users;
+function sessionReady(session: Session, user?: User) {
+    mGlobals.session = session;
+    // TODO: get rid of temp stuff
     if (mGlobals.user.temp) {
-        mGlobals.user = data.user;
+        mGlobals.user = user;
     }
     saveUserVideoState();
     setInterval(saveUserVideoState, 10000);
-    if (mGlobals.queue.length == 0) {
+    if (mGlobals.session.queue.length == 0) {
         $("#p_current_content_info").text("Queue up a song!");
         $("#p_current_recommender_info").text("Use the search bar above.");
     }
     nextVideoInQueue();
-    updateUsersListUI(mGlobals.current_users);
-    sessionReadyUI(mGlobals.session.name);
-    mGlobals.sessionInitialized = true;
+    updateUsersListUI(mGlobals.session.users);
+    sessionReadyUI();
+    mGlobals.sessionReady = true;
+}
+
+function handleSocketMessage(event) {
+    console.log('Received socket message with: ');
+    console.log(event.data);
+}
+
+function handleSocketError(event) {
+    alert('Socket error');
+    console.log(event);
 }
 
 function setupSockets() {
-    mGlobals.socket = io();
+    var uri = "ws://" + window.location.host + "/ws";
+    var socket = new WebSocket(uri);
+    socket.onopen = function (event) {
+        console.log("opened connection to " + uri);
+    };
+    socket.onclose = function (event) {
+        console.log("closed connection from " + uri);
+    };
+    socket.onmessage = function (event) {
+        handleSocketMessage(event);
+    };
+    socket.onerror = function (event) {
+        handleSocketError(event);
+    };
+    mGlobals.socket = socket;
+
     setupSocketEvents();
 }
 
@@ -419,27 +459,24 @@ function foundGenreJam(data) {
 }
 
 //three entry points: genre, url, text box
-function setupJamSession(urlName) {
-    if (mGlobals.entered_jam) {
+function setupJamSession() {
+    var sessionName = 'sessionName'; //TODO: get session name from url
+    if (mGlobals.sessionReady) {
         return;
     }
-    else {
-        mGlobals.entered_jam = true;
-    }
-
     setupSockets();
-
-    joinJamSession(urlName);
+    joinJamSession(sessionName);
+    mGlobals.sessionReady = true;
 }
 
-function joinJamSession(encodedSessionName) {
-    mGlobals.session.name = decodeURI(encodedSessionName);
+function joinJamSession(sessionName: string) {
 
-    mGlobals.user = createTempUser('Anonymous');
+    mGlobals.session.sessionName = decodeURI(sessionName);
+    mGlobals.user = new User();
 
     var data = {
         user: mGlobals.user,
-        sessionName: encodedSessionName
+        sessionName: sessionName
     };
     mGlobals.socket.emit('userJoinSession', data);
 
@@ -449,10 +486,9 @@ function joinJamSession(encodedSessionName) {
 //==================================================================
 // Chat functions
 //==================================================================
-function sendChatMessage(chat_input) {
-    if (mGlobals.sessionInitialized) {
-        mGlobals.socket.emit('chatMessage', chat_input.val());
-        chat_input.val("");
+function sendChatMessage(chatMessage: string) {
+    if (mGlobals.sessionReady) {
+        mGlobals.socket.emit('chatMessage', chatMessage); 
     }
 }
 
@@ -463,27 +499,28 @@ function sendChatMessage(chat_input) {
 function youtubeAPIInit() {
     gapi.client.setApiKey("AIzaSyC4A-dsGk-ha_b-eDpbxaVQt5bR7cOUddc");
     gapi.client.load("youtube", "v3", function () {
-        mGlobals.youtube_api_ready = true;
-        if (mGlobals.url_room && mGlobals.playerReady) {
-            setupJamSession({ urlName: mGlobals.url_room });
+        mGlobals.ytApiReady = true;
+        if (mGlobals.playerReady) {
+            setupJamSession();
         }
     });
 }
 
 function onYouTubeIframeAPIReady() {
-    mGlobals.player = new YT.Player('div_player', {
-        height: 'auto',
+    var playerOptions = {
         width: '100%',
+        height: 'auto',
         playerVars: {
             controls: 0,
             showinfo: 0,
             autoplay: 1
         },
         events: {
-            'onReady': onPlayerReady,
-            'onStateChange': onPlayerStateChange
+            onReady: onPlayerReady,
+            onStateChange: onPlayerStateChange
         }
-    });
+    }
+    var player = new YT.Player('div_player', playerOptions);
 }
 
 function searchVideos(query, callback) {
@@ -501,33 +538,34 @@ function searchVideos(query, callback) {
 function updatePlayerState(state) {
     if (mGlobals.playerReady) {
         if (state == mConstants.PLAYING) {
-            mGlobals.player.playVideo();
+            mGlobals.ytPlayer.playVideo();
         }
         else if (state == mConstants.PAUSED) {
-            mGlobals.player.pauseVideo();
+            mGlobals.ytPlayer.pauseVideo();
         }
     }
 }
 
-function onPlayerStateChange(event) {
+function onPlayerStateChange(eventArgs: YT.EventArgs) {
     //when video ends
-    if (event.data == 0) {
+    if (eventArgs.data == 0) {
         nextVideoInQueue();
     }
 }
 
-function updatePlayerUI(current_video, current_videoTime, current_recommender_name, current_video_title) {
+function updatePlayerUI(currentVideo: string, videoTime: number, recommenderName: string, videoTitle: string) {
     if (!mGlobals.playerReady) {
-        setTimeout(updatePlayerUI(current_video, current_videoTime, current_recommender_name), 1000);
+        setTimeout(updatePlayerUI(currentVideo, videoTime, recommenderName, videoTitle), 1000);
     }
-    mGlobals.player.loadVideoById(current_video, current_videoTime, "large");
-    $("#p_current_content_info").text(current_video_title);
-    $("#p_current_recommender_info").text('Recommended by: ' + current_recommender_name);
+    mGlobals.ytPlayer.loadVideoById(currentVideo, videoTime, "large");
+    $("#p_current_content_info").text(videoTitle);
+    $("#p_current_recommender_info").text('Recommended by: ' + recommenderName);
     var color = 'black';
     //TODO: shitty
-    for (var i = 0; i < mGlobals.current_users.length; i++) {
-        var user = mGlobals.current_users[i];
-        if (user.name === current_recommender_name) {
+    var currentUsers = mGlobals.session.users;
+    for (var i = 0; i < currentUsers.length; i++) {
+        var user = currentUsers[i];
+        if (user.userName === recommenderName) {
             color = user.color;
         }
     }

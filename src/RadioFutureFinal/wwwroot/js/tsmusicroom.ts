@@ -1,42 +1,66 @@
 /// <reference path="./DefinitelyTyped/jquery.d.ts" />
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-var jquery_1 = require("jquery");
-var Session = (function () {
-    function Session() {
-    }
-    return Session;
-}());
-var User = (function () {
+
+import $ from "jquery";
+declare var gapi: any; // Magic
+
+class Session {
+    sessionId: number;
+    sessionName: string;
+    users: Array<User>; 
+    queue: Array<Media>;
+}
+
+class User {
+    userId: number;
+    userName: string;
+    color: string;
+    videoTime: number;
+    queuePosition: number;
+    ytPlayerState: number;
+    waiting: boolean;
+    temp: boolean;
     // TODO: some variable to indicate user has not been saved
-    function User() {
+    constructor() {
         this.userName = name;
         this.temp = true;
     }
-    return User;
-}());
-var Media = (function () {
-    function Media(title, videoId, thumbURL, userId, userName) {
+}
+
+class Media {
+    mediaId: number;
+    mediaTitle: string;
+    userId: number;
+    userName: string;
+    ytVideoId: string;
+    likes: number;
+    dislikes: number;
+    thumbURL: string;
+    constructor(title: string, videoId: string, thumbURL: string, userId: number, userName: string) {
         this.mediaTitle = title;
         this.ytVideoId = videoId;
         this.thumbURL = thumbURL;
         this.userId = userId;
         this.userName = userName;
     }
-    return Media;
-}());
-var WsMessage = (function () {
-    function WsMessage() {
-    }
-    return WsMessage;
-}());
-jquery_1.default(document).ready(function () {
+}
+
+class WsMessage {
+    action: string;
+    session: Session;
+    media: Media;
+    user: User;
+}
+
+
+$(document).ready(function () {
+
     var pathname = window.location.pathname;
     var roomName = null;
     if (pathname.indexOf('\/rooms\/') > -1) {
         roomName = pathname.replace('\/rooms/', '');
     }
-    var input_search = jquery_1.default("#input_search");
+
+    var input_search = $("#input_search");
     input_search.bind("propertychange input paste", function (event) {
         searchTextChanged(input_search.val());
     });
@@ -45,14 +69,16 @@ jquery_1.default(document).ready(function () {
             searchEnterPressed(input_search.val());
         }
     });
-    var input_chat = jquery_1.default("#input_chat");
+
+    var input_chat = $("#input_chat");
     input_chat.keypress(function (e) {
         if (e.which == 13) {
             sendChatMessage(input_chat.val());
             input_chat.val("");
         }
     });
-    var input_name = jquery_1.default("#input_name");
+
+    var input_name = $("#input_name");
     input_name.keypress(function (e) {
         if (e.which == 13) {
             var newName = input_name.val();
@@ -61,26 +87,31 @@ jquery_1.default(document).ready(function () {
             input_chat.fadeIn();
         }
     });
+
     document.body.addEventListener('click', function () {
-        jquery_1.default("#div_search_results").fadeOut();
+        $("#div_search_results").fadeOut();
         if (input_search) {
             input_search.val("");
         }
     }, true);
-    /*
-    $("#chat_input").keypress(function(e) {
-        if(e.which==13) {
-            sendChatMessage();
-        }
-    });
-    $("#txt_email").keypress(function(e) {
-        if(e.which==13) {
-            emailQueue();
-        }
-    });
-    */
-    jquery_1.default('.drawer').drawer();
+
+	/*
+	$("#chat_input").keypress(function(e) {
+		if(e.which==13) {
+			sendChatMessage();		
+		}
+	});
+	$("#txt_email").keypress(function(e) {
+		if(e.which==13) {
+			emailQueue();
+		}
+	});
+	*/
+
+    $('.drawer').drawer();
 });
+
+
 //==================================================================
 // Global variables
 //==================================================================
@@ -88,6 +119,7 @@ var mConstants = {
     "PLAYING": 1,
     "PAUSED": 2
 };
+
 var mGlobals = {
     playerReady: false,
     ytApiReady: false,
@@ -97,20 +129,23 @@ var mGlobals = {
     ytPlayer: null,
     socket: null
 };
+
 //==================================================================
 // UI Functions
 //==================================================================
-function searchTextChanged(text) {
-    var divResults = jquery_1.default("#div_search_results");
+
+function searchTextChanged(text: string) {
+    var divResults = $("#div_search_results");
     if (text.length == 0) {
         divResults.fadeOut();
     }
 }
-function searchEnterPressed(query) {
-    var divResults = jquery_1.default("#div_search_results");
+
+function searchEnterPressed(query: string) {
+    var divResults = $("#div_search_results");
     divResults.html("");
     searchVideos(query, function (response) {
-        jquery_1.default.each(response.items, function (index, item) {
+        $.each(response.items, function (index, item) {
             divResults.html(divResults.html() + "<div class='div_search_result' onClick='queueSelectedVideo(this)' data-videoId='" + item.id.videoId + "' data-thumb_URL='" + item.snippet.thumbnails.medium.url + "'>" + '<p class="text_search_result">' + item.snippet.title + '</p></div>');
         });
     });
@@ -118,30 +153,35 @@ function searchEnterPressed(query) {
         divResults.fadeIn();
     }
 }
+
 function sessionReadyUI() {
-    jquery_1.default("#div_loading").hide();
-    jquery_1.default("#div_everything").animate({ opacity: 1 }, 'fast');
+    $("#div_loading").hide();
+    $("#div_everything").animate({ opacity: 1 }, 'fast');
 }
-function onPlayerReady(eventArgs) {
+
+function onPlayerReady(eventArgs: YT.EventArgs) {
     mGlobals.playerReady = true;
     if (mGlobals.ytApiReady) {
         setupJamSession();
     }
 }
-function queueRollover(item) {
-    jquery_1.default(item).attr('src', '../images/cross.jpg');
-    jquery_1.default(item).attr('onclick', "deleteVideoInQueue(" + item.getAttribute('data-queuePosition') + ")");
+
+function queueRollover(item: HTMLElement) {
+    $(item).attr('src', '../images/cross.jpg');
+    $(item).attr('onclick', "deleteVideoInQueue(" + item.getAttribute('data-queuePosition') + ")");
 }
-function queueRolloff(item) {
-    jquery_1.default(item).attr('src', item.getAttribute('data-thumb_URL'));
+
+function queueRolloff(item: HTMLElement) {
+    $(item).attr('src', item.getAttribute('data-thumb_URL'));
 }
-function updateQueueUI(starting_queuePosition) {
+
+function updateQueueUI(starting_queuePosition: number) {
     var queue = mGlobals.session.queue;
     var i = starting_queuePosition;
     var j = 0;
     //TODO: make robust
     var end = 5;
-    var div_queue = jquery_1.default("#div_footer");
+    var div_queue = $("#div_footer");
     div_queue.html("");
     while (i < queue.length) {
         var media = queue[i];
@@ -157,12 +197,16 @@ function updateQueueUI(starting_queuePosition) {
         j++;
     }
 }
+
 function emailQueue() {
     //mGlobals.socket.emit('emailQueue', { email: $("#txt_email").val(), queue: mGlobals.queue });
     //$("#txt_email").fadeOut();
 }
-function updateUsersListUI(users) {
+
+function updateUsersListUI(users: Array<User>) {
+
     var usersList = document.getElementById('div_users_list');
+
     usersList.innerHTML = "";
     var divarr = [];
     for (var i = 0; i < users.length; i++) {
@@ -180,31 +224,37 @@ function updateUsersListUI(users) {
         else {
             current_video_title = "Nothing";
         }
+
         var div_user = document.createElement('div');
         div_user.style.background = user.color;
         div_user.className = "div_user tooltip";
         div_user.setAttribute('data-userId', user.userId.toString());
+
         var p_user = document.createElement('p');
         p_user.className = "p_user";
         p_user.setAttribute('data-username', user.userName);
         p_user.appendChild(document.createTextNode(user.userName.charAt(0)));
+
         var span_tooltip = document.createElement('span');
         span_tooltip.className = "tooltiptext";
         span_tooltip.setAttribute('data-username', user.userName);
         span_tooltip.innerHTML = "Click to sync with " + user.userName + "!";
+
         div_user.appendChild(p_user);
         div_user.appendChild(span_tooltip);
         usersList.appendChild(div_user);
+
         divarr.push(div_user);
     }
     for (var i = 0; i < divarr.length; i++) {
         var mydiv = divarr[i];
-        jquery_1.default(mydiv).click(function (event) {
+        $(mydiv).click(function (event: Event) {
             var userId = Number(event.srcElement.getAttribute('data-userId'));
             syncWithUser(userId);
         });
     }
 }
+
 function setupVideo() {
     if (mGlobals.user.queuePosition != -1) {
         var media = mGlobals.session.queue[mGlobals.user.queuePosition];
@@ -212,10 +262,11 @@ function setupVideo() {
         updatePlayerUI(media.ytVideoId, mGlobals.user.videoTime, media.userName, media.mediaTitle);
     }
 }
+
 //==================================================================
 // Backend video and queue control functions
 //==================================================================
-function deleteVideoInQueue(queuePosition) {
+function deleteVideoInQueue(queuePosition: number) {
     var queue = mGlobals.session.queue;
     var id = queue[queuePosition].ytVideoId;
     queue.splice(queuePosition, 1);
@@ -225,6 +276,7 @@ function deleteVideoInQueue(queuePosition) {
     };
     mGlobals.socket.emit('deleteRecommendationFromSession', data);
 }
+
 function previousVideoInQueue() {
     mGlobals.user.videoTime = 0;
     var queue = mGlobals.session.queue;
@@ -234,6 +286,7 @@ function previousVideoInQueue() {
         mGlobals.user.waiting = false;
     }
 }
+
 function nextVideoInQueue() {
     mGlobals.user.videoTime = 0;
     var queue = mGlobals.session.queue;
@@ -246,9 +299,10 @@ function nextVideoInQueue() {
         mGlobals.user.waiting = true;
     }
 }
-function queueSelectedVideo(elmnt) {
-    jquery_1.default("#div_search_results").fadeOut();
-    jquery_1.default("#input_search").val("");
+
+function queueSelectedVideo(elmnt: Element) {
+    $("#div_search_results").fadeOut();
+    $("#input_search").val("");
     var videoId = elmnt.getAttribute('data-videoId');
     var title = elmnt.textContent || elmnt.textContent;
     var thumb_url = elmnt.getAttribute('data-thumb_URL');
@@ -260,12 +314,14 @@ function queueSelectedVideo(elmnt) {
     //TODO: local add recommendation
     mGlobals.socket.emit('addRecommendationToSession', data);
 }
+
 //==================================================================
 // Music Session setup and synchronization functions for session and user objects
 // Basically all the hard stuff
 //==================================================================
+
 // TODO: use id instead of name
-function syncWithUser(userId) {
+function syncWithUser(userId: number) {
     var currentUsers = mGlobals.session.users;
     for (var i = 0; i < currentUsers.length; i++) {
         if (currentUsers[i].userId === userId) {
@@ -278,7 +334,8 @@ function syncWithUser(userId) {
         }
     }
 }
-function saveUserNameChange(newName) {
+
+function saveUserNameChange(newName: string) {
     mGlobals.user.userName = newName;
     // TODO: this is silly
     var currentUsers = mGlobals.session.users;
@@ -292,6 +349,8 @@ function saveUserNameChange(newName) {
     };
     mGlobals.socket.emit('saveUserNameChange', data);
 }
+
+
 function saveUserVideoState() {
     if (mGlobals.playerReady) {
         mGlobals.user.videoTime = mGlobals.ytPlayer.getCurrentTime();
@@ -299,6 +358,7 @@ function saveUserVideoState() {
         mGlobals.socket.emit('saveUserVideoState', mGlobals.user);
     }
 }
+
 function setupSocketEvents() {
     //receives the newest user and session objects from database
     mGlobals.socket.on('updateUser', updateUser);
@@ -308,8 +368,9 @@ function setupSocketEvents() {
     mGlobals.socket.on('clientChatMessage', receivedChatMessage);
     mGlobals.socket.on('foundGenreJam', foundGenreJam);
 }
-function receivedChatMessage(msg, user) {
-    var ul_chat = jquery_1.default("#ul_chat");
+
+function receivedChatMessage(msg: string, user: User) {
+    var ul_chat = $("#ul_chat");
     var innerHTML = ul_chat.html() || "";
     ul_chat.html(innerHTML + '<li><span style="color: ' + user.color + '">' + user.userName + '</span>' + '<span>' + ': ' + msg + '</span></li>');
     var children = ul_chat.children();
@@ -317,16 +378,19 @@ function receivedChatMessage(msg, user) {
         children[0].remove();
     }
 }
+
 function synchronizeUsers() {
     mGlobals.socket.emit('synchronizeUsers');
 }
-function updateUsersList(users) {
+
+function updateUsersList(users: Array<User>) {
     if (mGlobals.sessionReady) {
         mGlobals.session.users = users;
         updateUsersListUI(mGlobals.session.users);
     }
 }
-function updateQueue(queue) {
+
+function updateQueue(queue: Array<Media>) {
     if (mGlobals.sessionReady) {
         mGlobals.session.queue = queue;
         updateQueueUI(mGlobals.user.queuePosition + 1);
@@ -335,12 +399,14 @@ function updateQueue(queue) {
         }
     }
 }
-function updateUser(user) {
+
+function updateUser(user: User) {
     if (mGlobals.sessionReady) {
         mGlobals.user = user;
     }
 }
-function sessionReady(session, user) {
+
+function sessionReady(session: Session, user?: User) {
     mGlobals.session = session;
     // TODO: get rid of temp stuff
     if (mGlobals.user.temp) {
@@ -349,22 +415,25 @@ function sessionReady(session, user) {
     saveUserVideoState();
     setInterval(saveUserVideoState, 10000);
     if (mGlobals.session.queue.length == 0) {
-        jquery_1.default("#p_current_content_info").text("Queue up a song!");
-        jquery_1.default("#p_current_recommender_info").text("Use the search bar above.");
+        $("#p_current_content_info").text("Queue up a song!");
+        $("#p_current_recommender_info").text("Use the search bar above.");
     }
     nextVideoInQueue();
     updateUsersListUI(mGlobals.session.users);
     sessionReadyUI();
     mGlobals.sessionReady = true;
 }
+
 function handleSocketMessage(event) {
     console.log('Received socket message with: ');
     console.log(event.data);
 }
+
 function handleSocketError(event) {
     alert('Socket error');
     console.log(event);
 }
+
 function setupSockets() {
     var uri = "ws://" + window.location.host + "/ws";
     var socket = new WebSocket(uri);
@@ -381,11 +450,14 @@ function setupSockets() {
         handleSocketError(event);
     };
     mGlobals.socket = socket;
+
     setupSocketEvents();
 }
+
 function foundGenreJam(data) {
     joinJamSession(data.genreName);
 }
+
 //three entry points: genre, url, text box
 function setupJamSession() {
     var sessionName = 'sessionName'; //TODO: get session name from url
@@ -396,28 +468,34 @@ function setupJamSession() {
     joinJamSession(sessionName);
     mGlobals.sessionReady = true;
 }
-function joinJamSession(sessionName) {
+
+function joinJamSession(sessionName: string) {
+
     mGlobals.session.sessionName = decodeURI(sessionName);
     mGlobals.user = new User();
+
     var data = {
         user: mGlobals.user,
         sessionName: sessionName
     };
     mGlobals.socket.emit('userJoinSession', data);
+
     setInterval(synchronizeUsers, 5000);
-}
-;
+};
+
 //==================================================================
 // Chat functions
 //==================================================================
-function sendChatMessage(chatMessage) {
+function sendChatMessage(chatMessage: string) {
     if (mGlobals.sessionReady) {
-        mGlobals.socket.emit('chatMessage', chatMessage);
+        mGlobals.socket.emit('chatMessage', chatMessage); 
     }
 }
+
 //==================================================================
 // Youtube API functions and player UI control
 //==================================================================
+
 function youtubeAPIInit() {
     gapi.client.setApiKey("AIzaSyC4A-dsGk-ha_b-eDpbxaVQt5bR7cOUddc");
     gapi.client.load("youtube", "v3", function () {
@@ -427,6 +505,7 @@ function youtubeAPIInit() {
         }
     });
 }
+
 function onYouTubeIframeAPIReady() {
     var playerOptions = {
         width: '100%',
@@ -440,9 +519,10 @@ function onYouTubeIframeAPIReady() {
             onReady: onPlayerReady,
             onStateChange: onPlayerStateChange
         }
-    };
+    }
     var player = new YT.Player('div_player', playerOptions);
 }
+
 function searchVideos(query, callback) {
     var request = gapi.client.youtube.search.list({
         part: "snippet",
@@ -450,9 +530,11 @@ function searchVideos(query, callback) {
         q: encodeURIComponent(query).replace(/%20/g, "+"),
         maxResults: 5
     });
+
     //execute the request
     request.execute(callback);
 }
+
 function updatePlayerState(state) {
     if (mGlobals.playerReady) {
         if (state == mConstants.PLAYING) {
@@ -463,19 +545,21 @@ function updatePlayerState(state) {
         }
     }
 }
-function onPlayerStateChange(eventArgs) {
+
+function onPlayerStateChange(eventArgs: YT.EventArgs) {
     //when video ends
     if (eventArgs.data == 0) {
         nextVideoInQueue();
     }
 }
-function updatePlayerUI(currentVideo, videoTime, recommenderName, videoTitle) {
+
+function updatePlayerUI(currentVideo: string, videoTime: number, recommenderName: string, videoTitle: string) {
     if (!mGlobals.playerReady) {
         setTimeout(updatePlayerUI(currentVideo, videoTime, recommenderName, videoTitle), 1000);
     }
     mGlobals.ytPlayer.loadVideoById(currentVideo, videoTime, "large");
-    jquery_1.default("#p_current_content_info").text(videoTitle);
-    jquery_1.default("#p_current_recommender_info").text('Recommended by: ' + recommenderName);
+    $("#p_current_content_info").text(videoTitle);
+    $("#p_current_recommender_info").text('Recommended by: ' + recommenderName);
     var color = 'black';
     //TODO: shitty
     var currentUsers = mGlobals.session.users;
@@ -487,4 +571,3 @@ function updatePlayerUI(currentVideo, videoTime, recommenderName, videoTitle) {
     }
     synchronizeUsers();
 }
-//# sourceMappingURL=tsmusicroom.js.map
