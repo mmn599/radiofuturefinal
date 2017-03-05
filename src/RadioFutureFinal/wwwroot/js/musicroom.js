@@ -130,7 +130,7 @@ function searchEnterPressed(input_search) {
 	divResults.html("");
 	searchVideos(input_search.val(), function(response) {
 		$.each(response.items, function(index, item) {
-		divResults.html(divResults.html() + "<div class='div_search_result' onClick='queueSelectedVideo(this)' data-videoId='" + item.id.videoId + "' data-thumb_URL='"+item.snippet.thumbnails.medium.url+"'>" + '<p class="text_search_result">' +  item.snippet.title+ '</p></div>' );
+		divResults.html(divResults.html() + "<div class='div_search_result' onClick='queueSelectedVideo(this)' data-videoId='" + item.id.videoId + "' data-thumbURL='"+item.snippet.thumbnails.medium.url+"'>" + '<p class="text_search_result">' +  item.snippet.title+ '</p></div>' );
 	});
 	});
 	if(!divResults.is(':visible')) {
@@ -156,29 +156,29 @@ function onPlayerReady(event) {
 function queueRollover(item) {
 	$(item).attr('src', '../images/cross.jpg');
 	//TODO: can place statically
-	$(item).attr('onclick', "deleteVideoInQueue(" + item.getAttribute('data-queue_position') + ")");
+	$(item).attr('onclick', "deleteVideoInQueue(" + item.getAttribute('data-queuePosition') + ")");
 }
 
 function queueRolloff(item) {
-	$(item).attr('src', item.getAttribute('data-thumb_URL'));
+	$(item).attr('src', item.getAttribute('data-thumbURL'));
 }
 
-function updateQueueUI(starting_queue_position) {
+function updateQueueUI(starting_queuePosition) {
 	var queue = mGlobals.queue;
-	var i = starting_queue_position;
+	var i = starting_queuePosition;
 	var j = 0;
 	//TODO: make robust
 	var end = 5;
 	var div_queue = $("#div_footer");
 	div_queue.html("");
 	while(i<queue.length) {
-		var recommendation = queue[i];
+		var media = queue[i];
 		var innertht;
 		if((j+1)%5===0) {
-			innerht = "<div class='div_content' style='margin-right: 0'><img class='img_queue_item' data-queue_position='" + i + "' data-thumb_URL='" + recommendation.thumb_URL + "' onmouseover='queueRollover(this)' onmouseout='queueRolloff(this)' src='" + recommendation.thumb_URL + "'></img></div>";
+			innerht = "<div class='div_content' style='margin-right: 0'><img class='img_queue_item' data-queuePosition='" + i + "' data-thumbURL='" + media.thumbURL + "' onmouseover='queueRollover(this)' onmouseout='queueRolloff(this)' src='" + media.thumbURL + "'></img></div>";
 		}
 		else {
-			innerht = "<div class='div_content'><img class='img_queue_item' data-queue_position='" + i + "' data-thumb_URL='" + recommendation.thumb_URL + "' onmouseover='queueRollover(this)' onmouseout='queueRolloff(this)' src='" + recommendation.thumb_URL + "'></img></div>";
+			innerht = "<div class='div_content'><img class='img_queue_item' data-queuePosition='" + i + "' data-thumbURL='" + media.thumbURL + "' onmouseover='queueRollover(this)' onmouseout='queueRolloff(this)' src='" + media.thumbURL + "'></img></div>";
 
 		}
 		div_queue.html(div_queue.html() + innerht);
@@ -200,13 +200,13 @@ function updateUsersListUI(users) {
 	for(var i=0;i<users.length;i++) {
 		var user = users[i];
 		//uses local user data instead of what is currently in the server
-		if(user._id===mGlobals.user._id) {
+		if(user.Id===mGlobals.user.Id) {
 			user = mGlobals.user;
 		}
 		var color = user.color;
-		var queue_position = user.queue_position;
-		if(queue_position!=-1) {
-			current_video_title = mGlobals.queue[queue_position].title;
+		var queuePosition = user.queuePosition;
+		if(queuePosition!=-1) {
+			current_video_title = mGlobals.queue[queuePosition].title;
 		}
 		else {
 			current_video_title = "Nothing";
@@ -245,28 +245,28 @@ function updateUsersListUI(users) {
 	for(var i=0;i<users.length;i++) {
 		var user = users[i];
 		//uses local user data instead of what is currently in the server
-		if(user._id===mGlobals.user._id) {
+		if(user.Id===mGlobals.user.Id) {
 			user = mGlobals.user;
 		}
 		var color = user.color;
-		var queue_position = user.queue_position;
-		if(queue_position!=-1) {
-			current_video_title = mGlobals.queue[queue_position].title;
+		var queuePosition = user.queuePosition;
+		if(queuePosition!=-1) {
+			current_video_title = mGlobals.queue[queuePosition].title;
 		}
 		else {
 			current_video_title = "Nothing";
 		}
-		mGlobals.queue[user.queue_position]
+		mGlobals.queue[user.queuePosition]
 		var innerht = '<p class="p_user" style="white-space: nowrap;">' + '<span class="span_user" onclick="syncWithUserUI(this.getAttribute(\'data-username\'))" data-username="' + user.name +'" style="border-bottom:1px solid '+color+'; cursor: pointer;">'+user.name +  '</span>' + '</span><br><br>' + '</p>';//+ ' is listening to ' + '<span style="font-weight: bold;">' + current_video_title + '</span>' + '</span><br><br>' + '</p>';
 		usersList.innerHTML += innerht;
 	}*/
 }
 
 function setupVideo() {
-	if(mGlobals.user.queue_position!=-1) {
-		var recommendation = mGlobals.queue[mGlobals.user.queue_position];
-		updateQueueUI(mGlobals.user.queue_position + 1);
-		updatePlayerUI(recommendation.videoId, mGlobals.user.video_time, recommendation.recommender_name, recommendation.title);		
+	if(mGlobals.user.queuePosition!=-1) {
+		var media = mGlobals.queue[mGlobals.user.queuePosition];
+		updateQueueUI(mGlobals.user.queuePosition + 1);
+		updatePlayerUI(media.videoId, mGlobals.user.videoTime, media.recommender_name, media.title);		
 	}
 }
 
@@ -279,31 +279,31 @@ function userNameChange(name_input) {
 //==================================================================
 // Backend video and queue control functions
 //==================================================================
-function deleteVideoInQueue(queue_position) {
-	var id = mGlobals.queue[queue_position]._id;
-	mGlobals.queue.splice(queue_position, 1);
-	updateQueueUI(mGlobals.user.queue_position + 1);
+function deleteVideoInQueue(queuePosition) {
+	var id = mGlobals.queue[queuePosition].Id;
+	mGlobals.queue.splice(queuePosition, 1);
+	updateQueueUI(mGlobals.user.queuePosition + 1);
 	var data =  {
-		recommendationId : id
+        Media : {MediaId : id}
 	};
-	mGlobals.socket.emit('deleteRecommendationFromSession', data);
+	mGlobals.socket.emit('deleteMediaFromSession', data);
 }
 
 function previousVideoInQueue() {
-	mGlobals.user.video_time = 0;
+	mGlobals.user.videoTime = 0;
 	var queue = mGlobals.queue;
-	if(mGlobals.user.queue_position>0) {
-		var queue_position = mGlobals.user.queue_position = mGlobals.user.queue_position - 1;
+	if(mGlobals.user.queuePosition>0) {
+		var queuePosition = mGlobals.user.queuePosition = mGlobals.user.queuePosition - 1;
 		setupVideo();
 		mGlobals.user.waiting = false;
 	}
 }
 
 function nextVideoInQueue() {
-	mGlobals.user.video_time = 0;
+	mGlobals.user.videoTime = 0;
 	var queue = mGlobals.queue;
-	if((mGlobals.user.queue_position+1)<queue.length) {
-		var queue_position = mGlobals.user.queue_position = mGlobals.user.queue_position + 1;
+	if((mGlobals.user.queuePosition+1)<queue.length) {
+		var queuePosition = mGlobals.user.queuePosition = mGlobals.user.queuePosition + 1;
 		setupVideo();
 		mGlobals.user.waiting = false;
 	}
@@ -317,14 +317,13 @@ function queueSelectedVideo(elmnt) {
 	mGlobals.ui.input_search.val("");
 	var videoId = elmnt.getAttribute('data-videoId');
 	var title = elmnt.innerText || element.textContent;
-	var thumb_url = elmnt.getAttribute('data-thumb_URL');
-	var recommendation = createRecommendation(title, videoId, thumb_url, mGlobals.user._id, mGlobals.user.name);
+	var thumbURL = elmnt.getAttribute('data-thumbURL');
+	var media = createMedia(title, videoId, thumbURL, mGlobals.user.Id, mGlobals.user.name);
 	var data = {
-		sessionId : mGlobals.sessionId,
-		recommendation : recommendation
+		Media : media
 	};
-	//TODO: local add recommendation
-	mGlobals.socket.emit('addRecommendationToSession', data);
+	//TODO: local add media
+	mGlobals.socket.emit('addMediaToSession', data);
 }
 
 //==================================================================
@@ -339,17 +338,17 @@ function syncWithUser(username) {
 			myuser = mGlobals.current_users[i];
 		}
 	}
-	mGlobals.user.queue_position = myuser.queue_position;
-	mGlobals.user.video_time = myuser.video_time;
-	mGlobals.user.player_state = myuser.player_state;
-	updateQueueUI(mGlobals.user.queue_position + 1);
+	mGlobals.user.queuePosition = myuser.queuePosition;
+	mGlobals.user.videoTime = myuser.videoTime;
+	mGlobals.user.ytPlayerState = myuser.ytPlayerState;
+	updateQueueUI(mGlobals.user.queuePosition + 1);
 	setupVideo();
 }
 
 function saveUserNameChange(name) {
-	mGlobals.user.name = name;
+	mGlobals.user.Name = name;
 	for(var i=0;i<mGlobals.current_users;i++) {
-		if(mGlobals.user._id===mGlobals.current_users[i]._id) {
+		if(mGlobals.user.Id===mGlobals.current_users[i].Id) {
 			mGlobals.current_users[i].name = name;
 		}
 	}
@@ -362,40 +361,37 @@ function saveUserNameChange(name) {
 
 function saveUserVideoState() {
 	if(mGlobals.player_ready) {
-		mGlobals.user.video_time = mGlobals.player.getCurrentTime();
-		mGlobals.user.player_state = mGlobals.player.getPlayerState();
-		mGlobals.socket.emit('saveUserVideoState', mGlobals.user);	
-		$.ajax({
-			type : 'POST',
-			url : '/userlist',
-			data : {sessionId : mGlobals.sessionId},
-			dataType : 'json',
-			success: function(data) {
-				mGlobals.current_users = data;
-			}
-		});
+		mGlobals.user.videoTime = mGlobals.player.getCurrentTime();
+		mGlobals.user.ytPlayerState = mGlobals.player.getPlayerState();
+		var data = {
+            User : mGlobals.user
+		}
+		mGlobals.socket.emit('saveUserVideoState', data);	
 	}
 }
 
 
 function synchronizeUsers() {
-	mGlobals.socket.emit('synchronizeUsers');
+    var data = {};
+	mGlobals.socket.emit('synchronizeUsers', data);
 }
 
 //==================================================================
 // WebSocket message response functions
 //==================================================================
 
-function updateUser(user) {
+function updateUser(data) {
+    var user = data.user;
 	if(mGlobals.sessionInitialized) {
 		mGlobals.user = user;	
 	}
 }
 
 function sessionReady(data) {
-	mGlobals.sessionId = data.sessionId;
-	mGlobals.queue = data.queue;
-	mGlobals.current_users = data.current_users;
+    var session = data.session;
+	mGlobals.sessionId = session.Id;
+	mGlobals.queue = session.queue;
+	mGlobals.current_users = session.users;
 	if(mGlobals.user.temp) {
 		mGlobals.user = data.user;
 	}
@@ -411,20 +407,19 @@ function sessionReady(data) {
 	mGlobals.sessionInitialized = true;
 }
 
-function updateUsersList(users) {
-	users = JSON.parse(users);
+function updateUsersList(data) {
+    var users = data.session.users;
 	if(mGlobals.sessionInitialized) {
 		mGlobals.current_users = users;
 		updateUsersListUI(mGlobals.current_users);	
 	}		
 }
 
-
-function updateQueue(queue) {
-	queue = JSON.parse(queue);
+function updateQueue(data) {
+    var queue = data.session.queue;
 	if(mGlobals.sessionInitialized) {
 		mGlobals.queue = queue;
-		updateQueueUI(mGlobals.user.queue_position + 1);
+		updateQueueUI(mGlobals.user.queuePosition + 1);
 		if(mGlobals.user.waiting) {
 			nextVideoInQueue();
 		}
@@ -442,17 +437,12 @@ function receivedChatMessage(data) {
 	}
 }
 
-function foundGenreJam(data) {
-	joinJamSession(data.genreName);
-}
-
 var messageFunctions = {
     'updateUser': updateUser,
     'sessionReady': sessionReady,
     'updateUsersList': updateUsersList,
     'updateQueue': updateQueue,
     'clientChatMessage': receivedChatMessage,
-    'foundGenreJam': foundGenreJam
 }
 
 function setupSockets() {
@@ -465,11 +455,11 @@ function setupSockets() {
         console.log("closed connection from " + uri);
     };
     socket.onmessage = function (event) {
-        var data = event.data;
-        // TODO: break it down!!!
+        var data = JSON.parse(event.data);
+        var action = data.action;
         console.log('Received websocket message from server:');
         console.log(data);
-        // messageFunctions[action](msg);
+        messageFunctions[action](data);
     };
     socket.onerror = function (event) {
         console.log("error: " + event.data);
@@ -479,9 +469,11 @@ function setupSockets() {
         console.log(data);
         var message = {
             action: action,
-            data: data
+            session: data.session,
+            media: data.media,
+            user: data.user
         }
-        socket.send(message);
+        socket.send(JSON.stringify(message));
     };
     mGlobals.socket = socket;
     console.log('beep');
@@ -513,7 +505,7 @@ function joinJamSession(encodedSessionName) {
 	
 	var data = {
 		user : mGlobals.user,
-		sessionName : encodedSessionName
+		session: { name: encodedSessionName },
 	};
 	mGlobals.socket.emit('userJoinSession', data);
 	setInterval(synchronizeUsers, 5000);
@@ -590,11 +582,11 @@ function onPlayerStateChange(event) {
     }
 }
 
-function updatePlayerUI(current_video, current_video_time, current_recommender_name, current_video_title) {
+function updatePlayerUI(current_video, current_videoTime, current_recommender_name, current_video_title) {
 	if(!mGlobals.player_ready) {
-		setTimeout(updatePlayerUI(current_video, current_video_time, current_recommender_name), 1000);
+		setTimeout(updatePlayerUI(current_video, current_videoTime, current_recommender_name), 1000);
 	}
-	mGlobals.player.loadVideoById(current_video, current_video_time, "large");	
+	mGlobals.player.loadVideoById(current_video, current_videoTime, "large");	
 	$("#p_current_content_info").text(current_video_title);
 	$("#p_current_recommender_info").text('Recommended by: ' + current_recommender_name);
 	var color = 'black';
@@ -612,23 +604,24 @@ function updatePlayerUI(current_video, current_video_time, current_recommender_n
 // Basically constructors. Probably a better way to do this.
 //==================================================================
 
-function createRecommendation(title, videoId, thumb_url, userId, recommender_name) {
-	var rec = {};
-	rec.videoId = videoId;
-	rec.title = title;
-	rec.thumb_URL = thumb_url;
-	rec.recommender_name = recommender_name;
-	rec.userId = userId;
-	return rec;
+function createMedia(title, videoId, thumbURL, userId, recommender_name) {
+    var media = {
+        videoId: videoId,
+        title: title,
+        thumbURL: thumbURL,
+        userName: recommender_name,
+        userId: userId
+    };
+    return media;
 }
 
 function createTempUser(nickname) {
 	var user = {};
 	user.temp = true;
 	user.name = nickname;
-	user.queue_position = -1;
-	user.video_time = -1;
-	user.player_state = -1;
+	user.queuePosition = -1;
+	user.videoTime = -1;
+	user.ytPlayerState = -1;
 	user.color = getRandomColor();
 	return user;
 }

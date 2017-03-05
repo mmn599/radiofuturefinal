@@ -9,7 +9,7 @@ namespace RadioFutureFinal.Contracts
     public class SessionV1
     {
         [JsonProperty]
-        public int SessionID { get; set; }
+        public int Id { get; set; }
 
         [JsonProperty]
         public string Name { get; set; }

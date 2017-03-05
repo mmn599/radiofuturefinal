@@ -8,25 +8,18 @@ namespace RadioFutureFinal.Contracts
 {
     public class MediaV1
     {
-        [JsonProperty]
-        public int MediaID { get; set; }
+        public int Id { get; set; }
 
-        [JsonProperty]
         public int UserID { get; set; }
 
-        [JsonProperty]
         public string UserName { get; set; }
 
-        [JsonProperty]
         public string YTVideoID { get; set; }
 
-        [JsonProperty]
         public int Likes { get; set; }
 
-        [JsonProperty]
         public int Dislikes { get; set; }
 
-        [JsonProperty]
         public string ThumbURL { get; set; }
 
     }

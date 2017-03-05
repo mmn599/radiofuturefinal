@@ -54,8 +54,9 @@ namespace RadioFutureFinal.WebSockets
             {
                 wsMessage = JsonConvert.DeserializeObject<WsMessage>(strMessage);
             }
-            catch
+            catch(Exception e)
             {
+                var msg = e.Message;
                 // TODO: Throw exception
                 var wsOutgoingMessage = new WsMessage();
                 wsOutgoingMessage.Action = "myaction";
