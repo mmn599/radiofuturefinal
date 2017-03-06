@@ -264,8 +264,9 @@ function updateUsersListUI(users) {
 function setupVideo() {
 	if(mGlobals.user.QueuePosition!=-1) {
 		var media = mGlobals.queue[mGlobals.user.QueuePosition];
+		console.log(media);
 		updateQueueUI(mGlobals.user.QueuePosition + 1);
-		updatePlayerUI(media.VideoId, mGlobals.user.VideoTime, media.UserName, media.Title);		
+		updatePlayerUI(media.YTVideoID, mGlobals.user.VideoTime, media.UserName, media.Title);		
 	}
 }
 
@@ -590,6 +591,8 @@ function updatePlayerUI(current_video, current_VideoTime, current_recommender_na
 		setTimeout(updatePlayerUI(current_video, current_VideoTime, current_recommender_name), 1000);
 	}
 	mGlobals.player.loadVideoById(current_video, current_VideoTime, "large");	
+    //TODO: Remove
+	//mGlobals.player.loadVideoById("Phl82D57P58", 0, "large");
 	$("#p_current_content_info").text(current_video_Title);
 	$("#p_current_recommender_info").text('Recommended by: ' + current_recommender_name);
 	var color = 'black';
@@ -611,7 +614,7 @@ function updatePlayerUI(current_video, current_VideoTime, current_recommender_na
 
 function createMedia(Title, VideoId, ThumbURL, UserId, recommender_name) {
     var media = {
-        VideoId: VideoId,
+        YTVideoId: VideoId,
         Title: Title,
         ThumbURL: ThumbURL,
         UserName: recommender_name,
