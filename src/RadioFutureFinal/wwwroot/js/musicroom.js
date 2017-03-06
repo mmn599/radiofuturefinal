@@ -147,10 +147,9 @@ function sessionReadyUI() {
 function onPlayerReady(event) {
     console.log('player ready!');
 	mGlobals.player_ready = true;
-    //TODO: fuck get this working
-	// if(mGlobals.youtube_api_ready) {
-    setupJamSession();
-	// }
+	if(mGlobals.youtube_api_ready) {
+        setupJamSession();
+	}
 }
 
 function queueRollover(item) {
@@ -526,6 +525,7 @@ function sendChatMessage(chat_input) {
 //==================================================================
 
 function youtubeAPIInit() {
+    console.log('doing it!');
 	gapi.client.setApiKey("AIzaSyC4A-dsGk-ha_b-eDpbxaVQt5bR7cOUddc");
 	gapi.client.load("youtube", "v3", function() {
 	    console.log('youtube api loaded');
@@ -537,6 +537,7 @@ function youtubeAPIInit() {
 }
 
 function onYouTubeIframeAPIReady() {
+    console.log('dasdasdasd');
 	mGlobals.player = new YT.Player('div_player', {
         height: 'auto',
         width: '100%',
@@ -546,10 +547,11 @@ function onYouTubeIframeAPIReady() {
         	autoplay: 1
         },
         events: {
-        	'onReady': onPlayerReady,
+            'onReady': onPlayerReady,
             'onStateChange': onPlayerStateChange
         }
     });
+	console.log('oh hell yeah');
 }
 
 function searchVideos(query, callback) {
