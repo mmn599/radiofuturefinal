@@ -1,4 +1,5 @@
-﻿using RadioFutureFinal.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using RadioFutureFinal.Data;
 using RadioFutureFinal.Models;
 using System;
 using System.Collections.Generic;
@@ -16,12 +17,20 @@ namespace RadioFutureFinal.DAL
             _context = context;
         }
 
-        public async Task<User> AddNewUserToSession(string userName, Session session)
+        public async Task<User> AddNewUserToSessionAsync(string userName, Session session)
         {
             var user = new User(userName);
             session.Users.Add(user);
             await UpdateSessionAsync(session);
             return user;
+        }
+
+        public async Task<Media> AddMediaToSessionAsync(Media media, int sessionId)
+        {
+            var session = GetSession(sessionId);
+            session.Queue.Add(media);
+            await UpdateSessionAsync(session);
+            return media;
         }
 
         public async Task RemoveUserAsync(User user)
@@ -33,6 +42,22 @@ namespace RadioFutureFinal.DAL
         public async Task UpdateUserAsync(User user)
         {
             _context.User.Update(user);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateUserVideoStateAsync(User user)
+        {
+            _context.User.Attach(user);
+            _context.Entry(user).Property(x => x.YTPlayerState).IsModified = true;
+            _context.Entry(user).Property(x => x.VideoTime).IsModified = true;
+            _context.Entry(user).Property(x => x.QueuePosition).IsModified = true;
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateUserName(User user)
+        {
+            _context.User.Attach(user);
+            _context.Entry(user).Property(x => x.Name).IsModified = true;
             await _context.SaveChangesAsync();
         }
 
@@ -87,11 +112,19 @@ namespace RadioFutureFinal.DAL
             _context.Media.Remove(media);
             await _context.SaveChangesAsync();
         }
+        public async Task RemoveMediaAsync(int mediaId)
+        {
+            var media = new Media() { MediaID = mediaId };
+            _context.Media.Remove(media);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task UpdateMediaAsync(Media media)
         {
             _context.Media.Update(media);
             await _context.SaveChangesAsync();
         }
+
         public Media GetMedia(int mediaId)
         {
             return _context.Media.FirstOrDefault(t => t.MediaID == mediaId);

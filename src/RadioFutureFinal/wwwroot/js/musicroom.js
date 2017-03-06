@@ -59,7 +59,7 @@ $(document).ready(function(){
 
 	mGlobals.ui.input_name.keypress(function(e) {
 		if(e.which==13) {
-			userNameChange(mGlobals.ui.input_name);
+			UserNameChange(mGlobals.ui.input_name);
 		}	
 	})
 
@@ -130,7 +130,7 @@ function searchEnterPressed(input_search) {
 	divResults.html("");
 	searchVideos(input_search.val(), function(response) {
 		$.each(response.items, function(index, item) {
-		divResults.html(divResults.html() + "<div class='div_search_result' onClick='queueSelectedVideo(this)' data-videoId='" + item.id.videoId + "' data-thumbURL='"+item.snippet.thumbnails.medium.url+"'>" + '<p class="text_search_result">' +  item.snippet.title+ '</p></div>' );
+		divResults.html(divResults.html() + "<div class='div_search_result' onClick='queueSelectedVideo(this)' data-VideoId='" + item.id.VideoId + "' data-ThumbURL='"+item.snippet.thumbnails.medium.url+"'>" + '<p class="text_search_result">' +  item.snippet.Title+ '</p></div>' );
 	});
 	});
 	if(!divResults.is(':visible')) {
@@ -159,7 +159,7 @@ function queueRollover(item) {
 }
 
 function queueRolloff(item) {
-	$(item).attr('src', item.getAttribute('data-thumbURL'));
+	$(item).attr('src', item.getAttribute('data-ThumbURL'));
 }
 
 function updateQueueUI(starting_QueuePosition) {
@@ -174,10 +174,10 @@ function updateQueueUI(starting_QueuePosition) {
 		var media = queue[i];
 		var innertht;
 		if((j+1)%5===0) {
-			innerht = "<div class='div_content' style='margin-right: 0'><img class='img_queue_item' data-QueuePosition='" + i + "' data-thumbURL='" + media.thumbURL + "' onmouseover='queueRollover(this)' onmouseout='queueRolloff(this)' src='" + media.thumbURL + "'></img></div>";
+			innerht = "<div class='div_content' style='margin-right: 0'><img class='img_queue_item' data-QueuePosition='" + i + "' data-ThumbURL='" + media.ThumbURL + "' onmouseover='queueRollover(this)' onmouseout='queueRolloff(this)' src='" + media.ThumbURL + "'></img></div>";
 		}
 		else {
-			innerht = "<div class='div_content'><img class='img_queue_item' data-QueuePosition='" + i + "' data-thumbURL='" + media.thumbURL + "' onmouseover='queueRollover(this)' onmouseout='queueRolloff(this)' src='" + media.thumbURL + "'></img></div>";
+			innerht = "<div class='div_content'><img class='img_queue_item' data-QueuePosition='" + i + "' data-ThumbURL='" + media.ThumbURL + "' onmouseover='queueRollover(this)' onmouseout='queueRolloff(this)' src='" + media.ThumbURL + "'></img></div>";
 
 		}
 		div_queue.html(div_queue.html() + innerht);
@@ -208,10 +208,10 @@ function updateUsersListUI(users) {
 		var color = user.color;
 		var QueuePosition = user.QueuePosition;
 		if(QueuePosition!=-1) {
-			current_video_title = mGlobals.queue[QueuePosition].title;
+			current_video_Title = mGlobals.queue[QueuePosition].Title;
 		}
 		else {
-			current_video_title = "Nothing";
+			current_video_Title = "Nothing";
 		}
 
 		var div_user = document.createElement('div');
@@ -253,13 +253,13 @@ function updateUsersListUI(users) {
 		var color = user.color;
 		var QueuePosition = user.QueuePosition;
 		if(QueuePosition!=-1) {
-			current_video_title = mGlobals.queue[QueuePosition].title;
+			current_video_Title = mGlobals.queue[QueuePosition].Title;
 		}
 		else {
-			current_video_title = "Nothing";
+			current_video_Title = "Nothing";
 		}
 		mGlobals.queue[user.QueuePosition]
-		var innerht = '<p class="p_user" style="white-space: nowrap;">' + '<span class="span_user" onclick="syncWithUserUI(this.getAttribute(\'data-username\'))" data-username="' + user.name +'" style="border-bottom:1px solid '+color+'; cursor: pointer;">'+user.name +  '</span>' + '</span><br><br>' + '</p>';//+ ' is listening to ' + '<span style="font-weight: bold;">' + current_video_title + '</span>' + '</span><br><br>' + '</p>';
+		var innerht = '<p class="p_user" style="white-space: nowrap;">' + '<span class="span_user" onclick="syncWithUserUI(this.getAttribute(\'data-username\'))" data-username="' + user.name +'" style="border-bottom:1px solid '+color+'; cursor: pointer;">'+user.name +  '</span>' + '</span><br><br>' + '</p>';//+ ' is listening to ' + '<span style="font-weight: bold;">' + current_video_Title + '</span>' + '</span><br><br>' + '</p>';
 		usersList.innerHTML += innerht;
 	}*/
 }
@@ -272,7 +272,7 @@ function setupVideo() {
 	}
 }
 
-function userNameChange(name_input) {
+function UserNameChange(name_input) {
 	name_input.hide();
 	mGlobals.ui.input_chat.fadeIn();
 	saveUserNameChange(name_input.val());
@@ -302,7 +302,7 @@ function previousVideoInQueue() {
 }
 
 function nextVideoInQueue() {
-	mGlobals.user.videoTime = 0;
+	mGlobals.user.VideoTime = 0;
 	var queue = mGlobals.queue;
 	if((mGlobals.user.QueuePosition+1)<queue.length) {
 		var QueuePosition = mGlobals.user.QueuePosition = mGlobals.user.QueuePosition + 1;
@@ -317,10 +317,10 @@ function nextVideoInQueue() {
 function queueSelectedVideo(elmnt) {
 	mGlobals.ui.div_search_results.fadeOut();
 	mGlobals.ui.input_search.val("");
-	var videoId = elmnt.getAttribute('data-videoId');
-	var title = elmnt.innerText || element.textContent;
-	var thumbURL = elmnt.getAttribute('data-thumbURL');
-	var media = createMedia(title, videoId, thumbURL, mGlobals.user.Id, mGlobals.user.name);
+	var VideoId = elmnt.getAttribute('data-VideoId');
+	var Title = elmnt.innerText || element.textContent;
+	var ThumbURL = elmnt.getAttribute('data-ThumbURL');
+	var media = createMedia(Title, VideoId, ThumbURL, mGlobals.user.Id, mGlobals.user.name);
 	var data = {
 		Media : media
 	};
@@ -341,8 +341,8 @@ function syncWithUser(username) {
 		}
 	}
 	mGlobals.user.QueuePosition = myuser.QueuePosition;
-	mGlobals.user.videoTime = myuser.videoTime;
-	mGlobals.user.ytPlayerState = myuser.ytPlayerState;
+	mGlobals.user.VideoTime = myuser.VideoTime;
+	mGlobals.user.YtPlayerState = myuser.YtPlayerState;
 	updateQueueUI(mGlobals.user.QueuePosition + 1);
 	setupVideo();
 }
@@ -363,8 +363,8 @@ function saveUserNameChange(name) {
 
 function saveUserVideoState() {
 	if(mGlobals.player_ready) {
-		mGlobals.user.videoTime = mGlobals.player.getCurrentTime();
-		mGlobals.user.ytPlayerState = mGlobals.player.getPlayerState();
+		mGlobals.user.VideoTime = mGlobals.player.getCurrentTime();
+		mGlobals.user.YtPlayerState = mGlobals.player.getPlayerState();
 		var data = {
             User : mGlobals.user
 		}
@@ -396,8 +396,7 @@ function sessionReady(data) {
 	mGlobals.current_users = session.Users;
     mGlobals.user = data.User;
 	saveUserVideoState();
-    //TODO: remove
-	//setInterval(saveUserVideoState, 10000);
+	setInterval(saveUserVideoState, 10000);
 	if(mGlobals.queue.length==0) {
 		$("#p_current_content_info").text("Queue up a song!");
 		$("#p_current_recommender_info").text("Use the search bar above.");
@@ -590,12 +589,12 @@ function onPlayerStateChange(event) {
     }
 }
 
-function updatePlayerUI(current_video, current_videoTime, current_recommender_name, current_video_title) {
+function updatePlayerUI(current_video, current_VideoTime, current_recommender_name, current_video_Title) {
 	if(!mGlobals.player_ready) {
-		setTimeout(updatePlayerUI(current_video, current_videoTime, current_recommender_name), 1000);
+		setTimeout(updatePlayerUI(current_video, current_VideoTime, current_recommender_name), 1000);
 	}
-	mGlobals.player.loadVideoById(current_video, current_videoTime, "large");	
-	$("#p_current_content_info").text(current_video_title);
+	mGlobals.player.loadVideoById(current_video, current_VideoTime, "large");	
+	$("#p_current_content_info").text(current_video_Title);
 	$("#p_current_recommender_info").text('Recommended by: ' + current_recommender_name);
 	var color = 'black';
 	//TODO: shitty
@@ -608,17 +607,19 @@ function updatePlayerUI(current_video, current_videoTime, current_recommender_na
 	synchronizeUsers();
 }
 
+//TODO: Fix CamelCase stuff with JSON
+
 //==================================================================
 // Basically constructors. Probably a better way to do this.
 //==================================================================
 
-function createMedia(title, videoId, thumbURL, userId, recommender_name) {
+function createMedia(Title, VideoId, ThumbURL, UserId, recommender_name) {
     var media = {
-        videoId: videoId,
-        title: title,
-        thumbURL: thumbURL,
-        userName: recommender_name,
-        userId: userId
+        VideoId: VideoId,
+        Title: Title,
+        ThumbURL: ThumbURL,
+        UserName: recommender_name,
+        UserId: UserId
     };
     return media;
 }
@@ -628,8 +629,8 @@ function createTempUser(nickname) {
 	user.temp = true;
 	user.name = nickname;
 	user.QueuePosition = -1;
-	user.videoTime = -1;
-	user.ytPlayerState = -1;
+	user.VideoTime = -1;
+	user.YtPlayerState = -1;
 	user.color = getRandomColor();
 	return user;
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RadioFutureFinal.Contracts;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -18,6 +19,17 @@ namespace RadioFutureFinal.Models
         public Media()
         {
 
+        }
+
+        public Media(MediaV1 media)
+        {
+            MediaID = media.Id;
+            UserID = media.UserID;
+            UserName = media.UserName;
+            YTVideoID = media.YTVideoID;
+            Likes = media.Likes;
+            Dislikes = media.Dislikes;
+            ThumbURL = media.ThumbURL;
         }
     }
 }

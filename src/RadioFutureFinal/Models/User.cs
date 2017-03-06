@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RadioFutureFinal.Contracts;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,6 +22,17 @@ namespace RadioFutureFinal.Models
             Name = userName;
             Recs = new List<Media>();
         }
+
+        public User(UserV1 user)
+        {
+            UserID = user.Id;
+            Name = user.Name;
+            VideoTime = user.VideoTime;
+            QueuePosition = user.QueuePosition;
+            YTPlayerState = user.YTPlayerState;
+            Waiting = user.Waiting;
+        }
+
 
         public User()
         {

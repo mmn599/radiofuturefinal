@@ -81,11 +81,11 @@ namespace RadioFutureFinal.WebSockets
             }
             else if(wsMessage.Action.Equals("AddMediaToSession", StringComparison.CurrentCultureIgnoreCase))
             {
-                // await AddMediaToSession(wsMessage, mySocket);
+                await AddMediaToSession(wsMessage, mySocket);
             }
             else if(wsMessage.Action.Equals("DeleteMediaFromSession", StringComparison.CurrentCultureIgnoreCase))
             {
-                // await DeleteMediaFromSession(wsMessage, mySocket);
+                await DeleteMediaFromSession(wsMessage, mySocket);
             }
             else if(wsMessage.Action.Equals("SaveUserVideoState", StringComparison.CurrentCultureIgnoreCase))
             {
@@ -93,15 +93,15 @@ namespace RadioFutureFinal.WebSockets
             }
             else if(wsMessage.Action.Equals("SaveUserNameChange", StringComparison.CurrentCultureIgnoreCase))
             {
-                // await SaveUserNameChange(wsMessage, mySocket);
+                await SaveUserNameChange(wsMessage, mySocket);
             }
             else if(wsMessage.Action.Equals("ChatMessage", StringComparison.CurrentCultureIgnoreCase))
             {
                 // await ChatMessage(wsMessage, mySocket);
             }
-            else if(wsMessage.Action.Equals("SynchronizeSession", StringComparison.CurrentCultureIgnoreCase))
+            else if(wsMessage.Action.Equals("SynchronizeUsers", StringComparison.CurrentCultureIgnoreCase))
             {
-                // await SynchronizeSession(wsMessage, mySocket);
+                await SynchronizeSession(wsMessage, mySocket);
             }
             else
             {
@@ -130,13 +130,31 @@ namespace RadioFutureFinal.WebSockets
             await SendMessageAsync(socket.WebSocket, wsMessage);
         }
 
-        private async Task ClientsUpdateSessionUsers(MySocket socket, Session session)
+        //TODO: better way of keeping track of messages and shit. All these functions feel weird
+
+        private async Task ClientsUpdateSession(MySocket socket, Session session, string action)
         {
             var wsMessage = new WsMessage();
-            wsMessage.Action = "updateUsersList";
+            wsMessage.Action = action;
             wsMessage.Session = new SessionV1(session);
-
             await SendMessageToSessionAsync(wsMessage, session.SessionID);
+        }
+
+        private async Task ClientsUpdateSessionUsers(MySocket socket, Session session)
+        {
+            await ClientsUpdateSession(socket, session, "updateUsersList");
+        }
+
+        private async Task ClientsUpdateSessionUsers(MySocket socket, int sessionId)
+        {
+            var session = _db.GetSession(sessionId);
+            await ClientsUpdateSession(socket, session, "updateUsersList");
+        }
+
+        private async Task ClientsUpdateSessionQueue(MySocket socket, int sessionId)
+        {
+            var session = _db.GetSession(sessionId);
+            await ClientsUpdateSession(socket, session, "updateQueue");
         }
 
 
@@ -154,7 +172,7 @@ namespace RadioFutureFinal.WebSockets
             _wsConnectionManager.SocketJoinSession(socket, session.SessionID);
 
             var userName = message.User.Name;
-            var user = await _db.AddNewUserToSession(userName, session);
+            var user = await _db.AddNewUserToSessionAsync(userName, session);
 
             await ClientSessionReady(socket, session, user);
             await ClientsUpdateSessionUsers(socket, session);
@@ -162,105 +180,32 @@ namespace RadioFutureFinal.WebSockets
 
         private async Task AddMediaToSession(WsMessage message, MySocket socket)
         {
-            var sessionName = message.Session.Name;
-            Session session = null;
-            bool sessionFound = _db.GetSessionByName(sessionName, out session);
-            if(!sessionFound)
-            {
-                session = await _db.CreateSessionAsync(sessionName);
-            }
-            _wsConnectionManager.SocketJoinSession(socket, session.SessionID);
-
-            var userName = message.User.Name;
-            var user = await _db.AddNewUserToSession(userName, session);
-
-            await ClientSessionReady(socket, session, user);
-            await ClientsUpdateSessionUsers(socket, session);
+            await _db.AddMediaToSessionAsync(new Media(message.Media), socket.SessionId);
+            await ClientsUpdateSessionQueue(socket, socket.SessionId);
         }
+
         private async Task DeleteMediaFromSession(WsMessage message, MySocket socket)
         {
-            var sessionName = message.Session.Name;
-            Session session = null;
-            bool sessionFound = _db.GetSessionByName(sessionName, out session);
-            if(!sessionFound)
-            {
-                session = await _db.CreateSessionAsync(sessionName);
-            }
-            _wsConnectionManager.SocketJoinSession(socket, session.SessionID);
-
-            var userName = message.User.Name;
-            var user = await _db.AddNewUserToSession(userName, session);
-
-            await ClientSessionReady(socket, session, user);
-            await ClientsUpdateSessionUsers(socket, session);
+            await _db.RemoveMediaAsync(message.Media.Id);
+            await ClientsUpdateSessionQueue(socket, socket.SessionId);
         }
+
         private async Task SaveUserVideoState(WsMessage message, MySocket socket)
         {
-            var sessionName = message.Session.Name;
-            Session session = null;
-            bool sessionFound = _db.GetSessionByName(sessionName, out session);
-            if(!sessionFound)
-            {
-                session = await _db.CreateSessionAsync(sessionName);
-            }
-            _wsConnectionManager.SocketJoinSession(socket, session.SessionID);
-
-            var userName = message.User.Name;
-            var user = await _db.AddNewUserToSession(userName, session);
-
-            await ClientSessionReady(socket, session, user);
-            await ClientsUpdateSessionUsers(socket, session);
+            await _db.UpdateUserVideoStateAsync(new User(message.User));
+            await ClientsUpdateSessionUsers(socket, message.Session.Id);
         }
         private async Task SaveUserNameChange(WsMessage message, MySocket socket)
         {
-            var sessionName = message.Session.Name;
-            Session session = null;
-            bool sessionFound = _db.GetSessionByName(sessionName, out session);
-            if(!sessionFound)
-            {
-                session = await _db.CreateSessionAsync(sessionName);
-            }
-            _wsConnectionManager.SocketJoinSession(socket, session.SessionID);
-
-            var userName = message.User.Name;
-            var user = await _db.AddNewUserToSession(userName, session);
-
-            await ClientSessionReady(socket, session, user);
-            await ClientsUpdateSessionUsers(socket, session);
+            await _db.UpdateUserNameAsync(new User(message.User));
+            await ClientsUpdateSessionUsers(socket, message.Session.Id);
         }
         private async Task ChatMessage(WsMessage message, MySocket socket)
         {
-            var sessionName = message.Session.Name;
-            Session session = null;
-            bool sessionFound = _db.GetSessionByName(sessionName, out session);
-            if(!sessionFound)
-            {
-                session = await _db.CreateSessionAsync(sessionName);
-            }
-            _wsConnectionManager.SocketJoinSession(socket, session.SessionID);
-
-            var userName = message.User.Name;
-            var user = await _db.AddNewUserToSession(userName, session);
-
-            await ClientSessionReady(socket, session, user);
-            await ClientsUpdateSessionUsers(socket, session);
         }
         private async Task SynchronizeSession(WsMessage message, MySocket socket)
         {
-            var sessionName = message.Session.Name;
-            Session session = null;
-            bool sessionFound = _db.GetSessionByName(sessionName, out session);
-            if(!sessionFound)
-            {
-                session = await _db.CreateSessionAsync(sessionName);
-            }
-            _wsConnectionManager.SocketJoinSession(socket, session.SessionID);
-
-            var userName = message.User.Name;
-            var user = await _db.AddNewUserToSession(userName, session);
-
-            await ClientSessionReady(socket, session, user);
-            await ClientsUpdateSessionUsers(socket, session);
+            await ClientsUpdateSessionUsers(socket, message.Session.Id);
         }
 
     }
