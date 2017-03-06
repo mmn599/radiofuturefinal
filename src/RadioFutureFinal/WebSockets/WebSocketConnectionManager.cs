@@ -45,8 +45,15 @@ namespace RadioFutureFinal.WebSockets
 
         public void SocketJoinSession(MySocket socket, int sessionId)
         {
-            var sessionSockets = _sessionSockets.FirstOrDefault(p => p.Key == sessionId).Value;
-            sessionSockets.Add(socket);
+            var ssKeyValuePair = _sessionSockets.FirstOrDefault(pair => pair.Key == sessionId);
+            if(ssKeyValuePair.Value == null)
+            {
+                _sessionSockets.TryAdd(sessionId, new List<MySocket>() { socket });
+            }
+            else
+            {
+                ssKeyValuePair.Value.Add(socket);
+            }
             socket.JoinSession(sessionId);
         }
 

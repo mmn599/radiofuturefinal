@@ -50,7 +50,7 @@ namespace RadioFutureFinal.DAL
             var session = new Session(sessionName);
             _context.Session.Add(session);
             await _context.SaveChangesAsync();
-            return sessionuserName
+            return session;
         }
         public async Task RemoveSessionAsync(Session session)
         {

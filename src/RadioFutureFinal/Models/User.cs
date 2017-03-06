@@ -17,7 +17,14 @@ namespace RadioFutureFinal.Models
 
         public User(string userName)
         {
+            QueuePosition = -1;
             Name = userName;
+            Recs = new List<Media>();
+        }
+
+        public User()
+        {
+            QueuePosition = -1;
             Recs = new List<Media>();
         }
     }

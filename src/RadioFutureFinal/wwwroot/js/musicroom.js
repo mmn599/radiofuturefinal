@@ -155,16 +155,16 @@ function onPlayerReady(event) {
 function queueRollover(item) {
 	$(item).attr('src', '../images/cross.jpg');
 	//TODO: can place statically
-	$(item).attr('onclick', "deleteVideoInQueue(" + item.getAttribute('data-queuePosition') + ")");
+	$(item).attr('onclick', "deleteVideoInQueue(" + item.getAttribute('data-QueuePosition') + ")");
 }
 
 function queueRolloff(item) {
 	$(item).attr('src', item.getAttribute('data-thumbURL'));
 }
 
-function updateQueueUI(starting_queuePosition) {
+function updateQueueUI(starting_QueuePosition) {
 	var queue = mGlobals.queue;
-	var i = starting_queuePosition;
+	var i = starting_QueuePosition;
 	var j = 0;
 	//TODO: make robust
 	var end = 5;
@@ -174,10 +174,10 @@ function updateQueueUI(starting_queuePosition) {
 		var media = queue[i];
 		var innertht;
 		if((j+1)%5===0) {
-			innerht = "<div class='div_content' style='margin-right: 0'><img class='img_queue_item' data-queuePosition='" + i + "' data-thumbURL='" + media.thumbURL + "' onmouseover='queueRollover(this)' onmouseout='queueRolloff(this)' src='" + media.thumbURL + "'></img></div>";
+			innerht = "<div class='div_content' style='margin-right: 0'><img class='img_queue_item' data-QueuePosition='" + i + "' data-thumbURL='" + media.thumbURL + "' onmouseover='queueRollover(this)' onmouseout='queueRolloff(this)' src='" + media.thumbURL + "'></img></div>";
 		}
 		else {
-			innerht = "<div class='div_content'><img class='img_queue_item' data-queuePosition='" + i + "' data-thumbURL='" + media.thumbURL + "' onmouseover='queueRollover(this)' onmouseout='queueRolloff(this)' src='" + media.thumbURL + "'></img></div>";
+			innerht = "<div class='div_content'><img class='img_queue_item' data-QueuePosition='" + i + "' data-thumbURL='" + media.thumbURL + "' onmouseover='queueRollover(this)' onmouseout='queueRolloff(this)' src='" + media.thumbURL + "'></img></div>";
 
 		}
 		div_queue.html(div_queue.html() + innerht);
@@ -199,13 +199,16 @@ function updateUsersListUI(users) {
 	for(var i=0;i<users.length;i++) {
 		var user = users[i];
 		//uses local user data instead of what is currently in the server
+		console.log('poop');
+		console.log(user);
 		if(user.Id===mGlobals.user.Id) {
 			user = mGlobals.user;
 		}
+		console.log(user);
 		var color = user.color;
-		var queuePosition = user.queuePosition;
-		if(queuePosition!=-1) {
-			current_video_title = mGlobals.queue[queuePosition].title;
+		var QueuePosition = user.QueuePosition;
+		if(QueuePosition!=-1) {
+			current_video_title = mGlobals.queue[QueuePosition].title;
 		}
 		else {
 			current_video_title = "Nothing";
@@ -214,17 +217,17 @@ function updateUsersListUI(users) {
 		var div_user = document.createElement('div');
 		div_user.style.background = user.color;
 		div_user.className = "div_user tooltip";
-		div_user.setAttribute('data-username', user.name);
+		div_user.setAttribute('data-username', user.Name);
 
 		var p_user = document.createElement('p');
 		p_user.className = "p_user";
-		p_user.setAttribute('data-username', user.name);
-		p_user.appendChild(document.createTextNode(user.name.charAt(0)));
+		p_user.setAttribute('data-username', user.Name);
+		p_user.appendChild(document.createTextNode(user.Name.charAt(0)));
 
 		var span_tooltip = document.createElement('span');
 		span_tooltip.className = "tooltiptext";
-		span_tooltip.setAttribute('data-username', user.name);
-		span_tooltip.innerHTML = "Click to sync with " + user.name + "!";
+		span_tooltip.setAttribute('data-username', user.Name);
+		span_tooltip.innerHTML = "Click to sync with " + user.Name + "!";
 
 		div_user.appendChild(p_user);
 		div_user.appendChild(span_tooltip);
@@ -248,24 +251,24 @@ function updateUsersListUI(users) {
 			user = mGlobals.user;
 		}
 		var color = user.color;
-		var queuePosition = user.queuePosition;
-		if(queuePosition!=-1) {
-			current_video_title = mGlobals.queue[queuePosition].title;
+		var QueuePosition = user.QueuePosition;
+		if(QueuePosition!=-1) {
+			current_video_title = mGlobals.queue[QueuePosition].title;
 		}
 		else {
 			current_video_title = "Nothing";
 		}
-		mGlobals.queue[user.queuePosition]
+		mGlobals.queue[user.QueuePosition]
 		var innerht = '<p class="p_user" style="white-space: nowrap;">' + '<span class="span_user" onclick="syncWithUserUI(this.getAttribute(\'data-username\'))" data-username="' + user.name +'" style="border-bottom:1px solid '+color+'; cursor: pointer;">'+user.name +  '</span>' + '</span><br><br>' + '</p>';//+ ' is listening to ' + '<span style="font-weight: bold;">' + current_video_title + '</span>' + '</span><br><br>' + '</p>';
 		usersList.innerHTML += innerht;
 	}*/
 }
 
 function setupVideo() {
-	if(mGlobals.user.queuePosition!=-1) {
-		var media = mGlobals.queue[mGlobals.user.queuePosition];
-		updateQueueUI(mGlobals.user.queuePosition + 1);
-		updatePlayerUI(media.videoId, mGlobals.user.videoTime, media.recommender_name, media.title);		
+	if(mGlobals.user.QueuePosition!=-1) {
+		var media = mGlobals.queue[mGlobals.user.QueuePosition];
+		updateQueueUI(mGlobals.user.QueuePosition + 1);
+		updatePlayerUI(media.VideoId, mGlobals.user.VideoTime, media.UserName, media.Title);		
 	}
 }
 
@@ -278,10 +281,10 @@ function userNameChange(name_input) {
 //==================================================================
 // Backend video and queue control functions
 //==================================================================
-function deleteVideoInQueue(queuePosition) {
-	var id = mGlobals.queue[queuePosition].Id;
-	mGlobals.queue.splice(queuePosition, 1);
-	updateQueueUI(mGlobals.user.queuePosition + 1);
+function deleteVideoInQueue(QueuePosition) {
+	var id = mGlobals.queue[QueuePosition].Id;
+	mGlobals.queue.splice(QueuePosition, 1);
+	updateQueueUI(mGlobals.user.QueuePosition + 1);
 	var data =  {
         Media : {MediaId : id}
 	};
@@ -289,10 +292,10 @@ function deleteVideoInQueue(queuePosition) {
 }
 
 function previousVideoInQueue() {
-	mGlobals.user.videoTime = 0;
+	mGlobals.user.VideoTime = 0;
 	var queue = mGlobals.queue;
-	if(mGlobals.user.queuePosition>0) {
-		var queuePosition = mGlobals.user.queuePosition = mGlobals.user.queuePosition - 1;
+	if(mGlobals.user.QueuePosition>0) {
+		var QueuePosition = mGlobals.user.QueuePosition = mGlobals.user.QueuePosition - 1;
 		setupVideo();
 		mGlobals.user.waiting = false;
 	}
@@ -301,8 +304,8 @@ function previousVideoInQueue() {
 function nextVideoInQueue() {
 	mGlobals.user.videoTime = 0;
 	var queue = mGlobals.queue;
-	if((mGlobals.user.queuePosition+1)<queue.length) {
-		var queuePosition = mGlobals.user.queuePosition = mGlobals.user.queuePosition + 1;
+	if((mGlobals.user.QueuePosition+1)<queue.length) {
+		var QueuePosition = mGlobals.user.QueuePosition = mGlobals.user.QueuePosition + 1;
 		setupVideo();
 		mGlobals.user.waiting = false;
 	}
@@ -337,10 +340,10 @@ function syncWithUser(username) {
 			myuser = mGlobals.current_users[i];
 		}
 	}
-	mGlobals.user.queuePosition = myuser.queuePosition;
+	mGlobals.user.QueuePosition = myuser.QueuePosition;
 	mGlobals.user.videoTime = myuser.videoTime;
 	mGlobals.user.ytPlayerState = myuser.ytPlayerState;
-	updateQueueUI(mGlobals.user.queuePosition + 1);
+	updateQueueUI(mGlobals.user.QueuePosition + 1);
 	setupVideo();
 }
 
@@ -387,15 +390,14 @@ function updateUser(data) {
 }
 
 function sessionReady(data) {
-    var session = data.session;
+    var session = data.Session;
 	mGlobals.sessionId = session.Id;
-	mGlobals.queue = session.queue;
-	mGlobals.current_users = session.users;
-	if(mGlobals.user.temp) {
-		mGlobals.user = data.user;
-	}
+	mGlobals.queue = session.Queue;
+	mGlobals.current_users = session.Users;
+    mGlobals.user = data.User;
 	saveUserVideoState();
-	setInterval(saveUserVideoState, 10000);
+    //TODO: remove
+	//setInterval(saveUserVideoState, 10000);
 	if(mGlobals.queue.length==0) {
 		$("#p_current_content_info").text("Queue up a song!");
 		$("#p_current_recommender_info").text("Use the search bar above.");
@@ -407,7 +409,7 @@ function sessionReady(data) {
 }
 
 function updateUsersList(data) {
-    var users = data.session.users;
+    var users = data.Session.Users;
 	if(mGlobals.sessionInitialized) {
 		mGlobals.current_users = users;
 		updateUsersListUI(mGlobals.current_users);	
@@ -418,7 +420,7 @@ function updateQueue(data) {
     var queue = data.session.queue;
 	if(mGlobals.sessionInitialized) {
 		mGlobals.queue = queue;
-		updateQueueUI(mGlobals.user.queuePosition + 1);
+		updateQueueUI(mGlobals.user.QueuePosition + 1);
 		if(mGlobals.user.waiting) {
 			nextVideoInQueue();
 		}
@@ -455,15 +457,22 @@ function setupSockets() {
     };
     socket.onmessage = function (event) {
         var data = JSON.parse(event.data);
-        var action = data.action;
+        var action = data.Action;
         console.log('Received websocket message from server:');
         console.log(data);
+        console.log(action);
+        var func = messageFunctions[action];
+        console.log(func);
         messageFunctions[action](data);
     };
     socket.onerror = function (event) {
         console.log("error: " + event.data);
     };
     socket.emit = function (action, data) {
+        if (socket.readyState === socket.CONNECTING) {
+            setTimeout(function () { socket.emit(action, data) }, 100);
+            return;
+        }
         console.log('Sending websocket message to server: ' + action);
         var message = {
             action: action,
@@ -618,7 +627,7 @@ function createTempUser(nickname) {
 	var user = {};
 	user.temp = true;
 	user.name = nickname;
-	user.queuePosition = -1;
+	user.QueuePosition = -1;
 	user.videoTime = -1;
 	user.ytPlayerState = -1;
 	user.color = getRandomColor();

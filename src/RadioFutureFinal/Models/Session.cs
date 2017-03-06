@@ -19,5 +19,10 @@ namespace RadioFutureFinal.Models
             Queue = new List<Media>();
             Name = name;
         }
+
+        public Session()
+        {
+
+        }
     }
 }
