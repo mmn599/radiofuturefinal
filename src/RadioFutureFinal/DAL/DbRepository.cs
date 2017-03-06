@@ -16,10 +16,12 @@ namespace RadioFutureFinal.DAL
             _context = context;
         }
 
-        public async Task AddUserAsync(User user)
+        public async Task<User> AddNewUserToSession(string userName, Session session)
         {
-            _context.User.Add(user);
-            await _context.SaveChangesAsync();
+            var user = new User(userName);
+            session.Users.Add(user);
+            await UpdateSessionAsync(session);
+            return user;
         }
 
         public async Task RemoveUserAsync(User user)
@@ -43,11 +45,12 @@ namespace RadioFutureFinal.DAL
         {
             return _context.User.ToList();
         }
-
-        public async Task AddSessionAsync(Session session)
+        public async Task<Session> CreateSessionAsync(string sessionName)
         {
+            var session = new Session(sessionName);
             _context.Session.Add(session);
             await _context.SaveChangesAsync();
+            return sessionuserName
         }
         public async Task RemoveSessionAsync(Session session)
         {
@@ -63,6 +66,12 @@ namespace RadioFutureFinal.DAL
         {
             return _context.Session.FirstOrDefault(t => t.SessionID == sessionId);
         }
+        public bool GetSessionByName(string sessionName, out Session session)
+        {
+            session = _context.Session.FirstOrDefault(t => t.Name == sessionName);
+            return session != null;
+        }
+
         public IEnumerable<Session> GetAllSessions()
         {
             return _context.Session.ToList();

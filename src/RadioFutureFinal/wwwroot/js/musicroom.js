@@ -465,17 +465,16 @@ function setupSockets() {
     };
     socket.emit = function (action, data) {
         console.log('Sending websocket message to server: ' + action);
-        console.log(data);
         var message = {
             action: action,
             session: data.session,
             media: data.media,
             user: data.user
         }
+        console.log(message);
         socket.send(JSON.stringify(message));
     };
     mGlobals.socket = socket;
-    console.log('beep');
 }
 
 //TODO: synchronize so multiple entry points don't happen
@@ -507,7 +506,8 @@ function joinJamSession(encodedSessionName) {
 		session: { name: encodedSessionName },
 	};
 	mGlobals.socket.emit('userJoinSession', data);
-	setInterval(synchronizeUsers, 5000);
+    // TODO: setup on server side
+	setInterval(synchronizeUsers, 10000);
 };
 
 //==================================================================
@@ -525,7 +525,6 @@ function sendChatMessage(chat_input) {
 //==================================================================
 
 function youtubeAPIInit() {
-    console.log('doing it!');
 	gapi.client.setApiKey("AIzaSyC4A-dsGk-ha_b-eDpbxaVQt5bR7cOUddc");
 	gapi.client.load("youtube", "v3", function() {
 	    console.log('youtube api loaded');
@@ -537,7 +536,6 @@ function youtubeAPIInit() {
 }
 
 function onYouTubeIframeAPIReady() {
-    console.log('dasdasdasd');
 	mGlobals.player = new YT.Player('div_player', {
         height: 'auto',
         width: '100%',
@@ -551,7 +549,6 @@ function onYouTubeIframeAPIReady() {
             'onStateChange': onPlayerStateChange
         }
     });
-	console.log('oh hell yeah');
 }
 
 function searchVideos(query, callback) {

@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using RadioFutureFinal.Contracts;
 using RadioFutureFinal.DAL;
+using RadioFutureFinal.Models;
 using System;
 using System.Net.WebSockets;
 using System.Text;
@@ -45,6 +46,15 @@ namespace RadioFutureFinal.WebSockets
                                    cancellationToken: CancellationToken.None);
         }
 
+        public async Task SendMessageToSessionAsync(WsMessage message, int sessionId)
+        {
+            foreach(var socket in _wsConnectionManager.GetSocketsInSession(sessionId))
+            {
+                await SendMessageAsync(socket.WebSocket, message);
+            }
+        }
+
+
         // TODO: how neccesary is this being async?
         public async Task ReceiveAsync(WebSocket socket, WebSocketReceiveResult result, byte[] buffer)
         {
@@ -58,39 +68,38 @@ namespace RadioFutureFinal.WebSockets
             {
                 var msg = e.Message;
                 // TODO: Throw exception
-                var wsOutgoingMessage = new WsMessage();
-                wsOutgoingMessage.Action = "myaction";
-                await SendMessageAsync(socket, wsOutgoingMessage);
                 return;
             }
 
             // TODO: smoother way to do this
-            Action<WsMessage> action = null;
-            if(wsMessage.Action == "JoinSession")
+            Action<WsMessage, MySocket> action = null;
+            // TODO: better data structure should make this one call
+            MySocket mySocket = _wsConnectionManager.GetSocketById(_wsConnectionManager.GetId(socket));
+            if(wsMessage.Action.Equals("JoinSession", StringComparison.CurrentCultureIgnoreCase))
             {
                 action = JoinSession;
             }
-            else if(wsMessage.Action == "AddMediaToSession")
+            else if(wsMessage.Action.Equals("AddMediaToSession", StringComparison.CurrentCultureIgnoreCase))
             {
                 action = AddMediaToSession;
             }
-            else if(wsMessage.Action == "DeleteMediaFromSession")
+            else if(wsMessage.Action.Equals("DeleteMediaFromSession", StringComparison.CurrentCultureIgnoreCase))
             {
                 action = DeleteMediaFromSession;
             }
-            else if(wsMessage.Action == "SaveUserVideoState")
+            else if(wsMessage.Action.Equals("SaveUserVideoState", StringComparison.CurrentCultureIgnoreCase))
             {
                 action = SaveUserVideoState;
             }
-            else if(wsMessage.Action == "SaveUserNameChange")
+            else if(wsMessage.Action.Equals("SaveUserNameChange", StringComparison.CurrentCultureIgnoreCase))
             {
                 action = SaveUserNameChange;
             }
-            else if(wsMessage.Action == "ChatMessage")
+            else if(wsMessage.Action.Equals("ChatMessage", StringComparison.CurrentCultureIgnoreCase))
             {
                 action = ChatMessage;
             }
-            else if(wsMessage.Action == "SynchronizeSession")
+            else if(wsMessage.Action.Equals("SynchronizeSession", StringComparison.CurrentCultureIgnoreCase))
             {
                 action = SynchronizeSession;
             }
@@ -100,7 +109,7 @@ namespace RadioFutureFinal.WebSockets
             }
 
             // TODO: barely understand what I'm doing here
-            await Task.Run(() => action);
+            await Task.Run(() => action(wsMessage, mySocket));
         }
 
         public async Task SendMessageToAllAsync(WsMessage message)
@@ -111,33 +120,65 @@ namespace RadioFutureFinal.WebSockets
             }
         }
 
-        public async Task SendMessageToSession(WsMessage message, int sessionId)
+        // ===============================================
+        // TODO: maybe move these functions to another file
+        private async Task ClientSessionReady(MySocket socket, Session session, User user)
         {
-            foreach(var socket in _wsConnectionManager.GetSocketsInSession(sessionId))
-            {
-                await SendMessageAsync(socket.WebSocket, message);
-            }
+            // TODO: How can I make sure this is somewhat updated properly?
+            var wsMessage = new WsMessage();
+            wsMessage.Action = "sessionReady";
+            wsMessage.Session = new SessionV1(session);
+            wsMessage.User = new UserV1(user);
+
+            await SendMessageAsync(socket.WebSocket, wsMessage);
         }
 
-        private void JoinSession(WsMessage message)
+        private async Task ClientsUpdateSessionUsers(MySocket socket, Session session)
+        {
+            var wsMessage = new WsMessage();
+            wsMessage.Action = "updateUsersList";
+            wsMessage.Session = new SessionV1(session);
+
+            await SendMessageToSessionAsync(wsMessage, session.SessionID);
+        }
+
+
+        // ===============================================
+
+        private async void JoinSession(WsMessage message, MySocket socket)
+        {
+            var sessionName = message.Session.Name;
+            Session session = null;
+            bool sessionFound = _db.GetSessionByName(sessionName, out session);
+            if(!sessionFound)
+            {
+                session = await _db.CreateSessionAsync(sessionName);
+            }
+            _wsConnectionManager.SocketJoinSession(socket, session.SessionID);
+
+            var userName = message.User.Name;
+            var user = await _db.AddNewUserToSession(userName, session);
+
+            await ClientSessionReady(socket, session, user);
+            await ClientsUpdateSessionUsers(socket, session);
+        }
+
+        private void AddMediaToSession(WsMessage message, MySocket socket)
         {
         }
-        private void AddMediaToSession(WsMessage message)
+        private void DeleteMediaFromSession(WsMessage message, MySocket socket)
         {
         }
-        private void DeleteMediaFromSession(WsMessage message)
+        private void SaveUserVideoState(WsMessage message, MySocket socket)
         {
         }
-        private void SaveUserVideoState(WsMessage message)
+        private void SaveUserNameChange(WsMessage message, MySocket socket)
         {
         }
-        private void SaveUserNameChange(WsMessage message)
+        private void ChatMessage(WsMessage message, MySocket socket)
         {
         }
-        private void ChatMessage(WsMessage message)
-        {
-        }
-        private void SynchronizeSession(WsMessage message)
+        private void SynchronizeSession(WsMessage message, MySocket socket)
         {
         }
 

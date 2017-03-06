@@ -46,7 +46,8 @@ namespace RadioFutureFinal.WebSockets
         public void SocketJoinSession(MySocket socket, int sessionId)
         {
             var sessionSockets = _sessionSockets.FirstOrDefault(p => p.Key == sessionId).Value;
-            sessionSockets.Add(socket); 
+            sessionSockets.Add(socket);
+            socket.JoinSession(sessionId);
         }
 
         public async Task RemoveSocket(WebSocket webSocket)

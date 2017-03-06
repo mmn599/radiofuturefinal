@@ -15,9 +15,10 @@ namespace RadioFutureFinal.Models
         public int YTPlayerState { get; set; }
         public bool Waiting { get; set; }
 
-        public User()
+        public User(string userName)
         {
-
+            Name = userName;
+            Recs = new List<Media>();
         }
     }
 }
