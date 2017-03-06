@@ -72,7 +72,6 @@ namespace RadioFutureFinal.WebSockets
             }
 
             // TODO: smoother way to do this
-            Action<WsMessage, MySocket> action = null;
             // TODO: better data structure should make this one call
             MySocket mySocket = _wsConnectionManager.GetSocketById(_wsConnectionManager.GetId(socket));
             if(wsMessage.Action.Equals("UserJoinSession", StringComparison.CurrentCultureIgnoreCase))
@@ -186,7 +185,7 @@ namespace RadioFutureFinal.WebSockets
 
         private async Task DeleteMediaFromSession(WsMessage message, MySocket socket)
         {
-            await _db.RemoveMediaAsync(message.Media.Id);
+            await _db.RemoveMediaAsync(socket.SessionId, message.Media.Id);
             await ClientsUpdateSessionQueue(socket, socket.SessionId);
         }
 

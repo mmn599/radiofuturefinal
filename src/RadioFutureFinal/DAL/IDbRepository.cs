@@ -25,8 +25,7 @@ namespace RadioFutureFinal.DAL
         IEnumerable<Session> GetAllSessions();
 
         Task AddMediaAsync(Media media);
-        Task RemoveMediaAsync(Media media);
-        Task RemoveMediaAsync(int mediaId);
+        Task RemoveMediaAsync(int sessionId, int mediaId);
         Task UpdateMediaAsync(Media media);
         Media GetMedia(int mediaId);
         IEnumerable<Media> GetAllMedia();

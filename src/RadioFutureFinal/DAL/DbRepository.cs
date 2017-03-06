@@ -107,15 +107,13 @@ namespace RadioFutureFinal.DAL
             _context.Media.Add(media);
             await _context.SaveChangesAsync();
         }
-        public async Task RemoveMediaAsync(Media media)
+        //TODO: Don't know how to do removing stuff properly
+        public async Task RemoveMediaAsync(int sessionId, int mediaId)
         {
-            _context.Media.Remove(media);
-            await _context.SaveChangesAsync();
-        }
-        public async Task RemoveMediaAsync(int mediaId)
-        {
-            var media = new Media() { MediaID = mediaId };
-            _context.Media.Remove(media);
+            var session = GetSession(sessionId);
+            var media = session.Queue.FirstOrDefault(m => m.MediaID == mediaId);
+            session.Queue.Remove(media);
+            _context.Session.Update(session);
             await _context.SaveChangesAsync();
         }
 

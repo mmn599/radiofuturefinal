@@ -283,7 +283,7 @@ function deleteVideoInQueue(QueuePosition) {
 	mGlobals.queue.splice(QueuePosition, 1);
 	updateQueueUI(mGlobals.user.QueuePosition + 1);
 	var data =  {
-        Media : {MediaId : id}
+        Media : {Id : id}
 	};
 	mGlobals.socket.emit('deleteMediaFromSession', data);
 }
@@ -441,7 +441,7 @@ var messageFunctions = {
     'sessionReady': sessionReady,
     'updateUsersList': updateUsersList,
     'updateQueue': updateQueue,
-    'clientChatMessage': receivedChatMessage,
+    'clientChatMessage': receivedChatMessage
 }
 
 function setupSockets() {
@@ -511,7 +511,7 @@ function joinJamSession(encodedSessionName) {
 		Session: { name: encodedSessionName },
 	};
 	mGlobals.socket.emit('userJoinSession', data);
-	setInterval(synchronizeUsers, 15000);
+	// setInterval(synchronizeUsers, 15000);
 };
 
 //==================================================================
