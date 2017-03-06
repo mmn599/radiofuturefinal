@@ -130,7 +130,7 @@ function searchEnterPressed(input_search) {
 	divResults.html("");
 	searchVideos(input_search.val(), function(response) {
 		$.each(response.items, function(index, item) {
-		divResults.html(divResults.html() + "<div class='div_search_result' onClick='queueSelectedVideo(this)' data-VideoId='" + item.id.VideoId + "' data-ThumbURL='"+item.snippet.thumbnails.medium.url+"'>" + '<p class="text_search_result">' +  item.snippet.Title+ '</p></div>' );
+		divResults.html(divResults.html() + "<div class='div_search_result' onClick='queueSelectedVideo(this)' data-VideoId='" + item.id.videoId + "' data-ThumbURL='"+item.snippet.thumbnails.medium.url+"'>" + '<p class="text_search_result">' +  item.snippet.title+ '</p></div>' );
 	});
 	});
 	if(!divResults.is(':visible')) {
@@ -199,12 +199,9 @@ function updateUsersListUI(users) {
 	for(var i=0;i<users.length;i++) {
 		var user = users[i];
 		//uses local user data instead of what is currently in the server
-		console.log('poop');
-		console.log(user);
 		if(user.Id===mGlobals.user.Id) {
 			user = mGlobals.user;
 		}
-		console.log(user);
 		var color = user.color;
 		var QueuePosition = user.QueuePosition;
 		if(QueuePosition!=-1) {
@@ -355,7 +352,7 @@ function saveUserNameChange(name) {
 		}
 	}
 	var data = {
-		user : mGlobals.user
+		User : mGlobals.user
 	};
 	mGlobals.socket.emit('saveUserNameChange', data);
 }
@@ -374,7 +371,9 @@ function saveUserVideoState() {
 
 
 function synchronizeUsers() {
-    var data = {};
+    var data = {
+        Session: { Id: mGlobals.sessionId }
+    };
 	mGlobals.socket.emit('synchronizeUsers', data);
 }
 
@@ -416,7 +415,7 @@ function updateUsersList(data) {
 }
 
 function updateQueue(data) {
-    var queue = data.session.queue;
+    var queue = data.Session.Queue;
 	if(mGlobals.sessionInitialized) {
 		mGlobals.queue = queue;
 		updateQueueUI(mGlobals.user.QueuePosition + 1);
@@ -459,9 +458,7 @@ function setupSockets() {
         var action = data.Action;
         console.log('Received websocket message from server:');
         console.log(data);
-        console.log(action);
         var func = messageFunctions[action];
-        console.log(func);
         messageFunctions[action](data);
     };
     socket.onerror = function (event) {
@@ -475,9 +472,9 @@ function setupSockets() {
         console.log('Sending websocket message to server: ' + action);
         var message = {
             action: action,
-            session: data.session,
-            media: data.media,
-            user: data.user
+            session: data.Session,
+            media: data.Media,
+            user: data.User
         }
         console.log(message);
         socket.send(JSON.stringify(message));
@@ -510,12 +507,11 @@ function joinJamSession(encodedSessionName) {
 	mGlobals.user = createTempUser('Anonymous');
 	
 	var data = {
-		user : mGlobals.user,
-		session: { name: encodedSessionName },
+		User : mGlobals.user,
+		Session: { name: encodedSessionName },
 	};
 	mGlobals.socket.emit('userJoinSession', data);
-    // TODO: setup on server side
-	// setInterval(synchronizeUsers, 10000);
+	setInterval(synchronizeUsers, 15000);
 };
 
 //==================================================================
