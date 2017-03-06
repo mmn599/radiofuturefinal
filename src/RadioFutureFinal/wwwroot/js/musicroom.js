@@ -515,7 +515,7 @@ function joinJamSession(encodedSessionName) {
 	};
 	mGlobals.socket.emit('userJoinSession', data);
     // TODO: setup on server side
-	setInterval(synchronizeUsers, 10000);
+	// setInterval(synchronizeUsers, 10000);
 };
 
 //==================================================================

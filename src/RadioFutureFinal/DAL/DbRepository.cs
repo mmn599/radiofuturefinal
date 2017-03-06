@@ -54,7 +54,7 @@ namespace RadioFutureFinal.DAL
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateUserName(User user)
+        public async Task UpdateUserNameAsync(User user)
         {
             _context.User.Attach(user);
             _context.Entry(user).Property(x => x.Name).IsModified = true;
