@@ -23,6 +23,7 @@ namespace RadioFutureFinal.Models
             Recs = new List<Media>();
         }
 
+        //TODO: Switch to Extension function
         public User(UserV1 user)
         {
             UserID = user.Id;

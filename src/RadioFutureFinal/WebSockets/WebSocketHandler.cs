@@ -88,7 +88,7 @@ namespace RadioFutureFinal.WebSockets
             }
             else if(wsMessage.Action.Equals("SaveUserVideoState", StringComparison.CurrentCultureIgnoreCase))
             {
-                // await SaveUserVideoState(wsMessage, mySocket);
+                await SaveUserVideoState(wsMessage, mySocket);
             }
             else if(wsMessage.Action.Equals("SaveUserNameChange", StringComparison.CurrentCultureIgnoreCase))
             {
@@ -96,7 +96,7 @@ namespace RadioFutureFinal.WebSockets
             }
             else if(wsMessage.Action.Equals("ChatMessage", StringComparison.CurrentCultureIgnoreCase))
             {
-                // await ChatMessage(wsMessage, mySocket);
+                await ChatMessage(wsMessage, mySocket);
             }
             else if(wsMessage.Action.Equals("SynchronizeUsers", StringComparison.CurrentCultureIgnoreCase))
             {
@@ -144,8 +144,10 @@ namespace RadioFutureFinal.WebSockets
             await ClientsUpdateSession(socket, session, "updateUsersList");
         }
 
-        private async Task ClientsUpdateSessionUsers(MySocket socket, int sessionId)
+
+        private async Task ClientsUpdateSessionUsers(MySocket socket)
         {
+            var sessionId = socket.SessionId;
             var session = _db.GetSession(sessionId);
             await ClientsUpdateSession(socket, session, "updateUsersList");
         }
@@ -182,30 +184,34 @@ namespace RadioFutureFinal.WebSockets
             await _db.AddMediaToSessionAsync(new Media(message.Media), socket.SessionId);
             await ClientsUpdateSessionQueue(socket, socket.SessionId);
         }
-
         private async Task DeleteMediaFromSession(WsMessage message, MySocket socket)
         {
             await _db.RemoveMediaAsync(socket.SessionId, message.Media.Id);
             await ClientsUpdateSessionQueue(socket, socket.SessionId);
         }
-
         private async Task SaveUserVideoState(WsMessage message, MySocket socket)
         {
             await _db.UpdateUserVideoStateAsync(new User(message.User));
-            await ClientsUpdateSessionUsers(socket, message.Session.Id);
+            await ClientsUpdateSessionUsers(socket);
         }
         private async Task SaveUserNameChange(WsMessage message, MySocket socket)
         {
             await _db.UpdateUserNameAsync(new User(message.User));
-            await ClientsUpdateSessionUsers(socket, message.Session.Id);
+            await ClientsUpdateSessionUsers(socket);
         }
         private async Task ChatMessage(WsMessage message, MySocket socket)
         {
+            await SendMessageToSessionAsync(message, socket.SessionId);
         }
         private async Task SynchronizeSession(WsMessage message, MySocket socket)
         {
-            await ClientsUpdateSessionUsers(socket, message.Session.Id);
+            await ClientsUpdateSessionUsers(socket);
         }
 
+        //TODO: Fix SaveUserNameChange
+        //TODO: Fix SaveUserVideoState
+        //TODO: Fix ChatMessage
+        //TODO: Basic manual debugging and checking to make sure functionality is where it was
+        //TODO: Basic HTML fixin'
     }
 }

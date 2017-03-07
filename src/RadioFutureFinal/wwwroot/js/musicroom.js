@@ -76,11 +76,6 @@ $(document).ready(function(){
 		}
 	}, true); 
 	/*
-	$("#chat_input").keypress(function(e) {
-		if(e.which==13) {
-			sendChatMessage();		
-		}
-	});
 	$("#txt_email").keypress(function(e) {
 		if(e.which==13) {
 			emailQueue();
@@ -427,10 +422,11 @@ function updateQueue(data) {
 }
 
 function receivedChatMessage(data) {
-	var msg = data.msg;
-	var user = data.user;
+	var msg = data.ChatMessage;
+	var userName = data.User.Name;
 	var innerHTML = mGlobals.ui.ul_chat.html() || "";
-	mGlobals.ui.ul_chat.html(innerHTML +'<li><span style="color: '+user.color+'">'+user.name+'</span>'+'<span>'+ ': ' + msg+ '</span></li>');
+	// mGlobals.ui.ul_chat.html(innerHTML +'<li><span style="color: '+user.color+'">'+user.name+'</span>'+'<span>'+ ': ' + msg+ '</span></li>');
+	mGlobals.ui.ul_chat.html(innerHTML +'<li><span style="color: '+ "Blue" +'">'+ userName +'</span>'+'<span>'+ ': ' + msg+ '</span></li>');
 	var children = mGlobals.ui.ul_chat.children();
 	if(children.length>10) {
 		children[0].remove();
@@ -475,7 +471,8 @@ function setupSockets() {
             action: action,
             session: data.Session,
             media: data.Media,
-            user: data.User
+            user: data.User,
+            chatMessage: data.ChatMessage
         }
         console.log(message);
         socket.send(JSON.stringify(message));
@@ -520,7 +517,11 @@ function joinJamSession(encodedSessionName) {
 //==================================================================
 function sendChatMessage(chat_input) {
 	if(mGlobals.sessionInitialized) {
-		mGlobals.socket.emit('chatMessage', chat_input.val());
+	    var data = {
+            ChatMessage: chat_input.val(),
+            User: { Name: mGlobals.User.Name }
+	    }
+	    mGlobals.socket.emit('chatMessage', data);
 		chat_input.val("");
 	}
 }
