@@ -1,9 +1,4 @@
 ﻿using Newtonsoft.Json;
-using RadioFutureFinal.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace RadioFutureFinal.Contracts
 {
@@ -26,20 +21,5 @@ namespace RadioFutureFinal.Contracts
 
         [JsonProperty]
         public bool Waiting { get; set; }
-
-        public UserV1()
-        {
-
-        }
-
-        public UserV1(User user)
-        {
-            Id = user.UserID;
-            Name = user.Name;
-            VideoTime = user.VideoTime;
-            QueuePosition = user.QueuePosition;
-            YTPlayerState = user.YTPlayerState;
-            Waiting = user.Waiting;
-        }
     }
 }

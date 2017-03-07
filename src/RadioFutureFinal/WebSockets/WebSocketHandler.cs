@@ -123,8 +123,8 @@ namespace RadioFutureFinal.WebSockets
             // TODO: How can I make sure this is somewhat updated properly?
             var wsMessage = new WsMessage();
             wsMessage.Action = "sessionReady";
-            wsMessage.Session = new SessionV1(session);
-            wsMessage.User = new UserV1(user);
+            wsMessage.Session = session.ToContract(); 
+            wsMessage.User = user.ToContract();
 
             await SendMessageAsync(socket.WebSocket, wsMessage);
         }
@@ -135,7 +135,7 @@ namespace RadioFutureFinal.WebSockets
         {
             var wsMessage = new WsMessage();
             wsMessage.Action = action;
-            wsMessage.Session = new SessionV1(session);
+            wsMessage.Session = session.ToContract();
             await SendMessageToSessionAsync(wsMessage, session.SessionID);
         }
 
@@ -191,12 +191,13 @@ namespace RadioFutureFinal.WebSockets
         }
         private async Task SaveUserVideoState(WsMessage message, MySocket socket)
         {
-            await _db.UpdateUserVideoStateAsync(new User(message.User));
-            await ClientsUpdateSessionUsers(socket);
+            var user = message.User;
+            await _db.UpdateUserVideoState(user.Id, user.YTPlayerState, user.VideoTime, user.QueuePosition);
         }
         private async Task SaveUserNameChange(WsMessage message, MySocket socket)
         {
-            await _db.UpdateUserNameAsync(new User(message.User));
+            var user = message.User;
+            await _db.UpdateUserName(user.Id, user.Name);
             await ClientsUpdateSessionUsers(socket);
         }
         private async Task ChatMessage(WsMessage message, MySocket socket)
@@ -208,10 +209,7 @@ namespace RadioFutureFinal.WebSockets
             await ClientsUpdateSessionUsers(socket);
         }
 
-        //TODO: Fix SaveUserNameChange
-        //TODO: Fix SaveUserVideoState
-        //TODO: Fix ChatMessage
-        //TODO: Basic manual debugging and checking to make sure functionality is where it was
         //TODO: Basic HTML fixin'
+        //TODO: Basic manual debugging and checking to make sure functionality is where it was
     }
 }

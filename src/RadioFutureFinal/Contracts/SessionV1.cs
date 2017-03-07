@@ -26,20 +26,5 @@ namespace RadioFutureFinal.Contracts
             
         }
 
-        public SessionV1(Session session)
-        {
-            Id = session.SessionID;
-            Name = session.Name;
-            Users = new List<UserV1>();
-            foreach(var user in session.Users)
-            {
-                Users.Add(new UserV1(user));
-            }
-            Queue = new List<MediaV1>();
-            foreach(var media in session.Queue)
-            {
-                Queue.Add(new MediaV1(media));
-            }
-        }
     }
 }

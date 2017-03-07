@@ -39,25 +39,28 @@ namespace RadioFutureFinal.DAL
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateUserAsync(User user)
+        //TODO: What the hell. Why isn't the commented code working? Find this out. Or just move off entity framework.
+        // This requires two database lookups (I think)
+        public async Task UpdateUserVideoState(int userId, int ytPlayerState, int videoTime, int queuePosition)
         {
-            _context.User.Update(user);
+            /*
+            var entry = _context.Entry(updatedUser);
+            entry.Property(e => e.YTPlayerState).IsModified = true;
+            entry.Property(e => e.QueuePosition).IsModified = true;
+            entry.Property(e => e.VideoTime).IsModified = true;
+            _context.SaveChanges();
+            */
+            var user = GetUser(userId);
+            user.YTPlayerState = ytPlayerState;
+            user.VideoTime = videoTime;
+            user.QueuePosition = queuePosition;
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateUserVideoStateAsync(User user)
+        public async Task UpdateUserName(int userId, string newName)
         {
-            _context.User.Attach(user);
-            _context.Entry(user).Property(x => x.YTPlayerState).IsModified = true;
-            _context.Entry(user).Property(x => x.VideoTime).IsModified = true;
-            _context.Entry(user).Property(x => x.QueuePosition).IsModified = true;
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task UpdateUserNameAsync(User user)
-        {
-            _context.User.Attach(user);
-            _context.Entry(user).Property(x => x.Name).IsModified = true;
+            var user = GetUser(userId);
+            user.Name = newName;
             await _context.SaveChangesAsync();
         }
 

@@ -29,21 +29,5 @@ namespace RadioFutureFinal.Contracts
 
         [JsonProperty]
         public string ThumbURL { get; set; }
-
-        public MediaV1()
-        {
-
-        }
-
-        public MediaV1(Media media)
-        {
-            Id = media.MediaID;
-            UserID = media.UserID;
-            UserName = media.UserName;
-            YTVideoID = media.YTVideoID;
-            Likes = media.Likes;
-            Dislikes = media.Dislikes;
-            ThumbURL = media.ThumbURL;
-        }
     }
 }

@@ -438,7 +438,7 @@ var messageFunctions = {
     'sessionReady': sessionReady,
     'updateUsersList': updateUsersList,
     'updateQueue': updateQueue,
-    'clientChatMessage': receivedChatMessage
+    'chatMessage': receivedChatMessage
 }
 
 function setupSockets() {
@@ -519,7 +519,7 @@ function sendChatMessage(chat_input) {
 	if(mGlobals.sessionInitialized) {
 	    var data = {
             ChatMessage: chat_input.val(),
-            User: { Name: mGlobals.User.Name }
+            User: { Name: mGlobals.user.Name }
 	    }
 	    mGlobals.socket.emit('chatMessage', data);
 		chat_input.val("");

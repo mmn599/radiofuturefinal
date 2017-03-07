@@ -23,18 +23,6 @@ namespace RadioFutureFinal.Models
             Recs = new List<Media>();
         }
 
-        //TODO: Switch to Extension function
-        public User(UserV1 user)
-        {
-            UserID = user.Id;
-            Name = user.Name;
-            VideoTime = user.VideoTime;
-            QueuePosition = user.QueuePosition;
-            YTPlayerState = user.YTPlayerState;
-            Waiting = user.Waiting;
-        }
-
-
         public User()
         {
             QueuePosition = -1;
