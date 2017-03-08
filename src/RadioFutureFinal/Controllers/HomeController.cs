@@ -13,6 +13,11 @@ namespace RadioFutureFinal.Controllers
             return View();
         }
 
+        public IActionResult Yeet()
+        {
+            return View();
+        }
+
         public IActionResult About()
         {
             ViewData["Message"] = "Your application description page.";

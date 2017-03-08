@@ -188,8 +188,10 @@ function emailQueue() {
 
 function updateUsersListUI(users) {
 	var usersList = document.getElementById('div_users_list');
+    
 
-	usersList.innerHTML = "";
+	usersList.innerHTML = "<p> There are " + users.length + " users ";
+    /*
 	var divarr = [];
 	for(var i=0;i<users.length;i++) {
 		var user = users[i];
