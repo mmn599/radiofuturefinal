@@ -53,33 +53,23 @@ $(document).ready(function(){
 		searchTextChanged($("#input_search").val());
 	});
 
-	$("#div_users_overall").mouseover(function (e) {
-	    var results = $("#div_user_results");
-        if(!results.is(':visible')) {
-            results.fadeIn();
-        }
-	});
+	var setupFade = function (overall, results) {
+	    overall.mouseenter(function (e) {
+	        if (!results.is(':visible')) {
+	            results.fadeIn();
+	        }
+	    });
+	    overall.mouseleave(function (e) {
+	        if (results.is(':visible')) {
+	            results.fadeOut();
+	        }
+	    });
+	}
 
-	$("#div_users_overall").mouseleave(function (e) {
-	    var results = $("#div_user_results");
-	    if (results.is(':visible')) {
-            results.fadeOut();
-	    }
-	});
-
-	$("#div_queue_overall").mouseover(function (e) {
-	    var results = $("#div_queue_results");
-        if(!results.is(':visible')) {
-            results.fadeIn();
-        }
-	});
-
-	$("#div_queue_overall").mouseleave(function (e) {
-	    var results = $("#div_queue_results");
-	    if (results.is(':visible')) {
-            results.fadeOut();
-	    }
-	});
+	setupFade($("#div_users_overall"), $("#div_user_results"));
+	setupFade($("#div_queue_overall"), $("#div_queue_results"));
+	setupFade($("#div_chat_overall"), $("#div_chat_results"));
+	setupFade($("#div_cc_overall"), $("#div_cc_results"));
 
 	mGlobals.ui.input_search.keypress(function(e) {
 		if(e.which==13) {
@@ -217,9 +207,9 @@ function emailQueue() {
 }
 
 function updateUsersListUI(users) {
-	var usersList = document.getElementById('div_users_overall');
+	//var usersList = document.getElementById('div_users_overall');
     
-	usersList.innerHTML = "<p> " + users.length + " users in the room";
+	//usersList.innerHTML = "<p> " + users.length + " users in the room";
     /*
 	var divarr = [];
 	for(var i=0;i<users.length;i++) {

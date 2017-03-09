@@ -19,10 +19,8 @@
     <div class="everything" id="div_loading"></div>
     <div class="everything" id="div_everything">
         <div id="div_all_info">
-            <div style="width: 25%;" class="info">
-                <div style="text-align: center" id="div_users_overall">
-                    <p>X users in the room</p>
-                </div>
+            <div id="div_users_overall" style="text-align: center; width: 25%;" class="info">
+                <p>12 users in the room</p>
                 <div id="div_user_results" class="results">
                     <p>User 1</p> 
                     <p>User 1</p> 
@@ -35,10 +33,8 @@
                 <input id="input_search" placeholder="type in an artist and song name and press enter">
                 <div id="div_search_results" class="results"></div>
             </div>
-            <div style="width: 25%;" class="info">
-                <div style="text-align: center" id="div_queue_overall">
-                    <p>9 things in the queue</p>
-                </div>
+            <div style="width: 25%;" id="div_queue_overall" class="info">
+                <p>9 things in the queue</p>
                 <div id="div_queue_results" class="results">
                     <p>Queue 1</p>
                     <p>Queue 1</p>
@@ -52,7 +48,14 @@
             <div id="div_player"></div>
         </div>
         <div id="div_current_content_info">
-            <div style="width: 33.33%;" class="info">
+            <div id="div_cc_overall" style="width: 33.33%;" class="info">
+                <div id="div_cc_results" class="results">
+                    <p>Poop 1</p>
+                    <p>Poop 1</p>
+                    <p>Poop 1</p>
+                    <p>Poop 1</p>
+                    <p>Poop 1</p>
+                </div>
                 <p>Rock Climbing 11 Year Old</p>
             </div>
             <div style="width: 33.33%;" class="info">
@@ -60,7 +63,14 @@
                 <img src="../images/pause-button.png" style="margin-left: 5%; margin-right: 5%; cursor: pointer" />
                 <img src="../images/arrows.png" style="cursor: pointer" onclick="nextVideoInQueue()"/>
             </div>
-            <div style="width: 33.33%;" class="info">
+            <div id="div_chat_overall" style="width: 33.33%;" class="info">
+                <div id="div_chat_results" class="results">
+                    <p>Poop 1</p>
+                    <p>Poop 1</p>
+                    <p>Poop 1</p>
+                    <p>Poop 1</p>
+                    <p>Poop 1</p>
+                </div>
                 <p>Chat!</p>
             </div>
         </div>

@@ -5,6 +5,10 @@
 	background: #f1f1f1;
 }
 
+input:focus {
+    outline-width: 0;
+}
+
 .everything {
 	width: 100%;
 	height: 100%;
@@ -50,6 +54,18 @@
     display: inline-block;
     width: 100%;
     height: 5%;
+}
+
+#div_cc_results {
+	right: 66.66%;
+	width: 33.33%;
+    bottom: 5%;
+}
+
+#div_chat_results {
+    right: 0%;
+	width: 33.33%;
+	bottom: 5%;
 }
 
 #div_search_results {
