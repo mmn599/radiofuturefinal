@@ -179,6 +179,13 @@ function queueRolloff(item) {
 
 function updateQueueUI(starting_QueuePosition) {
 	var queue = mGlobals.queue;
+	var length = queue.length;
+	var summary = queue.length + " things in the queue";
+	if (length == 1) {
+        summary = queue.length + " thing in the queue";
+	}
+	$("#p_queue_summary").text(summary);
+    /*
 	var i = starting_QueuePosition;
 	var j = 0;
 	//TODO: make robust
@@ -199,6 +206,7 @@ function updateQueueUI(starting_QueuePosition) {
 		i++;
 		j++;
 	}
+    */
 }
 
 function emailQueue() {
@@ -206,75 +214,33 @@ function emailQueue() {
 	$("#txt_email").fadeOut();
 }
 
+COLOR_LIST = ["red", "orange", "yellow", "green", "blue", "violet"];
+
 function updateUsersListUI(users) {
-	//var usersList = document.getElementById('div_users_overall');
-    
-	//usersList.innerHTML = "<p> " + users.length + " users in the room";
-    /*
-	var divarr = [];
-	for(var i=0;i<users.length;i++) {
-		var user = users[i];
-		//uses local user data instead of what is currently in the server
-		if(user.Id===mGlobals.user.Id) {
-			user = mGlobals.user;
-		}
-		var color = user.color;
-		var QueuePosition = user.QueuePosition;
-		if(QueuePosition!=-1) {
-			current_video_Title = mGlobals.queue[QueuePosition].Title;
-		}
-		else {
-			current_video_Title = "Nothing";
-		}
+    var num = users.length;
+    var summary = users.length + " users in the room";
+    if (num == 1) {
+        summary = users.length + " user in the room";
+    }
+    $("#p_users_summary").text(summary);
 
-		var div_user = document.createElement('div');
-		div_user.style.background = user.color;
-		div_user.className = "div_user tooltip";
-		div_user.setAttribute('data-username', user.Name);
-
-		var p_user = document.createElement('p');
-		p_user.className = "p_user";
-		p_user.setAttribute('data-username', user.Name);
-		p_user.appendChild(document.createTextNode(user.Name.charAt(0)));
-
-		var span_tooltip = document.createElement('span');
-		span_tooltip.className = "tooltiptext";
-		span_tooltip.setAttribute('data-username', user.Name);
-		span_tooltip.innerHTML = "Click to sync with " + user.Name + "!";
-
-		div_user.appendChild(p_user);
-		div_user.appendChild(span_tooltip);
-		usersList.appendChild(div_user);
-
-		divarr.push(div_user);
-	}
-	for(var i=0;i<divarr.length;i++) {
-		var mydiv = divarr[i];
-		$(mydiv).click(function() {
-			var username = event.target.getAttribute('data-username');
-			syncWithUser(username);
-		});
-	}
-	/*var usersList = document.getElementById('div_users_list');
-	usersList.innerHTML = "";
-	for(var i=0;i<users.length;i++) {
-		var user = users[i];
-		//uses local user data instead of what is currently in the server
-		if(user.Id===mGlobals.user.Id) {
-			user = mGlobals.user;
-		}
-		var color = user.color;
-		var QueuePosition = user.QueuePosition;
-		if(QueuePosition!=-1) {
-			current_video_Title = mGlobals.queue[QueuePosition].Title;
-		}
-		else {
-			current_video_Title = "Nothing";
-		}
-		mGlobals.queue[user.QueuePosition]
-		var innerht = '<p class="p_user" style="white-space: nowrap;">' + '<span class="span_user" onclick="syncWithUserUI(this.getAttribute(\'data-username\'))" data-username="' + user.name +'" style="border-bottom:1px solid '+color+'; cursor: pointer;">'+user.name +  '</span>' + '</span><br><br>' + '</p>';//+ ' is listening to ' + '<span style="font-weight: bold;">' + current_video_Title + '</span>' + '</span><br><br>' + '</p>';
-		usersList.innerHTML += innerht;
-	}*/
+    var userResults = $("#div_user_results");
+    var html = [];
+    //TODO: put style in css and make scrolley
+    $.each(users, function(index, user) {
+        var videoTitle = user.videoTitle;
+        if (!videoTitle) {
+            videoTitle = 'Nothing';
+        }
+        var currentHTML =
+            '<div style="text-align: left; display: flex; align-items: center;">' +
+                '<div style="display: inline-block; margin-right: 16px; height: 48px; width: 48px; background: ' + COLOR_LIST[index % 6] + ';"></div>' +
+                '<span style="margin-right: 16px;">' + user.Name + '<br /><span style="font-size: 12px";>' + videoTitle + '</span></span>' +
+                '<img src="../images/sync.png"/>' +
+            '</div>';
+        html.push(currentHTML);
+    });
+    userResults.html(html.join(""));
 }
 
 function setupVideo() {

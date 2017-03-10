@@ -75,8 +75,7 @@ input:focus {
 }
 
 #div_user_results {
-	right: 75%;
-	width: 25%;
+	left: 0%;
 	top: 5%;
 }
 
@@ -129,10 +128,6 @@ input:focus {
     margin-left: 5%;
     margin-right: 5%;
 	font-family: 'Josefin Sans';
-}
-
-.info > div > p {
-    margin: 0;
 }
 
 .info {

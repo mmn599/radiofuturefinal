@@ -20,13 +20,13 @@
     <div class="everything" id="div_everything">
         <div id="div_all_info">
             <div id="div_users_overall" style="text-align: center; width: 25%;" class="info">
-                <p>12 users in the room</p>
+                <p id="p_users_summary">12 users in the room</p>
                 <div id="div_user_results" class="results">
-                    <p>User 1</p> 
-                    <p>User 1</p> 
-                    <p>User 1</p> 
-                    <p>User 1</p> 
-                    <p>User 1</p> 
+                    <div style="text-align: left; display: flex; align-items: center;">
+                        <div style="display: inline-block; margin-right: 16px; height: 48px; width: 48px; background: green;"></div>
+                        <span style="margin-right: 16px;">Matthew Normyle<br />Chris Sharma Rock Climbing</span>
+                        <img src="~/images/sync.png"/>
+                    </div>
                 </div>
             </div>
             <div class="info" style="width: 50%;">
@@ -34,7 +34,7 @@
                 <div id="div_search_results" class="results"></div>
             </div>
             <div style="width: 25%;" id="div_queue_overall" class="info">
-                <p>9 things in the queue</p>
+                <p id="p_queue_summary">9 things in the queue</p>
                 <div id="div_queue_results" class="results">
                     <p>Queue 1</p>
                     <p>Queue 1</p>
@@ -56,7 +56,7 @@
                     <p>Poop 1</p>
                     <p>Poop 1</p>
                 </div>
-                <p>Rock Climbing 11 Year Old</p>
+                <p id="p_cc_summary">Rock Climbing 11 Year Old</p>
             </div>
             <div style="width: 33.33%;" class="info">
                 <img src="../images/arrows-1.png" style="cursor: pointer" onclick="previousVideoInQueue()"/>
@@ -71,7 +71,7 @@
                     <p>Poop 1</p>
                     <p>Poop 1</p>
                 </div>
-                <p>Chat!</p>
+                <p id="p_chat_summary">Chat!</p>
             </div>
         </div>
     </div>

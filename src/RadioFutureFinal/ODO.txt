@@ -1,0 +1,20 @@
+﻿-Users list
+	-populate with backend
+	-click for synchronization
+
+-Queue list
+	-design div
+	-populate with backend
+	-click for deleting
+
+-Next/previous video in queue buttons
+-Pause/play buttons
+
+-Current content
+	-design div
+	-populate with backend
+
+-Extensive manual testing
+
+
+
