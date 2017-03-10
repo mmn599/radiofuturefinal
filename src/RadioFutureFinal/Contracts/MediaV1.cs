@@ -22,6 +22,9 @@ namespace RadioFutureFinal.Contracts
         public string YTVideoID { get; set; }
 
         [JsonProperty]
+        public string VideoTitle { get; set; }
+
+        [JsonProperty]
         public int Likes { get; set; }
 
         [JsonProperty]

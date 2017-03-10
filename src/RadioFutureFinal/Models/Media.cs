@@ -12,6 +12,7 @@ namespace RadioFutureFinal.Models
         public int UserID { get; set; }
         public string UserName { get; set; }
         public string YTVideoID { get; set; }
+        public string VideoTitle { get; set; }
         public int Likes { get; set; }
         public int Dislikes { get; set; }
         public string ThumbURL { get; set; }
@@ -19,17 +20,6 @@ namespace RadioFutureFinal.Models
         public Media()
         {
 
-        }
-
-        public Media(MediaV1 media)
-        {
-            MediaID = media.Id;
-            UserID = media.UserID;
-            UserName = media.UserName;
-            YTVideoID = media.YTVideoID;
-            Likes = media.Likes;
-            Dislikes = media.Dislikes;
-            ThumbURL = media.ThumbURL;
         }
     }
 }

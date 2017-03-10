@@ -177,7 +177,8 @@ function queueRolloff(item) {
 	$(item).attr('src', item.getAttribute('data-ThumbURL'));
 }
 
-function updateQueueUI(starting_QueuePosition) {
+function updateQueueUI(queue_position) {
+    console.log('update queue ui');
 	var queue = mGlobals.queue;
 	var length = queue.length;
 	var summary = queue.length + " things in the queue";
@@ -185,33 +186,25 @@ function updateQueueUI(starting_QueuePosition) {
         summary = queue.length + " thing in the queue";
 	}
 	$("#p_queue_summary").text(summary);
-    /*
-	var i = starting_QueuePosition;
-	var j = 0;
-	//TODO: make robust
-	var end = 5;
-	var div_queue = $("#div_footer");
-	div_queue.html("");
-	while(i<queue.length) {
-		var media = queue[i];
-		var innertht;
-		if((j+1)%5===0) {
-			innerht = "<div class='div_content' style='margin-right: 0'><img class='img_queue_item' data-QueuePosition='" + i + "' data-ThumbURL='" + media.ThumbURL + "' onmouseover='queueRollover(this)' onmouseout='queueRolloff(this)' src='" + media.ThumbURL + "'></img></div>";
-		}
-		else {
-			innerht = "<div class='div_content'><img class='img_queue_item' data-QueuePosition='" + i + "' data-ThumbURL='" + media.ThumbURL + "' onmouseover='queueRollover(this)' onmouseout='queueRolloff(this)' src='" + media.ThumbURL + "'></img></div>";
 
-		}
-		div_queue.html(div_queue.html() + innerht);
-		i++;
-		j++;
-	}
-    */
-}
-
-function emailQueue() {
-	mGlobals.socket.emit('emailQueue', {email : $("#txt_email").val(), queue : mGlobals.queue});
-	$("#txt_email").fadeOut();
+    var queueResults = $("#div_queue_results");
+    var html = [];
+    if (length - queue_position <= 1) {
+        
+    }
+    //TODO: put style in css and make scrolley
+    for (var i = 0; i < length; i++) {
+        var media = queue[i];
+        console.log('doing it');
+        console.log(media);
+        var currentHTML =
+            '<div style="text-align: left; display: flex; align-items: center;">' +
+                '<img style="height: 90px; width: 160px; margin-right: 16px;" src="' + media.ThumbURL + '"/>' +
+                '<span style="margin-right: 16px;">' + media.VideoTitle + '</span>' +
+            '</div>';
+        html.push(currentHTML);
+    }
+    queueResults.html(html.join(""));
 }
 
 COLOR_LIST = ["red", "orange", "yellow", "green", "blue", "violet"];
@@ -603,7 +596,7 @@ function updatePlayerUI(current_video, current_VideoTime, current_recommender_na
 function createMedia(Title, VideoId, ThumbURL, UserId, recommender_name) {
     var media = {
         YTVideoId: VideoId,
-        Title: Title,
+        VideoTitle: Title,
         ThumbURL: ThumbURL,
         UserName: recommender_name,
         UserId: UserId

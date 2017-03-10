@@ -11,7 +11,7 @@ namespace RadioFutureFinal.Contracts
 
         public MediaV1 Media { get; set; }
 
-        public UserV1 User { get; set; }
+        public MyUserV1 User { get; set; }
 
         public string ChatMessage { get; set; }
     }

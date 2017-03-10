@@ -9,13 +9,13 @@ namespace RadioFutureFinal.DAL
     // TODO: should the get methods be async? should any of the methods be async?
     public interface IDbRepository
     {
-        Task<User> AddNewUserToSessionAsync(string userName, Session session);
+        Task<MyUser> AddNewUserToSessionAsync(string userName, Session session);
         Task<Media> AddMediaToSessionAsync(Media media, int sessionId);
         Task UpdateUserVideoState(int userId, int ytPlayerState, int videoTime, int queuePosition);
-        Task RemoveUserAsync(User user);
+        Task RemoveUserAsync(MyUser user);
         Task UpdateUserName(int userId, string newName);
-        User GetUser(int userId);
-        IEnumerable<User> GetAllUsers();
+        MyUser GetUser(int userId);
+        IEnumerable<MyUser> GetAllUsers();
         Task<Session> CreateSessionAsync(string sessionName);
         Task RemoveSessionAsync(Session session);
         Task UpdateSessionAsync(Session session);

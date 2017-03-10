@@ -5,13 +5,12 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using RadioFutureFinal.Data;
 
-namespace RadioFutureFinal.Data.Migrations
+namespace RadioFutureFinal.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20170225231653_Initial")]
-    partial class Initial
+    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.1.0-rtm-22752")
@@ -183,6 +182,8 @@ namespace RadioFutureFinal.Data.Migrations
 
                     b.Property<int>("Likes");
 
+                    b.Property<int?>("MyUserId");
+
                     b.Property<int?>("SessionID");
 
                     b.Property<string>("ThumbURL");
@@ -191,32 +192,22 @@ namespace RadioFutureFinal.Data.Migrations
 
                     b.Property<string>("UserName");
 
+                    b.Property<string>("VideoTitle");
+
                     b.Property<string>("YTVideoID");
 
                     b.HasKey("MediaID");
 
-                    b.HasIndex("SessionID");
+                    b.HasIndex("MyUserId");
 
-                    b.HasIndex("UserID");
+                    b.HasIndex("SessionID");
 
                     b.ToTable("Media");
                 });
 
-            modelBuilder.Entity("RadioFutureFinal.Models.Session", b =>
+            modelBuilder.Entity("RadioFutureFinal.Models.MyUser", b =>
                 {
-                    b.Property<int>("SessionID")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("Name");
-
-                    b.HasKey("SessionID");
-
-                    b.ToTable("Session");
-                });
-
-            modelBuilder.Entity("RadioFutureFinal.Models.User", b =>
-                {
-                    b.Property<int>("UserID")
+                    b.Property<int>("MyUserId")
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("Name");
@@ -231,11 +222,23 @@ namespace RadioFutureFinal.Data.Migrations
 
                     b.Property<int>("YTPlayerState");
 
-                    b.HasKey("UserID");
+                    b.HasKey("MyUserId");
 
                     b.HasIndex("SessionID");
 
-                    b.ToTable("User");
+                    b.ToTable("MyUser");
+                });
+
+            modelBuilder.Entity("RadioFutureFinal.Models.Session", b =>
+                {
+                    b.Property<int>("SessionID")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Name");
+
+                    b.HasKey("SessionID");
+
+                    b.ToTable("Session");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityRoleClaim<string>", b =>
@@ -277,17 +280,16 @@ namespace RadioFutureFinal.Data.Migrations
 
             modelBuilder.Entity("RadioFutureFinal.Models.Media", b =>
                 {
+                    b.HasOne("RadioFutureFinal.Models.MyUser")
+                        .WithMany("Recs")
+                        .HasForeignKey("MyUserId");
+
                     b.HasOne("RadioFutureFinal.Models.Session")
                         .WithMany("Queue")
                         .HasForeignKey("SessionID");
-
-                    b.HasOne("RadioFutureFinal.Models.User")
-                        .WithMany("Recs")
-                        .HasForeignKey("UserID")
-                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("RadioFutureFinal.Models.User", b =>
+            modelBuilder.Entity("RadioFutureFinal.Models.MyUser", b =>
                 {
                     b.HasOne("RadioFutureFinal.Models.Session")
                         .WithMany("Users")

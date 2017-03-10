@@ -118,7 +118,7 @@ namespace RadioFutureFinal.WebSockets
 
         // ===============================================
         // TODO: maybe move these functions to another file
-        private async Task ClientSessionReady(MySocket socket, Session session, User user)
+        private async Task ClientSessionReady(MySocket socket, Session session, MyUser user)
         {
             // TODO: How can I make sure this is somewhat updated properly?
             var wsMessage = new WsMessage();
@@ -181,7 +181,7 @@ namespace RadioFutureFinal.WebSockets
 
         private async Task AddMediaToSession(WsMessage message, MySocket socket)
         {
-            await _db.AddMediaToSessionAsync(new Media(message.Media), socket.SessionId);
+            await _db.AddMediaToSessionAsync(message.Media.ToModel(), socket.SessionId);
             await ClientsUpdateSessionQueue(socket, socket.SessionId);
         }
         private async Task DeleteMediaFromSession(WsMessage message, MySocket socket)

@@ -10,12 +10,12 @@ namespace RadioFutureFinal.Models
     {
         public int SessionID { get; set; }
         public string Name { get; set; }
-        public List<User> Users { get; set; }
+        public List<MyUser> Users { get; set; }
         public List<Media> Queue { get; set; }
 
         public Session(string name)
         {
-            Users = new List<User>();
+            Users = new List<MyUser>();
             Queue = new List<Media>();
             Name = name;
         }

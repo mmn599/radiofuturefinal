@@ -1,40 +1,40 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
+using RadioFutureFinal.Data;
 
-namespace RadioFutureFinal.Data.Migrations
+namespace RadioFutureFinal.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("00000000000000_CreateIdentitySchema")]
-    partial class CreateIdentitySchema
+    [Migration("20170310064852_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
-                .HasAnnotation("ProductVersion", "1.0.0-rc3")
+                .HasAnnotation("ProductVersion", "1.1.0-rtm-22752")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityRole", b =>
                 {
-                    b.Property<string>("Id");
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd();
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken();
 
                     b.Property<string>("Name")
-                        .HasAnnotation("MaxLength", 256);
+                        .HasMaxLength(256);
 
                     b.Property<string>("NormalizedName")
-                        .HasAnnotation("MaxLength", 256);
+                        .HasMaxLength(256);
 
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedName")
+                        .IsUnique()
                         .HasName("RoleNameIndex");
 
                     b.ToTable("AspNetRoles");
@@ -106,8 +106,6 @@ namespace RadioFutureFinal.Data.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.HasIndex("UserId");
-
                     b.ToTable("AspNetUserRoles");
                 });
 
@@ -128,7 +126,8 @@ namespace RadioFutureFinal.Data.Migrations
 
             modelBuilder.Entity("RadioFutureFinal.Models.ApplicationUser", b =>
                 {
-                    b.Property<string>("Id");
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd();
 
                     b.Property<int>("AccessFailedCount");
 
@@ -136,7 +135,7 @@ namespace RadioFutureFinal.Data.Migrations
                         .IsConcurrencyToken();
 
                     b.Property<string>("Email")
-                        .HasAnnotation("MaxLength", 256);
+                        .HasMaxLength(256);
 
                     b.Property<bool>("EmailConfirmed");
 
@@ -145,10 +144,10 @@ namespace RadioFutureFinal.Data.Migrations
                     b.Property<DateTimeOffset?>("LockoutEnd");
 
                     b.Property<string>("NormalizedEmail")
-                        .HasAnnotation("MaxLength", 256);
+                        .HasMaxLength(256);
 
                     b.Property<string>("NormalizedUserName")
-                        .HasAnnotation("MaxLength", 256);
+                        .HasMaxLength(256);
 
                     b.Property<string>("PasswordHash");
 
@@ -161,7 +160,7 @@ namespace RadioFutureFinal.Data.Migrations
                     b.Property<bool>("TwoFactorEnabled");
 
                     b.Property<string>("UserName")
-                        .HasAnnotation("MaxLength", 256);
+                        .HasMaxLength(256);
 
                     b.HasKey("Id");
 
@@ -173,6 +172,74 @@ namespace RadioFutureFinal.Data.Migrations
                         .HasName("UserNameIndex");
 
                     b.ToTable("AspNetUsers");
+                });
+
+            modelBuilder.Entity("RadioFutureFinal.Models.Media", b =>
+                {
+                    b.Property<int>("MediaID")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("Dislikes");
+
+                    b.Property<int>("Likes");
+
+                    b.Property<int?>("MyUserId");
+
+                    b.Property<int?>("SessionID");
+
+                    b.Property<string>("ThumbURL");
+
+                    b.Property<int>("UserID");
+
+                    b.Property<string>("UserName");
+
+                    b.Property<string>("VideoTitle");
+
+                    b.Property<string>("YTVideoID");
+
+                    b.HasKey("MediaID");
+
+                    b.HasIndex("MyUserId");
+
+                    b.HasIndex("SessionID");
+
+                    b.ToTable("Media");
+                });
+
+            modelBuilder.Entity("RadioFutureFinal.Models.MyUser", b =>
+                {
+                    b.Property<int>("MyUserId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Name");
+
+                    b.Property<int>("QueuePosition");
+
+                    b.Property<int?>("SessionID");
+
+                    b.Property<int>("VideoTime");
+
+                    b.Property<bool>("Waiting");
+
+                    b.Property<int>("YTPlayerState");
+
+                    b.HasKey("MyUserId");
+
+                    b.HasIndex("SessionID");
+
+                    b.ToTable("MyUser");
+                });
+
+            modelBuilder.Entity("RadioFutureFinal.Models.Session", b =>
+                {
+                    b.Property<int>("SessionID")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Name");
+
+                    b.HasKey("SessionID");
+
+                    b.ToTable("Session");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityRoleClaim<string>", b =>
@@ -210,6 +277,24 @@ namespace RadioFutureFinal.Data.Migrations
                         .WithMany("Roles")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("RadioFutureFinal.Models.Media", b =>
+                {
+                    b.HasOne("RadioFutureFinal.Models.MyUser")
+                        .WithMany("Recs")
+                        .HasForeignKey("MyUserId");
+
+                    b.HasOne("RadioFutureFinal.Models.Session")
+                        .WithMany("Queue")
+                        .HasForeignKey("SessionID");
+                });
+
+            modelBuilder.Entity("RadioFutureFinal.Models.MyUser", b =>
+                {
+                    b.HasOne("RadioFutureFinal.Models.Session")
+                        .WithMany("Users")
+                        .HasForeignKey("SessionID");
                 });
         }
     }

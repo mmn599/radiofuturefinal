@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace RadioFutureFinal.Models
 {
-    public class User
+    public class MyUser
     {
-        public int UserID { get; set; }
+        public int MyUserId { get; set; }
         public string Name { get; set; }
         public List<Media> Recs { get; set; }
         public int VideoTime { get; set; }
@@ -16,14 +16,14 @@ namespace RadioFutureFinal.Models
         public int YTPlayerState { get; set; }
         public bool Waiting { get; set; }
 
-        public User(string userName)
+        public MyUser(string userName)
         {
             QueuePosition = -1;
             Name = userName;
             Recs = new List<Media>();
         }
 
-        public User()
+        public MyUser()
         {
             QueuePosition = -1;
             Recs = new List<Media>();

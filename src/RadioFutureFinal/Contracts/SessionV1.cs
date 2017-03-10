@@ -16,7 +16,7 @@ namespace RadioFutureFinal.Contracts
         public string Name { get; set; }
 
         [JsonProperty]
-        public List<UserV1> Users { get; set; }
+        public List<MyUserV1> Users { get; set; }
 
         [JsonProperty]
         public List<MediaV1> Queue { get; set; }

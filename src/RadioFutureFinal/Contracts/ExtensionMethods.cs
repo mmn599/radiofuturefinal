@@ -8,11 +8,11 @@ namespace RadioFutureFinal.Contracts
 {
     public static class ExtensionMethods
     {
-        public static User ToModel(this UserV1 user)
+        public static MyUser ToModel(this MyUserV1 user)
         {
-            var userModel = new User()
+            var userModel = new MyUser()
             {
-                UserID = user.Id,
+                MyUserId = user.Id,
                 Name = user.Name,
                 VideoTime = user.VideoTime,
                 QueuePosition = user.QueuePosition,
@@ -22,11 +22,11 @@ namespace RadioFutureFinal.Contracts
             return userModel;
         }
 
-        public static UserV1 ToContract(this User user)
+        public static MyUserV1 ToContract(this MyUser user)
         {
-            var userContract = new UserV1()
+            var userContract = new MyUserV1()
             {
-                Id = user.UserID,
+                Id = user.MyUserId,
                 Name = user.Name,
                 VideoTime = user.VideoTime,
                 QueuePosition = user.QueuePosition,
@@ -42,7 +42,7 @@ namespace RadioFutureFinal.Contracts
             {
                 Id = session.SessionID,
                 Name = session.Name,
-                Users = new List<UserV1>(),
+                Users = new List<MyUserV1>(),
                 Queue = new List<MediaV1>()
             };
             foreach (var user in session.Users)
@@ -56,6 +56,22 @@ namespace RadioFutureFinal.Contracts
             return sessionContract;
         }
 
+        public static Media ToModel(this MediaV1 media)
+        {
+            var mediaModel = new Media()
+            {
+                MediaID = media.Id,
+                UserID = media.UserID,
+                UserName = media.UserName,
+                YTVideoID = media.YTVideoID,
+                Likes = media.Likes,
+                Dislikes = media.Dislikes,
+                VideoTitle = media.VideoTitle,
+                ThumbURL = media.ThumbURL
+            };
+            return mediaModel;
+        }
+
         public static MediaV1 ToContract(this Media media)
         {
             var mediaContract = new MediaV1()
@@ -66,7 +82,8 @@ namespace RadioFutureFinal.Contracts
                 YTVideoID = media.YTVideoID,
                 Likes = media.Likes,
                 Dislikes = media.Dislikes,
-                ThumbURL = media.ThumbURL
+                ThumbURL = media.ThumbURL,
+                VideoTitle = media.VideoTitle
             };
             return mediaContract;
         }
