@@ -44,7 +44,7 @@ $(document).ready(function(){
 	mGlobals.ui.spinner = new Spinner(opts).spin(target);
 
 	mGlobals.ui.input_search = $("#input_search");
-	mGlobals.ui.input_name = $("#name_input");
+	mGlobals.ui.input_name = $("#input_name");
 	mGlobals.ui.input_chat = $("#chat_input");
 	mGlobals.ui.ul_chat = $("#ul_chat");
 	mGlobals.ui.div_search_results = $("#div_search_results");
@@ -224,9 +224,9 @@ function updateUsersListUI(users) {
     var html = [];
     //TODO: put style in css and make scrolley
     $.each(users, function(index, user) {
-        var videoTitle = user.videoTitle;
-        if (!videoTitle) {
-            videoTitle = 'Nothing';
+        var videoTitle = 'Nothing';
+        if (user.QueuePosition != -1) {
+            videoTitle = mGlobals.queue[user.QueuePosition].VideoTitle;
         }
         var currentHTML =
             '<div style="text-align: left; display: flex; align-items: center;">' +
@@ -250,7 +250,7 @@ function setupVideo() {
 
 function UserNameChange(name_input) {
 	name_input.hide();
-	mGlobals.ui.input_chat.fadeIn();
+	mGlobals.ui.input_search.fadeIn();
 	saveUserNameChange(name_input.val());
 }
 

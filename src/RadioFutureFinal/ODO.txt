@@ -1,20 +1,11 @@
-﻿-Users list
-	-populate with backend
-	-click for synchronization
-
--Queue list
-	-design div
-	-populate with backend
-	-click for deleting
-
--Next/previous video in queue buttons
--Pause/play buttons
-
--Current content
-	-design div
-	-populate with backend
-
--Extensive manual testing
+﻿-Disconnect stuff
+-Up next stuff
+-User results stuff
+-Synchronization
 
 
-
+Performance stuff
+-Synchornization should come from server
+-The data structure for web sockets
+-Basically everyhitng with the database, especially updates
+-Updating rooms shouldnt hit database everytime

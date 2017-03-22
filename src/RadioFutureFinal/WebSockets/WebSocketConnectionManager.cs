@@ -43,7 +43,7 @@ namespace RadioFutureFinal.WebSockets
             _sockets.TryAdd(CreateConnectionId(), mySocket);
         }
 
-        public void SocketJoinSession(MySocket socket, int sessionId)
+        public void SocketJoinSession(MySocket socket, int sessionId, int userId)
         {
             var ssKeyValuePair = _sessionSockets.FirstOrDefault(pair => pair.Key == sessionId);
             if(ssKeyValuePair.Value == null)
@@ -54,7 +54,7 @@ namespace RadioFutureFinal.WebSockets
             {
                 ssKeyValuePair.Value.Add(socket);
             }
-            socket.JoinSession(sessionId);
+            socket.JoinSession(sessionId, userId);
         }
 
         public async Task RemoveSocket(WebSocket webSocket)

@@ -12,8 +12,8 @@ namespace RadioFutureFinal.DAL
         Task<MyUser> AddNewUserToSessionAsync(string userName, Session session);
         Task<Media> AddMediaToSessionAsync(Media media, int sessionId);
         Task UpdateUserVideoState(int userId, int ytPlayerState, int videoTime, int queuePosition);
-        Task RemoveUserAsync(MyUser user);
-        Task UpdateUserName(int userId, string newName);
+        Task RemoveUserFromSessionAsync(int sessionId, int userId);
+        Task UpdateUserNameAsync(int userId, string newName);
         MyUser GetUser(int userId);
         IEnumerable<MyUser> GetAllUsers();
         Task<Session> CreateSessionAsync(string sessionName);

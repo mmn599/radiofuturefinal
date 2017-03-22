@@ -33,9 +33,12 @@ namespace RadioFutureFinal.DAL
             return media;
         }
 
-        public async Task RemoveUserAsync(MyUser user)
+        public async Task RemoveUserFromSessionAsync(int sessionId, int userId)
         {
-            _context.MyUser.Remove(user);
+            var session = GetSession(sessionId);
+            var user = session.Users.FirstOrDefault(m => m.MyUserId == userId);
+            session.Users.Remove(user);
+            _context.Session.Update(session);
             await _context.SaveChangesAsync();
         }
 
@@ -57,7 +60,7 @@ namespace RadioFutureFinal.DAL
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateUserName(int userId, string newName)
+        public async Task UpdateUserNameAsync(int userId, string newName)
         {
             var user = GetUser(userId);
             user.Name = newName;

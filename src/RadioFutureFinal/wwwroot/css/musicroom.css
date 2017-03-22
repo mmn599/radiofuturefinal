@@ -110,6 +110,10 @@ input:focus {
 }
 
 #input_search {
+    display: none;
+}
+
+.myinput {
 	display: inline-block;
 	width: 100%;
     border: 0;

@@ -28,7 +28,11 @@ namespace RadioFutureFinal.WebSockets
 
         public virtual async Task OnDisconnected(WebSocket socket)
         {
+            // TODO: better data structure should make this one call
+            var mySocket = _wsConnectionManager.GetSocketById(_wsConnectionManager.GetId(socket));
+            await _db.RemoveUserFromSessionAsync(mySocket.SessionId, mySocket.UserId);
             await _wsConnectionManager.RemoveSocket(socket);
+            await ClientsUpdateSessionUsers(mySocket.SessionId);
         }
 
         public async Task SendMessageAsync(WebSocket socket, WsMessage wsMessage)
@@ -131,7 +135,7 @@ namespace RadioFutureFinal.WebSockets
 
         //TODO: better way of keeping track of messages and shit. All these functions feel weird
 
-        private async Task ClientsUpdateSession(MySocket socket, Session session, string action)
+        private async Task ClientsUpdateSession(Session session, string action)
         {
             var wsMessage = new WsMessage();
             wsMessage.Action = action;
@@ -139,23 +143,20 @@ namespace RadioFutureFinal.WebSockets
             await SendMessageToSessionAsync(wsMessage, session.SessionID);
         }
 
-        private async Task ClientsUpdateSessionUsers(MySocket socket, Session session)
+        private async Task ClientsUpdateSessionUsers(Session session)
         {
-            await ClientsUpdateSession(socket, session, "updateUsersList");
+            await ClientsUpdateSession(session, "updateUsersList");
         }
 
-
-        private async Task ClientsUpdateSessionUsers(MySocket socket)
+        private async Task ClientsUpdateSessionUsers(int sessionId)
         {
-            var sessionId = socket.SessionId;
-            var session = _db.GetSession(sessionId);
-            await ClientsUpdateSession(socket, session, "updateUsersList");
+            await ClientsUpdateSessionUsers(_db.GetSession(sessionId));
         }
 
-        private async Task ClientsUpdateSessionQueue(MySocket socket, int sessionId)
+        private async Task ClientsUpdateSessionQueue(int sessionId)
         {
             var session = _db.GetSession(sessionId);
-            await ClientsUpdateSession(socket, session, "updateQueue");
+            await ClientsUpdateSession(session, "updateQueue");
         }
 
 
@@ -170,24 +171,24 @@ namespace RadioFutureFinal.WebSockets
             {
                 session = await _db.CreateSessionAsync(sessionName);
             }
-            _wsConnectionManager.SocketJoinSession(socket, session.SessionID);
-
             var userName = message.User.Name;
             var user = await _db.AddNewUserToSessionAsync(userName, session);
 
+            _wsConnectionManager.SocketJoinSession(socket, session.SessionID, user.MyUserId);
+
             await ClientSessionReady(socket, session, user);
-            await ClientsUpdateSessionUsers(socket, session);
+            await ClientsUpdateSessionUsers(session);
         }
 
         private async Task AddMediaToSession(WsMessage message, MySocket socket)
         {
             await _db.AddMediaToSessionAsync(message.Media.ToModel(), socket.SessionId);
-            await ClientsUpdateSessionQueue(socket, socket.SessionId);
+            await ClientsUpdateSessionQueue(socket.SessionId);
         }
         private async Task DeleteMediaFromSession(WsMessage message, MySocket socket)
         {
             await _db.RemoveMediaAsync(socket.SessionId, message.Media.Id);
-            await ClientsUpdateSessionQueue(socket, socket.SessionId);
+            await ClientsUpdateSessionQueue(socket.SessionId);
         }
         private async Task SaveUserVideoState(WsMessage message, MySocket socket)
         {
@@ -197,8 +198,8 @@ namespace RadioFutureFinal.WebSockets
         private async Task SaveUserNameChange(WsMessage message, MySocket socket)
         {
             var user = message.User;
-            await _db.UpdateUserName(user.Id, user.Name);
-            await ClientsUpdateSessionUsers(socket);
+            await _db.UpdateUserNameAsync(user.Id, user.Name);
+            await ClientsUpdateSessionUsers(socket.SessionId);
         }
         private async Task ChatMessage(WsMessage message, MySocket socket)
         {
@@ -206,7 +207,7 @@ namespace RadioFutureFinal.WebSockets
         }
         private async Task SynchronizeSession(WsMessage message, MySocket socket)
         {
-            await ClientsUpdateSessionUsers(socket);
+            await ClientsUpdateSessionUsers(socket.SessionId);
         }
 
         //TODO: Basic HTML fixin'
