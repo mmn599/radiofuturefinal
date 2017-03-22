@@ -181,30 +181,33 @@ function updateQueueUI(queue_position) {
     console.log('update queue ui');
 	var queue = mGlobals.queue;
 	var length = queue.length;
-	var summary = queue.length + " things up next";
+	var lengthUpNext = queue.length - queue_position - 1;
+	var summary = lengthUpNext + " things up next";
 	if (length == 1) {
-        summary = queue.length + " thing up next";
+        summary = lengthUpNext + " thing up next";
+	}
+	else if (length == 0) {
+	    summary = "Nothing up next. Queue something!";
 	}
 	$("#p_queue_summary").text(summary);
 
     var queueResults = $("#div_queue_results");
     var html = [];
-    if (length - queue_position <= 1) {
-        
+    if (lengthUpNext > 0) {
+        //TODO: put style in css and make scrolley
+        for (var i = queue_position; i < length; i++) {
+            var media = queue[i];
+            console.log('doing it');
+            console.log(media);
+            var currentHTML =
+                '<div style="text-align: left; display: flex; align-items: center;">' +
+                    '<img style="height: 90px; width: 160px; margin-right: 16px;" src="' + media.ThumbURL + '"/>' +
+                    '<span style="margin-right: 16px;">' + media.VideoTitle + '</span>' +
+                '</div>';
+            html.push(currentHTML);
+        }
+        queueResults.html(html.join(""));
     }
-    //TODO: put style in css and make scrolley
-    for (var i = 0; i < length; i++) {
-        var media = queue[i];
-        console.log('doing it');
-        console.log(media);
-        var currentHTML =
-            '<div style="text-align: left; display: flex; align-items: center;">' +
-                '<img style="height: 90px; width: 160px; margin-right: 16px;" src="' + media.ThumbURL + '"/>' +
-                '<span style="margin-right: 16px;">' + media.VideoTitle + '</span>' +
-            '</div>';
-        html.push(currentHTML);
-    }
-    queueResults.html(html.join(""));
 }
 
 COLOR_LIST = ["red", "orange", "yellow", "green", "blue", "violet"];
