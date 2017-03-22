@@ -181,9 +181,9 @@ function updateQueueUI(queue_position) {
     console.log('update queue ui');
 	var queue = mGlobals.queue;
 	var length = queue.length;
-	var summary = queue.length + " things in the queue";
+	var summary = queue.length + " things up next";
 	if (length == 1) {
-        summary = queue.length + " thing in the queue";
+        summary = queue.length + " thing up next";
 	}
 	$("#p_queue_summary").text(summary);
 
@@ -241,7 +241,7 @@ function setupVideo() {
 		var media = mGlobals.queue[mGlobals.user.QueuePosition];
 		console.log(media);
 		updateQueueUI(mGlobals.user.QueuePosition + 1);
-		updatePlayerUI(media.YTVideoID, mGlobals.user.VideoTime, media.UserName, media.Title);		
+		updatePlayerUI(media, mGlobals.user.VideoTime, media.UserName);		
 	}
 }
 
@@ -567,23 +567,21 @@ function onPlayerStateChange(event) {
     }
 }
 
-function updatePlayerUI(current_video, current_VideoTime, current_recommender_name, current_video_Title) {
+function updatePlayerUI(media, time, recommenderName) {
+    console.log(media);
 	if(!mGlobals.player_ready) {
-		setTimeout(updatePlayerUI(current_video, current_VideoTime, current_recommender_name), 1000);
+		setTimeout(updatePlayerUI(media, time, recommenderName), 1000);
 	}
-	mGlobals.player.loadVideoById(current_video, current_VideoTime, "large");	
-    //TODO: Remove
-	//mGlobals.player.loadVideoById("Phl82D57P58", 0, "large");
-	$("#p_current_content_info").text(current_video_Title);
-	$("#p_current_recommender_info").text('Recommended by: ' + current_recommender_name);
-	var color = 'black';
-	//TODO: shitty
-	for(var i=0;i<mGlobals.current_users.length;i++) {
-		var user = mGlobals.current_users[i];
-		if(user.name===current_recommender_name) {
-			color = user.color;
-		} 
-	}
+	mGlobals.player.loadVideoById(media.YTVideoID, time, "large");	
+
+	$("#p_cc_summary").text(media.VideoTitle);
+    var html =
+    '<div style="text-align: left; display: flex; align-items: center;">' +
+        '<img style="height: 90px; width: 160px; margin-right: 16px;" src="' + media.ThumbURL + '"/>' +
+        '<span style="margin-right: 16px;">' + media.VideoTitle + '<br>' + 'Recommended by: ' + recommenderName + '</span>' +
+    '</div>';
+	$("#div_cc_results").html(html);
+
 	synchronizeUsers();
 }
 
