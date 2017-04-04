@@ -8,7 +8,6 @@ window.mobilecheck = function() {
 
 $(document).ready(function(){
 
-    console.log('document is ready');
 	var pathname = window.location.pathname;
 	var roomName = null;
 	if(pathname.indexOf('\/rooms\/')>-1) {
@@ -107,8 +106,6 @@ $(document).ready(function(){
 		}
 	});
 	*/
-	$('.drawer').drawer();
-
 });
 
 
@@ -165,7 +162,6 @@ function sessionReadyUI() {
 } 
 
 function onPlayerReady(event) {
-    console.log('player ready!');
 	mGlobals.player_ready = true;
 	if(mGlobals.youtube_api_ready) {
         setupJamSession();
@@ -183,11 +179,8 @@ function queueRolloff(item) {
 }
 
 function updateQueueUI(queue_position) {
-    console.log('update queue ui');
 	var queue = mGlobals.queue;
 	var length = queue.length;
-	console.log('Length: ' + queue.length);
-	console.log('Position: ' + queue_position);
 	var lengthUpNext = queue.length - queue_position;
 	var summary = lengthUpNext + " things up next";
 	if (lengthUpNext == 1) {
@@ -247,7 +240,6 @@ function updateUsersListUI(users) {
 function setupVideo() {
 	if(mGlobals.user.QueuePosition!=-1) {
 		var media = mGlobals.queue[mGlobals.user.QueuePosition];
-		console.log(media);
 		updateQueueUI(mGlobals.user.QueuePosition + 1);
 		updatePlayerUI(media, mGlobals.user.VideoTime, media.UserName);		
 	}
@@ -280,6 +272,7 @@ function previousVideoInQueue() {
 		setupVideo();
 		mGlobals.user.waiting = false;
 	}
+	saveUserVideoState();
 }
 
 function playVideo() {
@@ -305,6 +298,7 @@ function nextVideoInQueue() {
 	else {
 		mGlobals.user.waiting = true;
 	}
+	saveUserVideoState();
 }
 
 function queueSelectedVideo(elmnt) {
@@ -327,7 +321,6 @@ function queueSelectedVideo(elmnt) {
 //==================================================================
 
 function syncWithUser(userId) {
-    console.log('Syncing with user with id: ' + userId);
 	var myuser = {}
     // TODO: hash map
 	for(var i=0;i<mGlobals.current_users.length;i++) {
@@ -358,12 +351,12 @@ function saveUserNameChange(name) {
 
 function saveUserVideoState() {
 	if(mGlobals.player_ready) {
-		mGlobals.user.VideoTime = mGlobals.player.getCurrentTime();
+	    mGlobals.user.VideoTime = Math.round(mGlobals.player.getCurrentTime());
 		mGlobals.user.YtPlayerState = mGlobals.player.getPlayerState();
 		var data = {
-            User : mGlobals.user
-		}
-		mGlobals.socket.emit('saveUserVideoState', data);	
+		    User: mGlobals.user
+		};
+		mGlobals.socket.emit('SaveUserVideoState', data);	
 	}
 }
 
@@ -447,28 +440,22 @@ function setupSockets() {
 	var uri = "ws://" + window.location.host + "/ws";
     var socket = new WebSocket(uri);
     socket.onopen = function (event) {
-        console.log("opened connection to " + uri);
     };
     socket.onclose = function (event) {
-        console.log("closed connection from " + uri);
     };
     socket.onmessage = function (event) {
         var data = JSON.parse(event.data);
         var action = data.Action;
-        console.log('Received websocket message from server:');
-        console.log(data);
         var func = messageFunctions[action];
         messageFunctions[action](data);
     };
     socket.onerror = function (event) {
-        console.log("error: " + event.data);
     };
     socket.emit = function (action, data) {
         if (socket.readyState === socket.CONNECTING) {
             setTimeout(function () { socket.emit(action, data) }, 100);
             return;
         }
-        console.log('Sending websocket message to server: ' + action);
         var message = {
             action: action,
             session: data.Session,
@@ -476,6 +463,7 @@ function setupSockets() {
             user: data.User,
             chatMessage: data.ChatMessage
         }
+        console.log('socket sending: ');
         console.log(message);
         socket.send(JSON.stringify(message));
     };
@@ -491,7 +479,6 @@ function setupJamSession() {
 		mGlobals.entered_jam = true;
 	}
 
-    console.log('setupJamSession');
 	var pathname = window.location.pathname;
 	var encodedSessionName = null;
 	if(pathname.indexOf('\/rooms\/')>-1) {
@@ -536,7 +523,6 @@ function sendChatMessage(chat_input) {
 function youtubeAPIInit() {
 	gapi.client.setApiKey("AIzaSyC4A-dsGk-ha_b-eDpbxaVQt5bR7cOUddc");
 	gapi.client.load("youtube", "v3", function() {
-	    console.log('youtube api loaded');
 		mGlobals.youtube_api_ready = true;
 		if(mGlobals.player_ready) {
 			setupJamSession();
@@ -549,7 +535,7 @@ function onYouTubeIframeAPIReady() {
         height: 'auto',
         width: '100%',
         playerVars: {
-        	controls: 0,
+        	controls: 1,
         	showinfo: 0,
         	autoplay: 1
         },
@@ -591,7 +577,6 @@ function onPlayerStateChange(event) {
 }
 
 function updatePlayerUI(media, time, recommenderName) {
-    console.log(media);
 	if(!mGlobals.player_ready) {
 		setTimeout(updatePlayerUI(media, time, recommenderName), 1000);
 	}
