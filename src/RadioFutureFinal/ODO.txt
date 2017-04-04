@@ -1,8 +1,7 @@
-﻿-Disconnect stuff
--Up next stuff
+﻿-Up next stuff
 -User results stuff
 -Synchronization
-
+-Chat
 
 Performance stuff
 -Synchornization should come from server

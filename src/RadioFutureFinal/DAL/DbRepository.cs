@@ -95,11 +95,17 @@ namespace RadioFutureFinal.DAL
         }
         public Session GetSession(int sessionId)
         {
-            return _context.Session.FirstOrDefault(t => t.SessionID == sessionId);
+            return _context.Session.Where(s => s.SessionID == sessionId)
+                                    .Include(s => s.Queue)
+                                    .Include(s => s.Users)
+                                    .FirstOrDefault();
         }
         public bool GetSessionByName(string sessionName, out Session session)
         {
-            session = _context.Session.FirstOrDefault(t => t.Name == sessionName);
+            session = _context.Session.Where(s => s.Name == sessionName)
+                                    .Include(s => s.Queue)
+                                    .Include(s => s.Users)
+                                    .FirstOrDefault();
             return session != null;
         }
 

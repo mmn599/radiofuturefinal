@@ -181,7 +181,9 @@ function updateQueueUI(queue_position) {
     console.log('update queue ui');
 	var queue = mGlobals.queue;
 	var length = queue.length;
-	var lengthUpNext = queue.length - queue_position - 1;
+	console.log(queue.length);
+	console.log(queue_position);
+	var lengthUpNext = queue.length - queue_position;
 	var summary = lengthUpNext + " things up next";
 	if (lengthUpNext == 1) {
         summary = lengthUpNext + " thing up next";
