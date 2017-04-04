@@ -30,8 +30,9 @@ namespace RadioFutureFinal.WebSockets
         {
             // TODO: better data structure should make this one call
             var mySocket = _wsConnectionManager.GetSocketById(_wsConnectionManager.GetId(socket));
+            // TODO: ensure only valid websockets are sent to
+            _wsConnectionManager.RemoveSocket(socket);
             await _db.RemoveUserFromSessionAsync(mySocket.SessionId, mySocket.UserId);
-            await _wsConnectionManager.RemoveSocket(socket);
             await ClientsUpdateSessionUsers(mySocket.SessionId);
         }
 

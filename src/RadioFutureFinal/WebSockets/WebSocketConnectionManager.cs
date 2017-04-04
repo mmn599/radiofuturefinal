@@ -57,13 +57,13 @@ namespace RadioFutureFinal.WebSockets
             socket.JoinSession(sessionId, userId);
         }
 
-        public async Task RemoveSocket(WebSocket webSocket)
+        public void RemoveSocket(WebSocket webSocket)
         {
             var socketId = GetId(webSocket);
-            await RemoveSocket(socketId);
+            RemoveSocket(socketId);
         }
 
-        public async Task RemoveSocket(string id)
+        public void RemoveSocket(string id)
         {
             MySocket socket;
             _sockets.TryRemove(id, out socket);
@@ -74,9 +74,11 @@ namespace RadioFutureFinal.WebSockets
                 _sessionSockets.FirstOrDefault(p => p.Key == socket.SessionId).Value.Remove(socket);
             }
 
+            /*
             await socket.WebSocket.CloseAsync(closeStatus: WebSocketCloseStatus.NormalClosure,
                                     statusDescription: "Closed by the WebSocketManager",
                                     cancellationToken: CancellationToken.None);
+            */
         }
 
         private string CreateConnectionId()

@@ -183,10 +183,10 @@ function updateQueueUI(queue_position) {
 	var length = queue.length;
 	var lengthUpNext = queue.length - queue_position - 1;
 	var summary = lengthUpNext + " things up next";
-	if (length == 1) {
+	if (lengthUpNext == 1) {
         summary = lengthUpNext + " thing up next";
 	}
-	else if (length == 0) {
+	else if (lengthUpNext <= 0) {
 	    summary = "Nothing up next. Queue something!";
 	}
 	$("#p_queue_summary").text(summary);

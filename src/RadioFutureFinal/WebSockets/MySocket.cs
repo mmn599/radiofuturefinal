@@ -30,6 +30,7 @@ namespace RadioFutureFinal.WebSockets
         {
             _inSession = true;
             _sessionId = sessionId;
+            _userId = userId;
         }
     }
 }
