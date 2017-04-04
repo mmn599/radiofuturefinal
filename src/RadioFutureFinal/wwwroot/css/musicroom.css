@@ -68,6 +68,10 @@ input:focus {
 	bottom: 5%;
 }
 
+#btn_play {
+    display: none;
+}
+
 #div_search_results {
 	right: 25%;
 	width: 50%;

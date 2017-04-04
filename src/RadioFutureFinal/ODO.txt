@@ -1,10 +1,14 @@
-﻿-Up next stuff
--User results stuff
--Synchronization
+﻿-Synchronization
+-Put in the drop downs
 -Chat
+-Put it up
+-Mobile
 
 Performance stuff
--Synchornization should come from server
+-Synchronization should come from server
+-
+
+-Is looking up session by string name significantly slower? Does the db engine do the hashing?
 -The data structure for web sockets
 -Basically everyhitng with the database, especially updates
 -Updating rooms shouldnt hit database everytime

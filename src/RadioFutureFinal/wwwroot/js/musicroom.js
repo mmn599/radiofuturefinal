@@ -89,6 +89,11 @@ $(document).ready(function(){
 		}	
 	})
 
+	$("#btn_previous").click(previousVideoInQueue);
+	$("#btn_pause").click(pauseVideo);
+	$("#btn_play").click(playVideo);
+	$("#btn_next").click(nextVideoInQueue);
+
 	document.body.addEventListener('click', function() {
 		mGlobals.ui.div_search_results.fadeOut();
 		if(mGlobals.input_search) {
@@ -181,8 +186,8 @@ function updateQueueUI(queue_position) {
     console.log('update queue ui');
 	var queue = mGlobals.queue;
 	var length = queue.length;
-	console.log(queue.length);
-	console.log(queue_position);
+	console.log('Length: ' + queue.length);
+	console.log('Position: ' + queue_position);
 	var lengthUpNext = queue.length - queue_position;
 	var summary = lengthUpNext + " things up next";
 	if (lengthUpNext == 1) {
@@ -199,8 +204,6 @@ function updateQueueUI(queue_position) {
         //TODO: put style in css and make scrolley
         for (var i = queue_position; i < length; i++) {
             var media = queue[i];
-            console.log('doing it');
-            console.log(media);
             var currentHTML =
                 '<div style="text-align: left; display: flex; align-items: center;">' +
                     '<img style="height: 90px; width: 160px; margin-right: 16px;" src="' + media.ThumbURL + '"/>' +
@@ -208,8 +211,8 @@ function updateQueueUI(queue_position) {
                 '</div>';
             html.push(currentHTML);
         }
-        queueResults.html(html.join(""));
     }
+    queueResults.html(html.join(""));
 }
 
 COLOR_LIST = ["red", "orange", "yellow", "green", "blue", "violet"];
@@ -234,7 +237,7 @@ function updateUsersListUI(users) {
             '<div style="text-align: left; display: flex; align-items: center;">' +
                 '<div style="display: inline-block; margin-right: 16px; height: 48px; width: 48px; background: ' + COLOR_LIST[index % 6] + ';"></div>' +
                 '<span style="margin-right: 16px;">' + user.Name + '<br /><span style="font-size: 12px";>' + videoTitle + '</span></span>' +
-                '<img src="../images/sync.png"/>' +
+                '<img src="../images/sync.png" style="cursor: pointer;" onclick="syncWithUser(' + user.Id +')"/>' +
             '</div>';
         html.push(currentHTML);
     });
@@ -279,6 +282,18 @@ function previousVideoInQueue() {
 	}
 }
 
+function playVideo() {
+    $("#btn_play").hide();
+    $("#btn_pause").show();
+    mGlobals.player.playVideo();
+}
+
+function pauseVideo() {
+    $("#btn_pause").hide();
+    $("#btn_play").show();
+    mGlobals.player.pauseVideo();
+}
+
 function nextVideoInQueue() {
 	mGlobals.user.VideoTime = 0;
 	var queue = mGlobals.queue;
@@ -311,10 +326,12 @@ function queueSelectedVideo(elmnt) {
 // Basically all the hard stuff
 //==================================================================
 
-function syncWithUser(username) {
+function syncWithUser(userId) {
+    console.log('Syncing with user with id: ' + userId);
 	var myuser = {}
+    // TODO: hash map
 	for(var i=0;i<mGlobals.current_users.length;i++) {
-		if(mGlobals.current_users[i].name===username) {
+		if(mGlobals.current_users[i].Id===userId) {
 			myuser = mGlobals.current_users[i];
 		}
 	}
@@ -376,7 +393,7 @@ function sessionReady(data) {
 	mGlobals.current_users = session.Users;
     mGlobals.user = data.User;
 	saveUserVideoState();
-	setInterval(saveUserVideoState, 10000);
+	setInterval(saveUserVideoState, 5000);
 	if(mGlobals.queue.length==0) {
 		$("#p_current_content_info").text("Queue up a song!");
 		$("#p_current_recommender_info").text("Use the search bar above.");
@@ -494,7 +511,8 @@ function joinJamSession(encodedSessionName) {
 		Session: { name: encodedSessionName },
 	};
 	mGlobals.socket.emit('userJoinSession', data);
-	// setInterval(synchronizeUsers, 15000);
+    // TODO: synchronization should come from server
+	setInterval(synchronizeUsers, 5000);
 };
 
 //==================================================================
