@@ -306,11 +306,12 @@ function queueSelectedVideo(elmnt) {
 	var VideoId = elmnt.getAttribute('data-VideoId');
 	var Title = elmnt.innerText || element.textContent;
 	var ThumbURL = elmnt.getAttribute('data-ThumbURL');
-	var media = createMedia(Title, VideoId, ThumbURL, mGlobals.user.Id, mGlobals.user.name);
+	var media = createMedia(Title, VideoId, ThumbURL, mGlobals.user.Id, mGlobals.user.Name);
 	var data = {
 		Media : media
 	};
 	//TODO: local add media
+	console.log(data);
 	mGlobals.socket.emit('addMediaToSession', data);
 }
 
@@ -534,7 +535,7 @@ function onYouTubeIframeAPIReady() {
         height: 'auto',
         width: '100%',
         playerVars: {
-        	controls: 1,
+        	controls: 0,
         	showinfo: 0,
         	autoplay: 1
         },

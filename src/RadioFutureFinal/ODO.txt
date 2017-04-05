@@ -1,5 +1,4 @@
-﻿-Fix current video user
--Put in the drop downs
+﻿-Put in the drop downs
 -Chat
 -Put it up
 -Mobile
