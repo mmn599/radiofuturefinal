@@ -419,13 +419,7 @@ function updateQueue(data) {
 function receivedChatMessage(data) {
 	var msg = data.ChatMessage;
 	var userName = data.User.Name;
-	var innerHTML = mGlobals.ui.ul_chat.html() || "";
-	// mGlobals.ui.ul_chat.html(innerHTML +'<li><span style="color: '+user.color+'">'+user.name+'</span>'+'<span>'+ ': ' + msg+ '</span></li>');
-	mGlobals.ui.ul_chat.html(innerHTML +'<li><span style="color: '+ "Blue" +'">'+ userName +'</span>'+'<span>'+ ': ' + msg+ '</span></li>');
-	var children = mGlobals.ui.ul_chat.children();
-	if(children.length>10) {
-		children[0].remove();
-	}
+	$("#p_chat_summary").text(userName + ": " + msg);
 }
 
 var messageFunctions = {
