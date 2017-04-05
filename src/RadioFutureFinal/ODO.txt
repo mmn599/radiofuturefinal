@@ -1,5 +1,4 @@
-﻿-Synchronization
--Fix current video user
+﻿-Fix current video user
 -Put in the drop downs
 -Chat
 -Put it up

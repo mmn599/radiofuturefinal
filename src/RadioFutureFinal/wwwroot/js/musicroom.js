@@ -228,9 +228,8 @@ function updateUsersListUI(users) {
         }
         var currentHTML =
             '<div style="text-align: left; display: flex; align-items: center;">' +
-                '<div style="display: inline-block; margin-right: 16px; height: 48px; width: 48px; background: ' + COLOR_LIST[index % 6] + ';"></div>' +
-                '<span style="margin-right: 16px;">' + user.Name + '<br /><span style="font-size: 12px";>' + videoTitle + '</span></span>' +
-                '<img src="../images/sync.png" style="cursor: pointer;" onclick="syncWithUser(' + user.Id +')"/>' +
+                   '<div onclick="syncWithUser(' + user.Id + ')" + style="display: flex; align-items: center; justify-content: center; float: left; cursor: pointer; margin-right: 16px; height: 48px; width: 48px; background: ' + COLOR_LIST[index % 6] + ';">sync</div>' +
+                   '<span style="margin-right: 16px; float: right;">' + user.Name + '<br /><span style="font-size: 12px";>' + videoTitle + '</span></span>' +
             '</div>';
         html.push(currentHTML);
     });
