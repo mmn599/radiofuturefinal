@@ -62,9 +62,17 @@ input:focus {
     bottom: 5%;
 }
 
+#input_chat {
+    text-align: right;
+    display: block;
+    background-color: transparent;
+}
+
 #div_chat_results {
     right: 0%;
-	width: 33.33%;
+    display: inline-block;
+	width: 20%;
+    height: 12%;
 	bottom: 5%;
 }
 

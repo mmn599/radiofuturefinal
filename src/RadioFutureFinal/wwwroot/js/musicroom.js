@@ -82,9 +82,11 @@ $(document).ready(function(){
 		}	
 	})
 
-	mGlobals.ui.input_chat.keypress(function(e) {
+	var input_chat = $("#input_chat");
+    input_chat.keypress(function(e) {
 		if(e.which==13) {
-			sendChatMessage(mGlobals.ui.input_chat);
+			sendChatMessage(input_chat.val());
+			input_chat.val("");
 		}	
 	})
 
@@ -106,6 +108,7 @@ $(document).ready(function(){
 		}
 	});
 	*/
+
 });
 
 
@@ -311,7 +314,6 @@ function queueSelectedVideo(elmnt) {
 		Media : media
 	};
 	//TODO: local add media
-	console.log(data);
 	mGlobals.socket.emit('addMediaToSession', data);
 }
 
@@ -419,7 +421,10 @@ function updateQueue(data) {
 function receivedChatMessage(data) {
 	var msg = data.ChatMessage;
 	var userName = data.User.Name;
-	$("#p_chat_summary").text(userName + ": " + msg);
+    //TODO: color stuff
+	var numChildren = $("#ul_chat").length;
+	var html = '<li class="chat"><span style="margin: 0; color: ' + COLOR_LIST[length % 6] + ';">' + userName + ': </span><span>' + msg + '</span></li>';
+    $("#ul_chat").append(html);
 }
 
 var messageFunctions = {
@@ -457,8 +462,6 @@ function setupSockets() {
             user: data.User,
             chatMessage: data.ChatMessage
         }
-        console.log('socket sending: ');
-        console.log(message);
         socket.send(JSON.stringify(message));
     };
     mGlobals.socket = socket;
@@ -499,14 +502,15 @@ function joinJamSession(encodedSessionName) {
 //==================================================================
 // Chat functions
 //==================================================================
-function sendChatMessage(chat_input) {
+function sendChatMessage(msg) {
 	if(mGlobals.sessionInitialized) {
 	    var data = {
-            ChatMessage: chat_input.val(),
-            User: { Name: mGlobals.user.Name }
-	    }
+	        ChatMessage: msg,
+	        User: { Name: mGlobals.user.Name }
+	    };
+	    console.log('sending chat message');
+	    console.log(data);
 	    mGlobals.socket.emit('chatMessage', data);
-		chat_input.val("");
 	}
 }
 

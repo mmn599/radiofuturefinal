@@ -52,11 +52,11 @@
                 <img id="btn_next" src="../images/arrows.png" style="cursor: pointer"/>
             </div>
             <div id="div_chat_overall" style="padding-right: 1%; justify-content: flex-end; width: 32.33%;" class="info">
-                <div id="div_chat_results" class="results">
-                    <p>Still have to implement the UI for this feature!</p>
+                <div id="div_chat_results" style="display: none; padding: 0; overflow: auto;" class="results">
+                    <ul style="margin: 2%; padding: 0; list-style: none;" id="ul_chat">
+                    </ul>
                 </div>
-                <p id="p_chat_summary">Chat!</p>
-                <img style="margin-left: 8px;" src="~/images/drop-up.png" />
+                <input class="myinput" id="input_chat" placeholder="Enter your chat message"/>
             </div>
         </div>
     </div>
