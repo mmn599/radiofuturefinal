@@ -17,6 +17,7 @@ namespace RadioFutureFinal.DAL
             _configuration = configuration;   
         }
 
+        //TODO: get rid and use factory
         private static ApplicationDbContext ContextFactory()
         {
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
