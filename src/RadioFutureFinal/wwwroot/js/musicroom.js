@@ -200,11 +200,17 @@ function updateQueueUI(queue_position) {
         //TODO: put style in css and make scrolley
         for (var i = queue_position; i < length; i++) {
             var media = queue[i];
-            var currentHTML =
-                '<div style="text-align: left; display: flex; align-items: center;">' +
-                    '<img style="height: 90px; width: 160px; margin-right: 16px;" src="' + media.ThumbURL + '"/>' +
-                    '<span style="margin-right: 16px;">' + media.VideoTitle + '</span>' +
-                '</div>';
+            var currentHTML = "";
+            if (mobileBrowser) {
+                currentHTML = '<img style="width: 33.33%; height: 20vw;" src="'  + media.ThumbURL + '"/>';
+            }
+            else {
+                currentHTML =
+                    '<div style="text-align: left; display: flex; align-items: center;">' +
+                        '<img style="height: 90px; width: 160px; margin-right: 16px;" src="' + media.ThumbURL + '"/>' +
+                        '<span style="margin-right: 16px;">' + media.VideoTitle + '</span>' +
+                    '</div>';
+            }
             html.push(currentHTML);
         }
     }
@@ -229,11 +235,17 @@ function updateUsersListUI(users) {
         if (user.QueuePosition != -1) {
             videoTitle = mGlobals.queue[user.QueuePosition].VideoTitle;
         }
-        var currentHTML =
-            '<div style="text-align: left; display: flex; align-items: center;">' +
-                   '<div onclick="syncWithUser(' + user.Id + ')" + style="display: flex; align-items: center; justify-content: center; float: left; cursor: pointer; margin-right: 16px; height: 48px; width: 48px; background: ' + COLOR_LIST[index % 6] + ';">sync</div>' +
-                   '<span style="margin-right: 16px; float: right;">' + user.Name + '<br /><span style="font-size: 12px";>' + videoTitle + '</span></span>' +
-            '</div>';
+        var currentHTML = "";
+        if (mobileBrowser) {
+            currentHTML = '<div class="div_user" style="background: '+  COLOR_LIST[index % COLOR_LIST.length] + ';">sync with ' + user.Name + '</div>';
+        }
+        else {
+            currentHTML =
+                '<div style="text-align: left; display: flex; align-items: center;">' +
+                       '<div onclick="syncWithUser(' + user.Id + ')" + style="display: flex; align-items: center; justify-content: center; float: left; cursor: pointer; margin-right: 16px; height: 48px; width: 48px; background: ' + COLOR_LIST[index % COLOR_LIST.length] + ';">sync</div>' +
+                       '<span style="margin-right: 16px; float: right;">' + user.Name + '<br /><span style="font-size: 12px";>' + videoTitle + '</span></span>' +
+                '</div>';
+        }
         html.push(currentHTML);
     });
     userResults.html(html.join(""));
