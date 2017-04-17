@@ -581,12 +581,14 @@ function updatePlayerUI(media, time, recommenderName) {
 	mGlobals.player.loadVideoById(media.YTVideoID, time, "large");	
 
 	$("#p_cc_summary").text(media.VideoTitle);
-    var html =
-    '<div style="text-align: left; display: flex; align-items: center;">' +
-        '<img style="height: 90px; width: 160px; margin-right: 16px;" src="' + media.ThumbURL + '"/>' +
-        '<span style="margin-right: 16px;">' + media.VideoTitle + '<br>' + 'Recommended by: ' + recommenderName + '</span>' +
-    '</div>';
-	$("#div_cc_results").html(html);
+	if (!mobileBrowser) {
+        var html =
+        '<div style="text-align: left; display: flex; align-items: center;">' +
+            '<img style="height: 90px; width: 160px; margin-right: 16px;" src="' + media.ThumbURL + '"/>' +
+            '<span style="margin-right: 16px;">' + media.VideoTitle + '<br>' + 'Recommended by: ' + recommenderName + '</span>' +
+        '</div>';
+        $("#div_cc_results").html(html);
+	}
 
 	synchronizeUsers();
 }

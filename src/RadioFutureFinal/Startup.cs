@@ -11,7 +11,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using RadioFutureFinal.Data;
 using RadioFutureFinal.Models;
-using RadioFutureFinal.Services;
 using RadioFutureFinal.WebSockets;
 using RadioFutureFinal.DAL;
 using Microsoft.AspNetCore.Http;
@@ -55,10 +54,6 @@ namespace RadioFutureFinal
             services.AddWebSocketManager();
             services.AddSingleton(Configuration);
             services.AddSingleton<IDbRepository, DbRepository>();
-
-            // Add application services.
-            services.AddTransient<IEmailSender, AuthMessageSender>();
-            services.AddTransient<ISmsSender, AuthMessageSender>();
         }
         
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
