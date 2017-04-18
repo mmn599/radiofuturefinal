@@ -216,10 +216,6 @@ function updateQueueUI(queue_position) {
         }
     }
 
-    if (mobileBrowser) {
-        html.push('<span style="margin-left: 2vw;"> <-- ' + summary + '</span>');
-    }
-
     queueResults.html(html.join(""));
 }
 
@@ -255,10 +251,6 @@ function updateUsersListUI(users) {
         }
         html.push(currentHTML);
     });
-
-    if (mobileBrowser) {
-        html.push('<span style="margin-left: 2vw;"> <-- ' + summary + '</span>');
-    }
 
     userResults.html(html.join(""));
 }
