@@ -1,9 +1,10 @@
-﻿-Mobile
+﻿-Debug users list on local and production
+-Mobile UI decent on iphone5
+-Setup string index for session name SQL
+-ui polishing
 
 Performance and Code stuff
 -Setup typescript
--Is looking up session by string name significantly slower? Does the db engine do the hashing?
-
 -Do a real analysis of which websocket requests should be async
 -The data structure for web sockets
 -Basically everyhitng with the database, especially updates
