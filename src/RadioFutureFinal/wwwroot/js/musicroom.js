@@ -545,7 +545,7 @@ function onYouTubeIframeAPIReady() {
         height: 'auto',
         width: '100%',
         playerVars: {
-        	controls: 0,
+        	controls: 1,
         	showinfo: 0,
         	autoplay: 0
         },
@@ -571,7 +571,9 @@ function searchVideos(query, callback) {
 function updatePlayerState(state) {
 	if(mGlobals.player_ready) {
 		if(state==mConstants.PLAYING) {
-			mGlobals.player.playVideo();
+		    if (!mobileBrowser) {
+                mGlobals.player.playVideo();
+		    }
 		}
 		else if(state==mConstants.PAUSED) {
 			mGlobals.player.pauseVideo();
