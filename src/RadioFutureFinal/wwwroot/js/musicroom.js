@@ -186,6 +186,7 @@ function updateQueueUI(queue_position) {
 	var length = queue.length;
 	var lengthUpNext = queue.length - queue_position;
 	var summary = lengthUpNext + " things up next";
+    
 	if (lengthUpNext == 1) {
         summary = lengthUpNext + " thing up next";
 	}
@@ -202,7 +203,7 @@ function updateQueueUI(queue_position) {
             var media = queue[i];
             var currentHTML = "";
             if (mobileBrowser) {
-                currentHTML = '<img style="width: 33.33%; height: 20vw;" src="'  + media.ThumbURL + '"/>';
+                currentHTML = '<img style="float: left; width: 33.33%; height: 20vw;" src="'  + media.ThumbURL + '"/>';
             }
             else {
                 currentHTML =
@@ -214,6 +215,15 @@ function updateQueueUI(queue_position) {
             html.push(currentHTML);
         }
     }
+
+    if (mobileBrowser && lengthUpNext > 0) {
+        html.push('<span style="margin-left: 2vw;"> <-- ' + summary + '</span>');
+    }
+
+    if (mobileBrowser && lengthUpNext <= 0) {
+        html.push('<p style="text-align: center; margin: 0;"> The queue is empty! </p>');
+    }
+
     queueResults.html(html.join(""));
 }
 
@@ -248,6 +258,11 @@ function updateUsersListUI(users) {
         }
         html.push(currentHTML);
     });
+
+    if (mobileBrowser) {
+        html.push('<span style="margin-left: 2vw;"> <-- ' + summary + '</span>');
+    }
+
     userResults.html(html.join(""));
 }
 
