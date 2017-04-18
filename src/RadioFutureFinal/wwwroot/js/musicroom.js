@@ -547,7 +547,7 @@ function onYouTubeIframeAPIReady() {
         playerVars: {
         	controls: 0,
         	showinfo: 0,
-        	autoplay: 1
+        	autoplay: 0
         },
         events: {
             'onReady': onPlayerReady,
