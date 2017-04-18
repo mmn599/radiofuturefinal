@@ -3,6 +3,7 @@ using RadioFutureFinal.Contracts;
 using RadioFutureFinal.DAL;
 using RadioFutureFinal.Models;
 using System;
+using System.Collections.Generic;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
@@ -12,52 +13,30 @@ namespace RadioFutureFinal.WebSockets
 {
     public class WebSocketHandler
     {
-        protected WebSocketConnectionManager _wsConnectionManager { get; set; }
+        protected MyContext _myContext { get; set; }
         protected IDbRepository _db { get; set; }
 
-        public WebSocketHandler(IDbRepository db, WebSocketConnectionManager webSocketConnectionManager)
+        public WebSocketHandler(IDbRepository db, MyContext myContext)
         {
-            _wsConnectionManager = webSocketConnectionManager;
+            _myContext = myContext;
             _db = db;
         }
 
         public void OnConnected(WebSocket socket)
         {
-            _wsConnectionManager.AddSocket(socket);
+            _myContext.AddSocket(socket);
         }
 
         public virtual async Task OnDisconnected(WebSocket socket)
         {
-            // TODO: better data structure should make this one call
-            // TODO: ensure only valid websockets are sent to
-            var mySocket = _wsConnectionManager.GetMySocket(socket);
-            _wsConnectionManager.RemoveSocket(socket);
-            await _db.RemoveUserFromSessionAsync(mySocket.SessionId, mySocket.UserId);
-            await ClientsUpdateSessionUsers(mySocket.SessionId);
+            var mySocket = _myContext.GetMySocket(socket);
+            var sessionId = mySocket.SessionId;
+            _myContext.RemoveSocket(socket);
+            var updatedSession = await _db.RemoveUserFromSessionAsync(sessionId, mySocket.UserId);
+            await ClientMessages.ClientsUpdateSessionUsers(updatedSession, GetSocketsInSession(sessionId));
         }
 
-        public async Task SendMessageAsync(WebSocket socket, WsMessage wsMessage)
-        {
-            if (socket.State != WebSocketState.Open)
-                return;
 
-            string message = JsonConvert.SerializeObject(wsMessage);
-
-            await socket.SendAsync(buffer: new ArraySegment<byte>(array: Encoding.ASCII.GetBytes(message),
-                                                                  offset: 0,
-                                                                  count: message.Length),
-                                   messageType: WebSocketMessageType.Text,
-                                   endOfMessage: true,
-                                   cancellationToken: CancellationToken.None);
-        }
-
-        public async Task SendMessageToSessionAsync(WsMessage message, int sessionId)
-        {
-            foreach(var socket in _wsConnectionManager.GetSocketsInSession(sessionId))
-            {
-                await SendMessageAsync(socket.WebSocket, message);
-            }
-        }
 
 
         // TODO: how neccesary is this being async?
@@ -76,7 +55,7 @@ namespace RadioFutureFinal.WebSockets
                 return;
             }
 
-            MySocket mySocket = _wsConnectionManager.GetMySocket(socket);
+            MySocket mySocket = _myContext.GetMySocket(socket);
             // TODO: better action dictionary
             if(wsMessage.Action.Equals("UserJoinSession", StringComparison.CurrentCultureIgnoreCase))
             {
@@ -108,47 +87,16 @@ namespace RadioFutureFinal.WebSockets
             }
         }
 
-        // ===============================================
-        // TODO: maybe move these functions to another file
-        private async Task ClientSessionReady(MySocket socket, Session session, MyUser user)
+        private List<MySocket> GetSocketsInSession(int sessionId)
         {
-            // TODO: How can I make sure this is somewhat updated properly?
-            var wsMessage = new WsMessage();
-            wsMessage.Action = "sessionReady";
-            wsMessage.Session = session.ToContract(); 
-            wsMessage.User = user.ToContract();
-
-            await SendMessageAsync(socket.WebSocket, wsMessage);
+            List<MySocket> socketsInSession;
+            var found = _myContext.ActiveSessions.TryGetValue(sessionId, out socketsInSession);
+            if(!found)
+            {
+                // TODO: exception
+            }
+            return socketsInSession;
         }
-
-        //TODO: better way of keeping track of messages and shit. All these functions feel weird
-
-        private async Task ClientsUpdateSession(Session session, string action)
-        {
-            var wsMessage = new WsMessage();
-            wsMessage.Action = action;
-            wsMessage.Session = session.ToContract();
-            await SendMessageToSessionAsync(wsMessage, session.SessionID);
-        }
-
-        private async Task ClientsUpdateSessionUsers(Session session)
-        {
-            await ClientsUpdateSession(session, "updateUsersList");
-        }
-
-        private async Task ClientsUpdateSessionUsers(int sessionId)
-        {
-            await ClientsUpdateSessionUsers(_db.GetSession(sessionId));
-        }
-
-        private async Task ClientsUpdateSessionQueue(int sessionId)
-        {
-            var session = _db.GetSession(sessionId);
-            await ClientsUpdateSession(session, "updateQueue");
-        }
-
-
-        // ===============================================
 
         private async Task JoinSession(WsMessage message, MySocket socket)
         {
@@ -162,36 +110,46 @@ namespace RadioFutureFinal.WebSockets
             var userName = message.User.Name;
             var user = await _db.AddNewUserToSessionAsync(userName, session);
 
-            _wsConnectionManager.SocketJoinSession(socket, session.SessionID, user.MyUserId);
+            var sessionId = session.SessionID;
 
-            await ClientSessionReady(socket, session, user);
-            await ClientsUpdateSessionUsers(session);
+            _myContext.SocketJoinSession(socket, sessionId, user.MyUserId);
+
+            await ClientMessages.ClientSessionReady(socket, session, user);
+            await ClientMessages.ClientsUpdateSessionUsers(session, GetSocketsInSession(sessionId));
         }
 
         private async Task AddMediaToSession(WsMessage message, MySocket socket)
         {
-            await _db.AddMediaToSessionAsync(message.Media.ToModel(), socket.SessionId);
-            await ClientsUpdateSessionQueue(socket.SessionId);
+            var sessionId = socket.SessionId;
+            var updatedSession = await _db.AddMediaToSessionAsync(message.Media.ToModel(), sessionId);
+            await ClientMessages.ClientsUpdateSessionQueue(updatedSession, GetSocketsInSession(sessionId));
         }
+
         private async Task DeleteMediaFromSession(WsMessage message, MySocket socket)
         {
-            await _db.RemoveMediaAsync(socket.SessionId, message.Media.Id);
-            await ClientsUpdateSessionQueue(socket.SessionId);
+            var sessionId = socket.SessionId;
+            var updatedSession = await _db.RemoveMediaAsync(sessionId, message.Media.Id);
+            await ClientMessages.ClientsUpdateSessionQueue(updatedSession, GetSocketsInSession(sessionId));
         }
         private async Task SaveUserVideoState(WsMessage message, MySocket socket)
         {
             var user = message.User;
             await _db.UpdateUserVideoState(user.Id, user.YTPlayerState, user.VideoTime, user.QueuePosition);
         }
+
+        // TODO: don't use whole session
         private async Task SaveUserNameChange(WsMessage message, MySocket socket)
         {
             var user = message.User;
             await _db.UpdateUserNameAsync(user.Id, user.Name);
-            await ClientsUpdateSessionUsers(socket.SessionId);
+            var sessionId = socket.SessionId;
+            var session = _db.GetSession(sessionId);
+            await ClientMessages.ClientsUpdateSessionUsers(session, GetSocketsInSession(sessionId));
         }
+
         private async Task ChatMessage(WsMessage message, MySocket socket)
         {
-            await SendMessageToSessionAsync(message, socket.SessionId);
+            await ClientMessages.SendMessageToSessionAsync(message, GetSocketsInSession(socket.SessionId));
         }
     }
 }

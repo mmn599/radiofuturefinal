@@ -35,11 +35,6 @@ namespace RadioFutureFinal
 
             builder.AddEnvironmentVariables();
             Configuration = builder.Build();
-            MyAppContext = new MyContext();
-            var timer = new System.Threading.Timer((e) =>
-            {
-                MyAppContext.Clean();
-            }, null, 0, TimeSpan.FromSeconds(5).Milliseconds);
         }
 
         public IConfigurationRoot Configuration { get; }
@@ -59,8 +54,8 @@ namespace RadioFutureFinal
 
             services.AddWebSocketManager();
             services.AddSingleton(Configuration);
-            services.AddSingleton(MyAppContext);
             services.AddSingleton<IDbRepository, DbRepository>();
+            services.AddSingleton<MyContext>();
         }
         
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

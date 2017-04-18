@@ -20,8 +20,6 @@ namespace RadioFutureFinal.WebSockets
 
         public static IServiceCollection AddWebSocketManager(this IServiceCollection services)
         {
-            services.AddTransient<WebSocketConnectionManager>();
-
             services.AddSingleton<WebSocketHandler>();
             /*
             foreach (var type in Assembly.GetEntryAssembly().ExportedTypes)

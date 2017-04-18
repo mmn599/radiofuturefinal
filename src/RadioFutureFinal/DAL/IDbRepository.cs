@@ -10,13 +10,13 @@ namespace RadioFutureFinal.DAL
     public interface IDbRepository
     {
         Task<MyUser> AddNewUserToSessionAsync(string userName, Session session);
-        Task<Media> AddMediaToSessionAsync(Media media, int sessionId);
+        Task<Session> AddMediaToSessionAsync(Media media, int sessionId);
         Task UpdateUserVideoState(int userId, int ytPlayerState, int videoTime, int queuePosition);
-        Task RemoveUserFromSessionAsync(int sessionId, int userId);
+        Task<Session> RemoveUserFromSessionAsync(int sessionId, int userId);
         Task UpdateUserNameAsync(int userId, string newName);
         Task<Session> CreateSessionAsync(string sessionName);
         Session GetSession(int sessionId);
         bool GetSessionByName(string sessionName, out Session session);
-        Task RemoveMediaAsync(int sessionId, int mediaId);
+        Task<Session> RemoveMediaAsync(int sessionId, int mediaId);
     }
 }

@@ -44,6 +44,7 @@ namespace RadioFutureFinal.DAL
             await sourceContext.SaveChangesAsync();
         }
 
+        // TODO: ensure EF just adds a user and doesn't update a non fully populated session
         public async Task<MyUser> AddNewUserToSessionAsync(string userName, Session session)
         {
             using (var context = ContextFactory())
@@ -55,18 +56,18 @@ namespace RadioFutureFinal.DAL
             }
         }
 
-        public async Task<Media> AddMediaToSessionAsync(Media media, int sessionId)
+        public async Task<Session> AddMediaToSessionAsync(Media media, int sessionId)
         {
             using (var context = ContextFactory())
             {
                 var session = GetSessionInternal(context, sessionId);
                 session.Queue.Add(media);
                 await UpdateSessionAsyncInternal(session, context);
-                return media;
+                return session;
             }
         }
 
-        public async Task RemoveUserFromSessionAsync(int sessionId, int userId)
+        public async Task<Session> RemoveUserFromSessionAsync(int sessionId, int userId)
         {
             using (var context = ContextFactory())
             {
@@ -75,6 +76,7 @@ namespace RadioFutureFinal.DAL
                 session.Users.Remove(user);
                 context.Session.Update(session);
                 await context.SaveChangesAsync();
+                return session;
             }
         }
 
@@ -135,7 +137,7 @@ namespace RadioFutureFinal.DAL
         }
 
         //TODO: Don't know how to do removing stuff properly
-        public async Task RemoveMediaAsync(int sessionId, int mediaId)
+        public async Task<Session> RemoveMediaAsync(int sessionId, int mediaId)
         {
             using (var context = ContextFactory())
             {
@@ -144,6 +146,7 @@ namespace RadioFutureFinal.DAL
                 session.Queue.Remove(media);
                 context.Session.Update(session);
                 await context.SaveChangesAsync();
+                return session;
             }
         }
 
