@@ -216,12 +216,8 @@ function updateQueueUI(queue_position) {
         }
     }
 
-    if (mobileBrowser && lengthUpNext > 0) {
+    if (mobileBrowser) {
         html.push('<span style="margin-left: 2vw;"> <-- ' + summary + '</span>');
-    }
-
-    if (mobileBrowser && lengthUpNext <= 0) {
-        html.push('<p style="text-align: center; margin: 0;"> The queue is empty! </p>');
     }
 
     queueResults.html(html.join(""));
