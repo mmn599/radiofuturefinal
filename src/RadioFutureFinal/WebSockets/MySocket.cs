@@ -26,7 +26,7 @@ namespace RadioFutureFinal.WebSockets
             _userId = -1;
         }
 
-        public void JoinSession(int sessionId, int userId)
+        public void AddSessionInfoToSocket(int sessionId, int userId)
         {
             _inSession = true;
             _sessionId = sessionId;

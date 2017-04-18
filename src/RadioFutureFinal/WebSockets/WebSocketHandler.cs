@@ -29,8 +29,8 @@ namespace RadioFutureFinal.WebSockets
         public virtual async Task OnDisconnected(WebSocket socket)
         {
             // TODO: better data structure should make this one call
-            var mySocket = _wsConnectionManager.GetSocketById(_wsConnectionManager.GetId(socket));
             // TODO: ensure only valid websockets are sent to
+            var mySocket = _wsConnectionManager.GetMySocket(socket);
             _wsConnectionManager.RemoveSocket(socket);
             await _db.RemoveUserFromSessionAsync(mySocket.SessionId, mySocket.UserId);
             await ClientsUpdateSessionUsers(mySocket.SessionId);
@@ -76,9 +76,7 @@ namespace RadioFutureFinal.WebSockets
                 return;
             }
 
-            // TODO: smoother way to do this
-            // TODO: better data structure should make this one call
-            MySocket mySocket = _wsConnectionManager.GetSocketById(_wsConnectionManager.GetId(socket));
+            MySocket mySocket = _wsConnectionManager.GetMySocket(socket);
             if(wsMessage.Action.Equals("UserJoinSession", StringComparison.CurrentCultureIgnoreCase))
             {
                 await JoinSession(wsMessage, mySocket);
@@ -110,14 +108,6 @@ namespace RadioFutureFinal.WebSockets
             else
             {
                 // TODO: exception handling
-            }
-        }
-
-        public async Task SendMessageToAllAsync(WsMessage message)
-        {
-            foreach (var pair in _wsConnectionManager.GetAll())
-            {
-                await SendMessageAsync(pair.Value.WebSocket, message);
             }
         }
 
@@ -210,8 +200,5 @@ namespace RadioFutureFinal.WebSockets
         {
             await ClientsUpdateSessionUsers(socket.SessionId);
         }
-
-        //TODO: Basic HTML fixin'
-        //TODO: Basic manual debugging and checking to make sure functionality is where it was
     }
 }

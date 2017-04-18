@@ -12,73 +12,85 @@ namespace RadioFutureFinal.WebSockets
     public class WebSocketConnectionManager
     {
 
-        // TODO: This data structure could be way better
-        private ConcurrentDictionary<string, MySocket> _sockets = new ConcurrentDictionary<string, MySocket>();
-        // TODO: May run into threading issues
-        private ConcurrentDictionary<int, List<MySocket>> _sessionSockets = new ConcurrentDictionary<int, List<MySocket>>();
+        private MyContext _context;
 
-        public MySocket GetSocketById(string id)
+        public WebSocketConnectionManager(MyContext context)
         {
-            return _sockets.FirstOrDefault(p => p.Key == id).Value;
+            _context = context;
+        }
+
+        public MySocket GetMySocket(WebSocket socket)
+        {
+            MySocket mySocket;
+            var found = _context.ActiveSockets.TryGetValue(socket, out mySocket);
+            if(!found)
+            {
+                // TODO: exception
+            }
+            return mySocket;
         }
 
         public IEnumerable<MySocket> GetSocketsInSession(int sessionId)
         {
-            return _sessionSockets.FirstOrDefault(p => p.Key == sessionId).Value;
-        }
+            List<MySocket> socketsInSession;
+            var found = _context.ActiveSessions.TryGetValue(sessionId, out socketsInSession);
 
-        public ConcurrentDictionary<string, MySocket> GetAll()
-        {
-            return _sockets;
-        }
+            if(!found)
+            {
+                // TODO: throw exception
+            }
 
-        public string GetId(WebSocket socket)
-        {
-            return _sockets.FirstOrDefault(p => p.Value.WebSocket == socket).Key;
+            return socketsInSession;
         }
 
         public void AddSocket(WebSocket socket)
         {
             var mySocket = new MySocket(socket);
-            _sockets.TryAdd(CreateConnectionId(), mySocket);
+            _context.ActiveSockets.TryAdd(socket, mySocket);
         }
 
         public void SocketJoinSession(MySocket socket, int sessionId, int userId)
         {
-            var ssKeyValuePair = _sessionSockets.FirstOrDefault(pair => pair.Key == sessionId);
-            if(ssKeyValuePair.Value == null)
+            List<MySocket> sessionSockets;
+            var sessionFound = _context.ActiveSessions.TryGetValue(sessionId, out sessionSockets);
+
+            if(sessionFound)
             {
-                _sessionSockets.TryAdd(sessionId, new List<MySocket>() { socket });
+                sessionSockets.Add(socket);
             }
             else
             {
-                ssKeyValuePair.Value.Add(socket);
+                // First socket in the session
+                var result = _context.ActiveSessions.TryAdd(sessionId, new List<MySocket>() { socket });
+                if(result == false)
+                {
+                    // TODO: throw exception
+                }
             }
-            socket.JoinSession(sessionId, userId);
+
+            socket.AddSessionInfoToSocket(sessionId, userId);
         }
 
-        public void RemoveSocket(WebSocket webSocket)
+        public void RemoveSocket(WebSocket socket)
         {
-            var socketId = GetId(webSocket);
-            RemoveSocket(socketId);
-        }
-
-        public void RemoveSocket(string id)
-        {
-            MySocket socket;
-            _sockets.TryRemove(id, out socket);
+            MySocket mySocket;
+            var found = _context.ActiveSockets.TryRemove(socket, out mySocket);
             
-            if(socket.InSession)
+            if(!found)
             {
-                var sessionId = socket.SessionId;
-                _sessionSockets.FirstOrDefault(p => p.Key == socket.SessionId).Value.Remove(socket);
+                // TODO: throw exception
             }
 
-            /*
-            await socket.WebSocket.CloseAsync(closeStatus: WebSocketCloseStatus.NormalClosure,
-                                    statusDescription: "Closed by the WebSocketManager",
-                                    cancellationToken: CancellationToken.None);
-            */
+            List<MySocket> socketsInSession;
+            var sessionId = mySocket.SessionId;
+            found = _context.ActiveSessions.TryGetValue(sessionId, out socketsInSession);
+            
+            if(!found)
+            {
+                // TODO: throw exception
+            }
+
+            socketsInSession.Add(mySocket);
         }
 
         private string CreateConnectionId()

@@ -53,6 +53,7 @@ namespace RadioFutureFinal
 
             services.AddWebSocketManager();
             services.AddSingleton(Configuration);
+            services.AddSingleton<MyContext>();
             services.AddSingleton<IDbRepository, DbRepository>();
         }
         
