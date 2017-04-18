@@ -35,9 +35,15 @@ namespace RadioFutureFinal
 
             builder.AddEnvironmentVariables();
             Configuration = builder.Build();
+            MyAppContext = new MyContext();
+            var timer = new System.Threading.Timer((e) =>
+            {
+                MyAppContext.Clean();
+            }, null, 0, TimeSpan.FromSeconds(5).Milliseconds);
         }
 
         public IConfigurationRoot Configuration { get; }
+        public MyContext MyAppContext { get; } 
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -53,7 +59,7 @@ namespace RadioFutureFinal
 
             services.AddWebSocketManager();
             services.AddSingleton(Configuration);
-            services.AddSingleton<MyContext>();
+            services.AddSingleton(MyAppContext);
             services.AddSingleton<IDbRepository, DbRepository>();
         }
         

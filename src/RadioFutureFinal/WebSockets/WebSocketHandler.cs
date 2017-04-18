@@ -77,6 +77,7 @@ namespace RadioFutureFinal.WebSockets
             }
 
             MySocket mySocket = _wsConnectionManager.GetMySocket(socket);
+            // TODO: better action dictionary
             if(wsMessage.Action.Equals("UserJoinSession", StringComparison.CurrentCultureIgnoreCase))
             {
                 await JoinSession(wsMessage, mySocket);
@@ -100,10 +101,6 @@ namespace RadioFutureFinal.WebSockets
             else if(wsMessage.Action.Equals("ChatMessage", StringComparison.CurrentCultureIgnoreCase))
             {
                 await ChatMessage(wsMessage, mySocket);
-            }
-            else if(wsMessage.Action.Equals("SynchronizeUsers", StringComparison.CurrentCultureIgnoreCase))
-            {
-                await SynchronizeSession(wsMessage, mySocket);
             }
             else
             {
@@ -195,10 +192,6 @@ namespace RadioFutureFinal.WebSockets
         private async Task ChatMessage(WsMessage message, MySocket socket)
         {
             await SendMessageToSessionAsync(message, socket.SessionId);
-        }
-        private async Task SynchronizeSession(WsMessage message, MySocket socket)
-        {
-            await ClientsUpdateSessionUsers(socket.SessionId);
         }
     }
 }

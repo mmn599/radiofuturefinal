@@ -20,6 +20,13 @@ namespace RadioFutureFinal
             ActiveSessions = new ConcurrentDictionary<int, List<MySocket>>();
         }
 
+        public void Clean()
+        {
+            foreach(var sessionId in ActiveSessions)
+            {
+                
+            }
+        }
 
     }
 }
