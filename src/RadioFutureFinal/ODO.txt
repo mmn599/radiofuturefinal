@@ -2,7 +2,6 @@
 
 Performance and Code stuff
 -Setup typescript
--Synchronization should come from server
 -Is looking up session by string name significantly slower? Does the db engine do the hashing?
 
 -Do a real analysis of which websocket requests should be async
