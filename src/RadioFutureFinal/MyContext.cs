@@ -5,6 +5,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.WebSockets;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace RadioFutureFinal
@@ -12,17 +13,20 @@ namespace RadioFutureFinal
     public class MyContext
     {
         private IDbRepository _db;
+        private Timer _cleaningTimer;
 
         public ConcurrentDictionary<WebSocket, MySocket> ActiveSockets { get; }
         // key is session id
         public ConcurrentDictionary<int, List<MySocket>> ActiveSessions { get; }
+
 
         public MyContext(IDbRepository db)
         {
             _db = db;
             ActiveSockets = new ConcurrentDictionary<WebSocket, MySocket>();
             ActiveSessions = new ConcurrentDictionary<int, List<MySocket>>();
-            var timer = new System.Threading.Timer((e) =>
+
+            _cleaningTimer = new Timer((e) =>
             {
                 SynchronizeUserMediaStates();
             }, null, 0, 5000);
@@ -102,10 +106,10 @@ namespace RadioFutureFinal
             socketsInSession.Add(mySocket);
         }
 
-
         // Long running function that updates user video states across the session
         // TODO: minimuze clients calling "UpdateUserVideo" state and instead interpolate and update infrequently
         public async Task SynchronizeUserMediaStates()
+
         {
             // TODO: check to make sure at scale this function won't overrun itself
             foreach(var kvPair in ActiveSessions)

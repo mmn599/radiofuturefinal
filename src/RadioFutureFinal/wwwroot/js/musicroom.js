@@ -230,6 +230,7 @@ function updateQueueUI(queue_position) {
 COLOR_LIST = ["red", "orange", "yellow", "green", "blue", "violet"];
 
 function updateUsersListUI(users) {
+    console.log('Updating users list');
     var num = users.length;
     var summary = users.length + " users in the room";
     if (num == 1) {
@@ -522,8 +523,6 @@ function joinJamSession(encodedSessionName) {
 		Session: { name: encodedSessionName },
 	};
 	mGlobals.socket.emit('userJoinSession', data);
-    // TODO: synchronization should come from server
-	setInterval(synchronizeUsers, 5000);
 };
 
 //==================================================================
