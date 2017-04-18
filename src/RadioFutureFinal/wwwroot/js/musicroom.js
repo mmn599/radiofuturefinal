@@ -417,6 +417,7 @@ function sessionReady(data) {
 
 function updateUsersList(data) {
     var users = data.Session.Users;
+    console.log(users);
 	if(mGlobals.sessionInitialized) {
 		mGlobals.current_users = users;
 		updateUsersListUI(mGlobals.current_users);	
