@@ -7,6 +7,7 @@ namespace RadioFutureFinal.WebSockets
 {
     public class WebSocketSenderFactory
     {
+        // TODO: make this function default
         public WebSocketSender CreateWebSocketSender(Func<WebSocket, Task> onBadSend)
         {
             return new WebSocketSender(onBadSend);
