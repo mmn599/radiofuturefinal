@@ -1,4 +1,5 @@
 ﻿-Debug users list on local and production
+-Maintain active sessions
 -Mobile UI decent on iphone5
 -ui polishing
 
