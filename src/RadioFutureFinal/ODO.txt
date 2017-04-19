@@ -1,6 +1,5 @@
 ﻿-Debug users list on local and production
 -Mobile UI decent on iphone5
--Setup string index for session name SQL
 -ui polishing
 
 Performance and Code stuff
