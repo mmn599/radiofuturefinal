@@ -1,5 +1,4 @@
-﻿-Bigger font on home screen
--Bigger results list
+﻿-Bigger results list
 -Remove keyboard when enter is pressed
 -Debug users list on local and production
 

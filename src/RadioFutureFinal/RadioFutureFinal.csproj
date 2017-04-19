@@ -12,12 +12,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="wwwroot\css\homepage - Copy.css">
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-    <Content Include="wwwroot\css\homepage - Copy.min.css">
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
     <Content Include="wwwroot\css\homepagemobile.css" />
     <Content Include="wwwroot\css\homepagemobile.min.css" />
   </ItemGroup>

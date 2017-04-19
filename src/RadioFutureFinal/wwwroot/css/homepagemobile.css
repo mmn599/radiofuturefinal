@@ -32,7 +32,6 @@
 	width: 33%;
 	height: 33%;
 	display: inline-block;
-	float: left;
 	text-align: center;
 }
 
@@ -151,10 +150,6 @@ body {
 	justify-content: center;
 }
 
-#youtubeplayer {
-
-}
-
 #div_queue {
 	width: 100%;
 	text-align: center;
@@ -227,10 +222,6 @@ body {
 
 #txt_email {
     width: 300px;
-}
-
-#btn_email {
-
 }
 
 .footer_col {
