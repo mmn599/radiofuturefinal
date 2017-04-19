@@ -68,13 +68,17 @@
 }
 
 .edittext {
-	border: 0;
-	outline: 0;
-	background: transparent;
-	border-bottom: 2px solid black;
-	margin: auto;
-	width: 94vw;
-	text-align: center;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    border-bottom: 2px solid black;
+    margin: auto;
+    width: 94vw;
+    text-align: center;
+    autocomplete: off; 
+    autocorrect: off;
+    autocapitalize: off;
+    spellcheck: false;
 }
 
 input {
