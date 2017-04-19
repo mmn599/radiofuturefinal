@@ -15,19 +15,27 @@ namespace RadioFutureFinal.WebSockets
     {
         // TODO: ensure only valid websockets are sent to
 
-        public static async Task SendMessageAsync(WebSocket socket, WsMessage wsMessage)
+        public static async Task<bool> SendMessageAsync(WebSocket socket, WsMessage wsMessage)
         {
             if (socket.State != WebSocketState.Open)
-                return;
+                return false;
 
             string message = JsonConvert.SerializeObject(wsMessage);
 
-            await socket.SendAsync(buffer: new ArraySegment<byte>(array: Encoding.ASCII.GetBytes(message),
-                                                                  offset: 0,
-                                                                  count: message.Length),
-                                   messageType: WebSocketMessageType.Text,
-                                   endOfMessage: true,
-                                   cancellationToken: CancellationToken.None);
+            try
+            {
+                await socket.SendAsync(buffer: new ArraySegment<byte>(array: Encoding.ASCII.GetBytes(message),
+                                                                      offset: 0,
+                                                                      count: message.Length),
+                                       messageType: WebSocketMessageType.Text,
+                                       endOfMessage: true,
+                                       cancellationToken: CancellationToken.None);
+                return true;
+            }
+            catch(Exception e)
+            {
+                return false;
+            }
         }
 
         public static async Task SendMessageToSessionAsync(WsMessage message, List<MySocket> socketsInSession)
