@@ -150,13 +150,13 @@ function searchEnterPressed(input_search) {
 	divResults.html("");
 	searchVideos(input_search.val(), function(response) {
 		$.each(response.items, function(index, item) {
-		divResults.html(divResults.html() + "<div class='div_search_result' onClick='queueSelectedVideo(this)' data-VideoId='" + item.id.videoId + "' data-ThumbURL='"+item.snippet.thumbnails.medium.url+"'>" + '<p class="text_search_result">' +  item.snippet.title+ '</p></div>' );
-	});
+            divResults.html(divResults.html() + "<div class='div_search_result' onClick='queueSelectedVideo(this)' data-VideoId='" + item.id.videoId + "' data-ThumbURL='"+item.snippet.thumbnails.medium.url+"'>" + '<p class="text_search_result">' +  item.snippet.title+ '</p></div>' );
+        });
+        input_search.blur();
 	});
 	if(!divResults.is(':visible')) {
 		divResults.fadeIn();
 	}
-    input_search.blur();
 }
 
 function sessionReadyUI() {
