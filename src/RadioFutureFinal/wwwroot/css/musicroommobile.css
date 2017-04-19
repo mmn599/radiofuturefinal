@@ -81,6 +81,7 @@ input:focus {
 }
 
 #div_search_results {
+    width: 94vw;
 }
 
 #div_user_results {
@@ -109,7 +110,7 @@ input:focus {
 
 .div_search_result > p {
 	margin: 0;
-	font-size: 24px;
+	font-size: 5vw;
 	margin-bottom: 2%;
 }
 

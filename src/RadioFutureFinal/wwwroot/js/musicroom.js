@@ -156,6 +156,7 @@ function searchEnterPressed(input_search) {
 	if(!divResults.is(':visible')) {
 		divResults.fadeIn();
 	}
+    input_search.blur();
 }
 
 function sessionReadyUI() {
