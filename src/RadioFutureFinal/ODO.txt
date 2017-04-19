@@ -1,5 +1,4 @@
-﻿-Setup sync on mobile
--Responsive youtube UI on mobile
+﻿-Responsive youtube UI on mobile
 
 -Debug users list on local and production
 
