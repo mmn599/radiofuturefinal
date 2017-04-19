@@ -1,6 +1,4 @@
-﻿-Bigger results list
--Remove keyboard when enter is pressed
--Debug users list on local and production
+﻿-Debug users list on local and production
 
 Performance and Code stuff
 -Setup typescript
