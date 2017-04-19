@@ -1,4 +1,6 @@
-﻿-Debug users list on local and production
+﻿-self user on user list
+-change the yellow
+-self delete mechanism
 
 Performance and Code stuff
 -TODO: better way of detecting faulty websockets and closing them
