@@ -29,12 +29,13 @@ namespace RadioFutureFinal.WebSockets
 
         public async Task OnDisconnected(WebSocket socket)
         {
-            var removedMySocket = _myContext.RemoveSocket(socket);
-            var sessionId = removedMySocket.SessionId;
+            var mySocket = _myContext.GetMySocket(socket);
+            var sessionId = mySocket.SessionId;
+            var userId = mySocket.UserId;
 
             _myContext.SocketDisconnected(socket);
 
-            var updatedSession = await _db.RemoveUserFromSessionAsync(sessionId, removedMySocket.UserId);
+            var updatedSession = await _db.RemoveUserFromSessionAsync(sessionId, userId);
             await ClientMessages.ClientsUpdateSessionUsers(updatedSession, GetSocketsInSession(sessionId));
         }
 

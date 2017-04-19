@@ -89,7 +89,7 @@ namespace RadioFutureFinal
             socket.AddSessionInfoToSocket(sessionId, userId);
         }
 
-        public MySocket RemoveSocket(WebSocket socket)
+        private void RemoveSocket(WebSocket socket)
         {
             MySocket mySocket;
             var found = ActiveSockets.TryRemove(socket, out mySocket);
@@ -112,8 +112,6 @@ namespace RadioFutureFinal
             {
                 DeactiveSession(sessionId);
             }
-
-            return mySocket;
         }
 
         private void DeactiveSession(int sessionId)

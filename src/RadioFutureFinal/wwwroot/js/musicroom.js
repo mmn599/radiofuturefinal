@@ -571,19 +571,6 @@ function searchVideos(query, callback) {
 	request.execute(callback);
 }
 
-function updatePlayerState(state) {
-	if(mGlobals.player_ready) {
-		if(state==mConstants.PLAYING) {
-		    if (!mobileBrowser) {
-                mGlobals.player.playVideo();
-		    }
-		}
-		else if(state==mConstants.PAUSED) {
-			mGlobals.player.pauseVideo();
-		}
-	}
-}
-
 function onPlayerStateChange(event) {
 	//when video ends
     if(event.data==0) {
