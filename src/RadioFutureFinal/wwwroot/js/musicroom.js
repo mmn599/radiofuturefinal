@@ -240,12 +240,12 @@ function updateUsersListUI(users) {
         }
         var currentHTML = "";
         if (mobileBrowser) {
-            currentHTML = '<div class="div_user" style="background: '+  COLOR_LIST[index % COLOR_LIST.length] + ';">sync with ' + user.Name + '</div>';
+            currentHTML = '<div onclick="syncWithUser(' + user.Id + ')" class="div_user" style="background: ' + COLOR_LIST[index % COLOR_LIST.length] + ';">sync with ' + user.Name + '</div>';
         }
         else {
             currentHTML =
                 '<div style="text-align: left; display: flex; align-items: center;">' +
-                       '<div onclick="syncWithUser(' + user.Id + ')" + style="display: flex; align-items: center; justify-content: center; float: left; cursor: pointer; margin-right: 16px; height: 48px; width: 48px; background: ' + COLOR_LIST[index % COLOR_LIST.length] + ';">sync</div>' +
+                       '<div onclick="syncWithUser(' + user.Id + ')" style="display: flex; align-items: center; justify-content: center; float: left; cursor: pointer; margin-right: 16px; height: 48px; width: 48px; background: ' + COLOR_LIST[index % COLOR_LIST.length] + ';">sync</div>' +
                        '<span style="margin-right: 16px; float: right;">' + user.Name + '<br /><span style="font-size: 12px";>' + videoTitle + '</span></span>' +
                 '</div>';
         }
