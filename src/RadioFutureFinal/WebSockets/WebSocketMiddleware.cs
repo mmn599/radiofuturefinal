@@ -40,6 +40,7 @@ namespace RadioFutureFinal.WebSockets
 
                 else if (result.MessageType == WebSocketMessageType.Close)
                 {
+                    // TODO: should I have this?
                     await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closed in server by the client", CancellationToken.None);
                     await _webSocketHandler.OnDisconnected(socket);
                     return;

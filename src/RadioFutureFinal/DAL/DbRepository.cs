@@ -129,7 +129,6 @@ namespace RadioFutureFinal.DAL
             }
         }
 
-
         public Session GetSession(int sessionId)
         {
             using (var context = ContextFactory())

@@ -24,20 +24,19 @@ namespace RadioFutureFinal.WebSockets
 
         public void OnConnected(WebSocket socket)
         {
-            _myContext.AddSocket(socket);
+            _myContext.SocketConnected(socket);
         }
 
-        public virtual async Task OnDisconnected(WebSocket socket)
+        public async Task OnDisconnected(WebSocket socket)
         {
-            var mySocket = _myContext.GetMySocket(socket);
-            var sessionId = mySocket.SessionId;
-            _myContext.RemoveSocket(socket);
-            var updatedSession = await _db.RemoveUserFromSessionAsync(sessionId, mySocket.UserId);
+            var removedMySocket = _myContext.RemoveSocket(socket);
+            var sessionId = removedMySocket.SessionId;
+
+            _myContext.SocketDisconnected(socket);
+
+            var updatedSession = await _db.RemoveUserFromSessionAsync(sessionId, removedMySocket.UserId);
             await ClientMessages.ClientsUpdateSessionUsers(updatedSession, GetSocketsInSession(sessionId));
         }
-
-
-
 
         // TODO: how neccesary is this being async?
         public async Task ReceiveAsync(WebSocket socket, WebSocketReceiveResult result, byte[] buffer)

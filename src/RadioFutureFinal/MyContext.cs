@@ -56,10 +56,15 @@ namespace RadioFutureFinal
             return socketsInSession;
         }
 
-        public void AddSocket(WebSocket socket)
+        public void SocketConnected(WebSocket socket)
         {
             var mySocket = new MySocket(socket);
             ActiveSockets.TryAdd(socket, mySocket);
+        }
+
+        public void SocketDisconnected(WebSocket socket)
+        {
+            RemoveSocket(socket);
         }
 
         public void SocketJoinSession(MySocket socket, int sessionId, int userId)
@@ -84,7 +89,7 @@ namespace RadioFutureFinal
             socket.AddSessionInfoToSocket(sessionId, userId);
         }
 
-        public void RemoveSocket(WebSocket socket)
+        public MySocket RemoveSocket(WebSocket socket)
         {
             MySocket mySocket;
             var found = ActiveSockets.TryRemove(socket, out mySocket);
@@ -97,13 +102,32 @@ namespace RadioFutureFinal
             List<MySocket> socketsInSession;
             var sessionId = mySocket.SessionId;
             found = ActiveSessions.TryGetValue(sessionId, out socketsInSession);
-            
             if(!found)
             {
                 // TODO: throw exception
             }
+            socketsInSession.Remove(mySocket);
 
-            socketsInSession.Add(mySocket);
+            if(socketsInSession.Count == 0)
+            {
+                DeactiveSession(sessionId);
+            }
+
+            return mySocket;
+        }
+
+        private void DeactiveSession(int sessionId)
+        {
+            List<MySocket> socketsInSession;
+            var found = ActiveSessions.TryRemove(sessionId, out socketsInSession);
+            if(!found)
+            {
+                // TODO: throw exception
+            }
+            if(socketsInSession.Count != 0)
+            {
+                // TODO: throw exception
+            }
         }
 
         // Long running function that updates user video states across the session
