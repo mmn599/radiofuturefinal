@@ -223,7 +223,6 @@ function updateQueueUI(queue_position) {
 COLOR_LIST = ["red", "orange", "yellow", "green", "blue", "violet"];
 
 function updateUsersListUI(users) {
-    console.log('Updating users list');
     var num = users.length;
     var summary = users.length + " users in the room";
     if (num == 1) {
@@ -370,11 +369,18 @@ function saveUserNameChange(name) {
 
 function saveUserVideoState() {
 	if(mGlobals.player_ready) {
-	    mGlobals.user.VideoTime = Math.round(mGlobals.player.getCurrentTime());
+        var currentTime = mGlobals.player.getCurrentTime();
+        if (currentTime != null) {
+            mGlobals.user.VideoTime = Math.round(mGlobals.player.getCurrentTime());
+        }
+        else {
+            mGlobals.user.VideoTime = 0;
+        }
 		mGlobals.user.YtPlayerState = mGlobals.player.getPlayerState();
 		var data = {
 		    User: mGlobals.user
 		};
+        console.log(data);
 		mGlobals.socket.emit('SaveUserVideoState', data);	
 	}
 }
@@ -418,7 +424,6 @@ function sessionReady(data) {
 
 function updateUsersList(data) {
     var users = data.Session.Users;
-    console.log(users);
 	if(mGlobals.sessionInitialized) {
 		mGlobals.current_users = users;
 		updateUsersListUI(mGlobals.current_users);	
@@ -524,8 +529,6 @@ function sendChatMessage(msg) {
 	        ChatMessage: msg,
 	        User: { Name: mGlobals.user.Name }
 	    };
-	    console.log('sending chat message');
-	    console.log(data);
 	    mGlobals.socket.emit('chatMessage', data);
 	}
 }

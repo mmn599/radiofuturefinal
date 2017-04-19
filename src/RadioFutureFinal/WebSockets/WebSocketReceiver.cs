@@ -39,17 +39,7 @@ namespace RadioFutureFinal.WebSockets
         public async Task ReceiveAsync(WebSocket socket, WebSocketReceiveResult result, byte[] buffer)
         {
             var strMessage = Encoding.UTF8.GetString(buffer, 0, result.Count);
-            WsMessage wsMessage = null;
-            try
-            {
-                wsMessage = JsonConvert.DeserializeObject<WsMessage>(strMessage);
-            }
-            catch(Exception e)
-            {
-                var msg = e.Message;
-                // TODO: Throw exception
-                return;
-            }
+            WsMessage wsMessage = JsonConvert.DeserializeObject<WsMessage>(strMessage);
 
             MySocket mySocket = _myContext.GetMySocket(socket);
             // TODO: better action dictionary
