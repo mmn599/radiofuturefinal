@@ -1,5 +1,4 @@
-﻿-Responsive youtube UI on mobile
-
+﻿-Mobile minor UI changes
 -Debug users list on local and production
 
 Performance and Code stuff
