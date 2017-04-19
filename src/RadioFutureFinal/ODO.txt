@@ -5,6 +5,6 @@
 Performance and Code stuff
 -Setup typescript
 -Do a real analysis of which websocket requests should be async
--The data structure for web sockets
 -Basically everyhitng with the database, especially updates
 -Updating rooms shouldnt hit database everytime
+-Why does the app use so much memory?
