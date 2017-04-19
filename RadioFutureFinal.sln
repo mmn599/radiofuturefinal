@@ -1,16 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26403.7
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{6EDE94D8-87F1-4BA4-9EB2-5579A9C927B8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9FEEAB3A-263B-4CB2-AF46-F930A0A1F9EE}"
-	ProjectSection(SolutionItems) = preProject
-		global.json = global.json
-	EndProjectSection
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "RadioFutureFinal", "src\RadioFutureFinal\RadioFutureFinal.xproj", "{939C9613-C0C7-45F2-9456-A15BC6A0206D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RadioFutureFinal", "src\RadioFutureFinal\RadioFutureFinal.csproj", "{939C9613-C0C7-45F2-9456-A15BC6A0206D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
