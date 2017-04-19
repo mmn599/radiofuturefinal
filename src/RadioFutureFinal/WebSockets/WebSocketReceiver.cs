@@ -13,13 +13,16 @@ namespace RadioFutureFinal.WebSockets
 {
     public class WebSocketReceiver
     {
-        protected MyContext _myContext { get; set; }
-        protected IDbRepository _db { get; set; }
+        MyContext _myContext;
+        IDbRepository _db;
+        IWebSocketSender _wsSender;
 
-        public WebSocketReceiver(IDbRepository db, MyContext myContext)
+        public WebSocketReceiver(IDbRepository db, MyContext myContext, WebSocketSenderFactory wsSenderFactory)
         {
             _myContext = myContext;
             _db = db;
+            _wsSender = wsSenderFactory.CreateWebSocketSender(myContext.BadSend);
+
         }
 
         public void OnConnected(WebSocket socket)
@@ -29,18 +32,7 @@ namespace RadioFutureFinal.WebSockets
 
         public async Task OnDisconnected(WebSocket socket)
         {
-            var mySocket = _myContext.GetMySocket(socket);
-            var sessionId = mySocket.SessionId;
-            var userId = mySocket.UserId;
-
-            _myContext.SocketDisconnected(socket);
-
-            var updatedSession = await _db.RemoveUserFromSessionAsync(sessionId, userId);
-            var remainingSockets = GetSocketsInSession(sessionId);
-            if(remainingSockets.Count > 0)
-            {
-                await WebSocketSender.ClientsUpdateSessionUsers(updatedSession, remainingSockets);
-            }
+            await _myContext.RemoveSocketFromContext(socket);
         }
 
         // TODO: how neccesary is this being async?
@@ -91,18 +83,6 @@ namespace RadioFutureFinal.WebSockets
             }
         }
 
-        private List<MySocket> GetSocketsInSession(int sessionId)
-        {
-            List<MySocket> socketsInSession;
-            var found = _myContext.ActiveSessions.TryGetValue(sessionId, out socketsInSession);
-            if(!found)
-            {
-                // TODO: maybe exception?
-                return new List<MySocket>();
-            }
-            return socketsInSession;
-        }
-
         // TODO: significant bug where additional session is created with same name if two request are made in similar times
         private async Task JoinSession(WsMessage message, MySocket socket)
         {
@@ -120,22 +100,22 @@ namespace RadioFutureFinal.WebSockets
 
             _myContext.SocketJoinSession(socket, sessionId, user.MyUserId);
 
-            await WebSocketSender.ClientSessionReady(socket, session, user);
-            await WebSocketSender.ClientsUpdateSessionUsers(session, GetSocketsInSession(sessionId));
+            await _wsSender.ClientSessionReady(socket, session, user);
+            await _wsSender.ClientsUpdateSessionUsers(session, _myContext.GetSocketsInSession(sessionId));
         }
 
         private async Task AddMediaToSession(WsMessage message, MySocket socket)
         {
             var sessionId = socket.SessionId;
             var updatedSession = await _db.AddMediaToSessionAsync(message.Media.ToModel(), sessionId);
-            await WebSocketSender.ClientsUpdateSessionQueue(updatedSession, GetSocketsInSession(sessionId));
+            await _wsSender.ClientsUpdateSessionQueue(updatedSession, _myContext.GetSocketsInSession(sessionId));
         }
 
         private async Task DeleteMediaFromSession(WsMessage message, MySocket socket)
         {
             var sessionId = socket.SessionId;
             var updatedSession = await _db.RemoveMediaAsync(sessionId, message.Media.Id);
-            await WebSocketSender.ClientsUpdateSessionQueue(updatedSession, GetSocketsInSession(sessionId));
+            await _wsSender.ClientsUpdateSessionQueue(updatedSession, _myContext.GetSocketsInSession(sessionId));
         }
         private async Task SaveUserVideoState(WsMessage message, MySocket socket)
         {
@@ -150,12 +130,12 @@ namespace RadioFutureFinal.WebSockets
             await _db.UpdateUserNameAsync(user.Id, user.Name);
             var sessionId = socket.SessionId;
             var session = _db.GetSession(sessionId);
-            await WebSocketSender.ClientsUpdateSessionUsers(session, GetSocketsInSession(sessionId));
+            await _wsSender.ClientsUpdateSessionUsers(session, _myContext.GetSocketsInSession(sessionId));
         }
 
         private async Task ChatMessage(WsMessage message, MySocket socket)
         {
-            await WebSocketSender.ClientsSendChatMessage(message, GetSocketsInSession(socket.SessionId));
+            await _wsSender.ClientsSendChatMessage(message, _myContext.GetSocketsInSession(socket.SessionId));
         }
     }
 }

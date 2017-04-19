@@ -52,10 +52,12 @@ namespace RadioFutureFinal
 
             services.AddMvc();
 
-            services.AddWebSocketManager();
             services.AddSingleton(Configuration);
             services.AddSingleton<IDbRepository, DbRepository>();
+            services.AddSingleton<WebSocketSenderFactory>();
             services.AddSingleton<MyContext>();
+            // TODO: make a web socket receiver factory?
+            services.AddSingleton<WebSocketReceiver>();
         }
         
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -78,6 +80,7 @@ namespace RadioFutureFinal
             app.UseStaticFiles();
 
             app.UseWebSockets();
+
             app.Map("/ws", (_app) => _app.UseMiddleware<WebSocketMiddleware>(serviceProvider.GetService<WebSocketReceiver>()));
 
             app.UseIdentity();

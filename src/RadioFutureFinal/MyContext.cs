@@ -12,19 +12,21 @@ namespace RadioFutureFinal
 {
     public class MyContext
     {
-        private IDbRepository _db;
-        private Timer _cleaningTimer;
+        IDbRepository _db;
+        IWebSocketSender _wsSender;
+        Timer _cleaningTimer;
 
-        public ConcurrentDictionary<WebSocket, MySocket> ActiveSockets { get; }
         // key is session id
-        public ConcurrentDictionary<int, List<MySocket>> ActiveSessions { get; }
+        ConcurrentDictionary<int, List<MySocket>> ActiveSessions { get; }
+        ConcurrentDictionary<WebSocket, MySocket> ActiveSockets { get; }
 
-
-        public MyContext(IDbRepository db)
+        public MyContext(IDbRepository db, WebSocketSenderFactory wsSenderFactory)
         {
             _db = db;
             ActiveSockets = new ConcurrentDictionary<WebSocket, MySocket>();
             ActiveSessions = new ConcurrentDictionary<int, List<MySocket>>();
+
+            _wsSender = wsSenderFactory.CreateWebSocketSender(BadSend);
 
             _cleaningTimer = new Timer((e) =>
             {
@@ -43,7 +45,7 @@ namespace RadioFutureFinal
             return mySocket;
         }
 
-        public IEnumerable<MySocket> GetSocketsInSession(int sessionId)
+        public List<MySocket> GetSocketsInSession(int sessionId)
         {
             List<MySocket> socketsInSession;
             var found = ActiveSessions.TryGetValue(sessionId, out socketsInSession);
@@ -60,11 +62,6 @@ namespace RadioFutureFinal
         {
             var mySocket = new MySocket(socket);
             ActiveSockets.TryAdd(socket, mySocket);
-        }
-
-        public void SocketDisconnected(WebSocket socket)
-        {
-            RemoveSocket(socket);
         }
 
         public void SocketJoinSession(MySocket socket, int sessionId, int userId)
@@ -89,31 +86,6 @@ namespace RadioFutureFinal
             socket.AddSessionInfoToSocket(sessionId, userId);
         }
 
-        private void RemoveSocket(WebSocket socket)
-        {
-            MySocket mySocket;
-            var found = ActiveSockets.TryRemove(socket, out mySocket);
-            
-            if(!found)
-            {
-                // TODO: throw exception
-            }
-
-            List<MySocket> socketsInSession;
-            var sessionId = mySocket.SessionId;
-            found = ActiveSessions.TryGetValue(sessionId, out socketsInSession);
-            if(!found)
-            {
-                // TODO: throw exception
-            }
-            socketsInSession.Remove(mySocket);
-
-            if(socketsInSession.Count == 0)
-            {
-                DeactiveSession(sessionId);
-            }
-        }
-
         private void DeactiveSession(int sessionId)
         {
             List<MySocket> socketsInSession;
@@ -128,6 +100,55 @@ namespace RadioFutureFinal
             }
         }
 
+        // TODO: terrible name
+        private List<MySocket> RemoveSocketFromDataStructures(MySocket socket)
+        {
+            var found = ActiveSockets.TryRemove(socket.WebSocket, out socket);
+            if(!found)
+            {
+                // TODO: throw exception
+            }
+            List<MySocket> socketsInSession;
+            found = ActiveSessions.TryGetValue(socket.SessionId, out socketsInSession);
+            if(!found)
+            {
+                // TODO: throw exception
+            }
+            socketsInSession.Remove(socket);
+
+            return socketsInSession;
+        }
+
+        public async Task RemoveSocketFromContext(MySocket mySocket)
+        {
+            var sessionId = mySocket.SessionId;
+            var userId = mySocket.UserId;
+
+            var remainingSocketsInSession = RemoveSocketFromDataStructures(mySocket);
+
+            if(remainingSocketsInSession.Count == 0)
+            {
+                DeactiveSession(sessionId);
+            }
+
+            var updatedSession = await _db.RemoveUserFromSessionAsync(sessionId, userId);
+            if (remainingSocketsInSession.Count > 0)
+            {
+                await _wsSender.ClientsUpdateSessionUsers(updatedSession, remainingSocketsInSession);
+            }
+        }
+
+        public async Task RemoveSocketFromContext(WebSocket socket)
+        {
+            var mySocket = GetMySocket(socket);
+            await RemoveSocketFromContext(mySocket);
+        }
+
+        public async Task BadSend(WebSocket webSocket)
+        {
+            await RemoveSocketFromContext(webSocket);
+        }
+
         // Long running function that updates user video states across the session
         // TODO: minimuze clients calling "UpdateUserVideo" state and instead interpolate and update infrequently
         public async Task SynchronizeUserMediaStates()
@@ -139,7 +160,7 @@ namespace RadioFutureFinal
                 int sessionId = kvPair.Key;
                 List<MySocket> socketsInSession = kvPair.Value;
                 var session = _db.GetSession(sessionId);
-                await WebSocketSender.ClientsUpdateSessionUsers(session, socketsInSession);
+                await _wsSender.ClientsUpdateSessionUsers(session, socketsInSession);
             }
         }
 
@@ -147,7 +168,5 @@ namespace RadioFutureFinal
         {
             return Guid.NewGuid().ToString();
         }
-
-
     }
 }

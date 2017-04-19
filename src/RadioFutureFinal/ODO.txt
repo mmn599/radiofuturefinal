@@ -1,6 +1,8 @@
 ﻿-Debug users list on local and production
 
 Performance and Code stuff
+-TODO: better way of detecting faulty websockets and closing them
+-Make a websocket receiver factory?
 -Setup typescript
 -Do a real analysis of which websocket requests should be async
 -Basically everyhitng with the database, especially updates

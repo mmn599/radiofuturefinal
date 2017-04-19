@@ -11,14 +11,24 @@ using System.Threading.Tasks;
 
 namespace RadioFutureFinal.WebSockets
 {
-    public static class WebSocketSender
+    public class WebSocketSender : IWebSocketSender
     {
+        Func<WebSocket, Task> _onBadSend;
 
-        // TODO: find a better way to deal with removing websockets if they are closed
-        private static async Task<bool> SendMessageAsync(WebSocket socket, WsMessage wsMessage)
+        public WebSocketSender(Func<WebSocket, Task> onBadSend) 
         {
+            _onBadSend = onBadSend; 
+        }
+            
+        // TODO: find a better way to deal with removing websockets if they are closed
+        private async Task<bool> SendMessageAsync(WebSocket socket, WsMessage wsMessage)
+        {
+            var success = true;
+
             if (socket.State != WebSocketState.Open)
-                return false;
+            {
+                success = false;
+            }
 
             string message = JsonConvert.SerializeObject(wsMessage);
 
@@ -30,39 +40,44 @@ namespace RadioFutureFinal.WebSockets
                                        messageType: WebSocketMessageType.Text,
                                        endOfMessage: true,
                                        cancellationToken: CancellationToken.None);
-                return true;
             }
             catch(WebSocketException e)
             {
                 // TODO: indicates the websocket closed without doing the handshake. this happens on mobile. find a more robust way to fix this.
-                return false;
+                success = false;
             }
+
+            if(!success)
+            {
+                await _onBadSend?.Invoke(socket);
+            }
+
+            return success;
         }
 
-        private static async Task<List<MySocket>> SendMessageToSessionAsync(WsMessage message, List<MySocket> socketsInSession)
+        private async Task<SendResult> SendMessageToSessionAsync(WsMessage message, List<MySocket> socketsInSession)
         {
-            var errorSockets = new List<MySocket>();
+            var faultySockets = new List<MySocket>();
             foreach(var socket in socketsInSession)
             {
                 var success = await SendMessageAsync(socket.WebSocket, message);
                 if(!success)
                 {
-                    errorSockets.Add(socket);
+                    faultySockets.Add(socket);
                 }
             }
-            return errorSockets;
+
+            if(faultySockets.Count == 0)
+            {
+                return SendResult.CreateSuccess();
+            }
+            else
+            {
+                return SendResult.CreateFailure(faultySockets);
+            }
         }
 
-        private static async Task<List<MySocket>> ClientsUpdateSession(Session session, string action, List<MySocket> socketsInSession)
-        {
-            var wsMessage = new WsMessage();
-            wsMessage.Action = action;
-            wsMessage.Session = session.ToContract();
-            var errorSockets = await SendMessageToSessionAsync(wsMessage, socketsInSession);
-            return errorSockets;
-        }
-
-        public static async Task<bool> ClientSessionReady(MySocket socket, Session session, MyUser user)
+        public async Task<SendResult> ClientSessionReady(MySocket socket, Session session, MyUser user)
         {
             // TODO: How can I make sure this is somewhat updated properly?
             var wsMessage = new WsMessage();
@@ -71,24 +86,40 @@ namespace RadioFutureFinal.WebSockets
             wsMessage.User = user.ToContract();
 
             var success = await SendMessageAsync(socket.WebSocket, wsMessage);
-            return success;
+            if(success)
+            {
+                return SendResult.CreateSuccess();
+            }
+            else
+            {
+                return SendResult.CreateFailure(new List<MySocket>() { socket });
+            }
+        }
+
+        private async Task<SendResult> ClientsUpdateSession(Session session, string action, List<MySocket> socketsInSession)
+        {
+            var wsMessage = new WsMessage();
+            wsMessage.Action = action;
+            wsMessage.Session = session.ToContract();
+            var sendResult = await SendMessageToSessionAsync(wsMessage, socketsInSession);
+            return sendResult;
         }
 
         //TODO: probably shouldn't be sending full session for user and queue updates
-        public static async Task ClientsUpdateSessionUsers(Session session, List<MySocket> socketsInSession)
+        public async Task<SendResult> ClientsUpdateSessionUsers(Session session, List<MySocket> socketsInSession)
         {
-            await ClientsUpdateSession(session, "updateUsersList", socketsInSession);
+            return await ClientsUpdateSession(session, "updateUsersList", socketsInSession);
         }
 
-        public static async Task ClientsUpdateSessionQueue(Session session, List<MySocket> socketsInSession)
+        public async Task<SendResult> ClientsUpdateSessionQueue(Session session, List<MySocket> socketsInSession)
         {
-            await ClientsUpdateSession(session, "updateQueue", socketsInSession);
+            return await ClientsUpdateSession(session, "updateQueue", socketsInSession);
         }
 
         // TODO: don't use full WsMessage
-        public static async Task ClientsSendChatMessage(WsMessage message, List<MySocket> socketsInSession)
+        public async Task<SendResult> ClientsSendChatMessage(WsMessage message, List<MySocket> socketsInSession)
         {
-            await SendMessageToSessionAsync(message, socketsInSession);
+            return await SendMessageToSessionAsync(message, socketsInSession);
         }
     }
 }
