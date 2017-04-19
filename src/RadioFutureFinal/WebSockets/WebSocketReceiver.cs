@@ -11,12 +11,12 @@ using System.Threading.Tasks;
 
 namespace RadioFutureFinal.WebSockets
 {
-    public class WebSocketHandler
+    public class WebSocketReceiver
     {
         protected MyContext _myContext { get; set; }
         protected IDbRepository _db { get; set; }
 
-        public WebSocketHandler(IDbRepository db, MyContext myContext)
+        public WebSocketReceiver(IDbRepository db, MyContext myContext)
         {
             _myContext = myContext;
             _db = db;
@@ -39,7 +39,7 @@ namespace RadioFutureFinal.WebSockets
             var remainingSockets = GetSocketsInSession(sessionId);
             if(remainingSockets.Count > 0)
             {
-                await ClientMessages.ClientsUpdateSessionUsers(updatedSession, remainingSockets);
+                await WebSocketSender.ClientsUpdateSessionUsers(updatedSession, remainingSockets);
             }
         }
 
@@ -120,22 +120,22 @@ namespace RadioFutureFinal.WebSockets
 
             _myContext.SocketJoinSession(socket, sessionId, user.MyUserId);
 
-            await ClientMessages.ClientSessionReady(socket, session, user);
-            await ClientMessages.ClientsUpdateSessionUsers(session, GetSocketsInSession(sessionId));
+            await WebSocketSender.ClientSessionReady(socket, session, user);
+            await WebSocketSender.ClientsUpdateSessionUsers(session, GetSocketsInSession(sessionId));
         }
 
         private async Task AddMediaToSession(WsMessage message, MySocket socket)
         {
             var sessionId = socket.SessionId;
             var updatedSession = await _db.AddMediaToSessionAsync(message.Media.ToModel(), sessionId);
-            await ClientMessages.ClientsUpdateSessionQueue(updatedSession, GetSocketsInSession(sessionId));
+            await WebSocketSender.ClientsUpdateSessionQueue(updatedSession, GetSocketsInSession(sessionId));
         }
 
         private async Task DeleteMediaFromSession(WsMessage message, MySocket socket)
         {
             var sessionId = socket.SessionId;
             var updatedSession = await _db.RemoveMediaAsync(sessionId, message.Media.Id);
-            await ClientMessages.ClientsUpdateSessionQueue(updatedSession, GetSocketsInSession(sessionId));
+            await WebSocketSender.ClientsUpdateSessionQueue(updatedSession, GetSocketsInSession(sessionId));
         }
         private async Task SaveUserVideoState(WsMessage message, MySocket socket)
         {
@@ -150,12 +150,12 @@ namespace RadioFutureFinal.WebSockets
             await _db.UpdateUserNameAsync(user.Id, user.Name);
             var sessionId = socket.SessionId;
             var session = _db.GetSession(sessionId);
-            await ClientMessages.ClientsUpdateSessionUsers(session, GetSocketsInSession(sessionId));
+            await WebSocketSender.ClientsUpdateSessionUsers(session, GetSocketsInSession(sessionId));
         }
 
         private async Task ChatMessage(WsMessage message, MySocket socket)
         {
-            await ClientMessages.ClientsSendChatMessage(message, GetSocketsInSession(socket.SessionId));
+            await WebSocketSender.ClientsSendChatMessage(message, GetSocketsInSession(socket.SessionId));
         }
     }
 }

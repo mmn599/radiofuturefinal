@@ -78,7 +78,7 @@ namespace RadioFutureFinal
             app.UseStaticFiles();
 
             app.UseWebSockets();
-            app.Map("/ws", (_app) => _app.UseMiddleware<WebSocketMiddleware>(serviceProvider.GetService<WebSocketHandler>()));
+            app.Map("/ws", (_app) => _app.UseMiddleware<WebSocketMiddleware>(serviceProvider.GetService<WebSocketReceiver>()));
 
             app.UseIdentity();
 

@@ -11,10 +11,10 @@ namespace RadioFutureFinal.WebSockets
     public class WebSocketMiddleware
     {
         private readonly RequestDelegate _next;
-        private WebSocketHandler _webSocketHandler { get; set; }
+        private WebSocketReceiver _webSocketHandler { get; set; }
 
         public WebSocketMiddleware(RequestDelegate next,
-                                          WebSocketHandler webSocketHandler)
+                                          WebSocketReceiver webSocketHandler)
         {
             _next = next;
             _webSocketHandler = webSocketHandler;

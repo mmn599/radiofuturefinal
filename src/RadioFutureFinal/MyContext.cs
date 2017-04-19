@@ -139,7 +139,7 @@ namespace RadioFutureFinal
                 int sessionId = kvPair.Key;
                 List<MySocket> socketsInSession = kvPair.Value;
                 var session = _db.GetSession(sessionId);
-                await ClientMessages.ClientsUpdateSessionUsers(session, socketsInSession);
+                await WebSocketSender.ClientsUpdateSessionUsers(session, socketsInSession);
             }
         }
 

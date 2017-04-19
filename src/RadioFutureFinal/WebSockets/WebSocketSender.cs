@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace RadioFutureFinal.WebSockets
 {
-    public static class ClientMessages
+    public static class WebSocketSender
     {
 
         // TODO: find a better way to deal with removing websockets if they are closed
