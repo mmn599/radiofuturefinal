@@ -238,6 +238,9 @@ namespace RadioFutureFinal.Migrations
 
                     b.HasKey("SessionID");
 
+                    b.HasIndex("Name")
+                        .IsUnique();
+
                     b.ToTable("Session");
                 });
 

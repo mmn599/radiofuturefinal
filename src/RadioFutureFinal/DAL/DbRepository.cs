@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using RadioFutureFinal.Data;
 using RadioFutureFinal.Models;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -110,8 +111,21 @@ namespace RadioFutureFinal.DAL
             {
                 var session = new Session(sessionName);
                 context.Session.Add(session);
-                await context.SaveChangesAsync();
-                return session;
+                try
+                {
+                    await context.SaveChangesAsync();
+                    return session;
+                }
+                catch(DbUpdateException exception)
+                {
+                    Session alreadyCreatedSession;
+                    var found = GetSessionByName(sessionName, out alreadyCreatedSession);
+                    if(!found)
+                    {
+                        // TODO: exception handling
+                    }
+                    return alreadyCreatedSession;
+                }
             }
         }
 

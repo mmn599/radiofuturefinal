@@ -68,7 +68,7 @@ namespace RadioFutureFinal.Migrations
                 {
                     SessionID = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(nullable: true, maxLength: 256)
+                    Name = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -273,7 +273,8 @@ namespace RadioFutureFinal.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Session_Name",
                 table: "Session",
-                column: "Name");
+                column: "Name",
+                unique: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

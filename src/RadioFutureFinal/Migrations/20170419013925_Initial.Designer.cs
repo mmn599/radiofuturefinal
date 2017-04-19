@@ -8,7 +8,7 @@ using RadioFutureFinal.Data;
 namespace RadioFutureFinal.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20170310064852_Initial")]
+    [Migration("20170419013925_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -238,6 +238,9 @@ namespace RadioFutureFinal.Migrations
                     b.Property<string>("Name");
 
                     b.HasKey("SessionID");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("Session");
                 });
