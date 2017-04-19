@@ -1,4 +1,6 @@
-﻿-Mobile minor UI changes
+﻿-Bigger font on home screen
+-Bigger results list
+-Remove keyboard when enter is pressed
 -Debug users list on local and production
 
 Performance and Code stuff

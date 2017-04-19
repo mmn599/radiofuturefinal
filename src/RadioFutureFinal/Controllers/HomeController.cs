@@ -10,26 +10,11 @@ namespace RadioFutureFinal.Controllers
     {
         public IActionResult Index()
         {
-            return View();
-        }
-
-        public IActionResult Yeet()
-        {
-            return View();
-        }
-
-        public IActionResult About()
-        {
-            ViewData["Message"] = "Your application description page.";
-
-            return View();
-        }
-
-        public IActionResult Contact()
-        {
-            ViewData["Message"] = "Your contact page.";
-
-            return View();
+            if(Utils.BroserIsMobile(HttpContext))
+            {
+                return View("~/Views/Home/IndexMobile.cshtml");
+            }
+            return View("~/Views/Home/Index.cshtml");
         }
 
         public IActionResult Error()
