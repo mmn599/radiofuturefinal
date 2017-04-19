@@ -1,6 +1,6 @@
-﻿-Debug users list on local and production
--Mobile UI decent on iphone5
--ui polishing
+﻿-Responsive youtube UI on mobile
+
+-Debug users list on local and production
 
 Performance and Code stuff
 -Setup typescript
