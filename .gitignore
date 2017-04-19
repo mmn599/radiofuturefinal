@@ -240,5 +240,3 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
-
-src/RadioFutureFinal/wwwroot/js/musicroom.min.js
