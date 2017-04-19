@@ -405,7 +405,8 @@ function sessionReady(data) {
 	mGlobals.current_users = session.Users;
     mGlobals.user = data.User;
 	saveUserVideoState();
-	setInterval(saveUserVideoState, 5000);
+    // TODO: delete 
+	// setInterval(saveUserVideoState, 5000);
 	if(mGlobals.queue.length==0) {
 		$("#p_current_content_info").text("Queue up a song!");
 		$("#p_current_recommender_info").text("Use the search bar above.");

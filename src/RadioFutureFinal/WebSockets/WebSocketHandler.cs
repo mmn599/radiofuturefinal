@@ -155,7 +155,7 @@ namespace RadioFutureFinal.WebSockets
 
         private async Task ChatMessage(WsMessage message, MySocket socket)
         {
-            await ClientMessages.SendMessageToSessionAsync(message, GetSocketsInSession(socket.SessionId));
+            await ClientMessages.ClientsSendChatMessage(message, GetSocketsInSession(socket.SessionId));
         }
     }
 }

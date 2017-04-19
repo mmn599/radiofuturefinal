@@ -13,9 +13,9 @@ namespace RadioFutureFinal.WebSockets
 {
     public static class ClientMessages
     {
-        // TODO: ensure only valid websockets are sent to
 
-        public static async Task<bool> SendMessageAsync(WebSocket socket, WsMessage wsMessage)
+        // TODO: find a better way to deal with removing websockets if they are closed
+        private static async Task<bool> SendMessageAsync(WebSocket socket, WsMessage wsMessage)
         {
             if (socket.State != WebSocketState.Open)
                 return false;
@@ -32,21 +32,37 @@ namespace RadioFutureFinal.WebSockets
                                        cancellationToken: CancellationToken.None);
                 return true;
             }
-            catch(Exception e)
+            catch(WebSocketException e)
             {
+                // TODO: indicates the websocket closed without doing the handshake. this happens on mobile. find a more robust way to fix this.
                 return false;
             }
         }
 
-        public static async Task SendMessageToSessionAsync(WsMessage message, List<MySocket> socketsInSession)
+        private static async Task<List<MySocket>> SendMessageToSessionAsync(WsMessage message, List<MySocket> socketsInSession)
         {
+            var errorSockets = new List<MySocket>();
             foreach(var socket in socketsInSession)
             {
-                await SendMessageAsync(socket.WebSocket, message);
+                var success = await SendMessageAsync(socket.WebSocket, message);
+                if(!success)
+                {
+                    errorSockets.Add(socket);
+                }
             }
+            return errorSockets;
         }
 
-        public static async Task ClientSessionReady(MySocket socket, Session session, MyUser user)
+        private static async Task<List<MySocket>> ClientsUpdateSession(Session session, string action, List<MySocket> socketsInSession)
+        {
+            var wsMessage = new WsMessage();
+            wsMessage.Action = action;
+            wsMessage.Session = session.ToContract();
+            var errorSockets = await SendMessageToSessionAsync(wsMessage, socketsInSession);
+            return errorSockets;
+        }
+
+        public static async Task<bool> ClientSessionReady(MySocket socket, Session session, MyUser user)
         {
             // TODO: How can I make sure this is somewhat updated properly?
             var wsMessage = new WsMessage();
@@ -54,16 +70,8 @@ namespace RadioFutureFinal.WebSockets
             wsMessage.Session = session.ToContract(); 
             wsMessage.User = user.ToContract();
 
-            await SendMessageAsync(socket.WebSocket, wsMessage);
-        }
-
-        //TODO: better way of keeping track of messages and shit. All these functions feel weird
-        public static async Task ClientsUpdateSession(Session session, string action, List<MySocket> socketsInSession)
-        {
-            var wsMessage = new WsMessage();
-            wsMessage.Action = action;
-            wsMessage.Session = session.ToContract();
-            await SendMessageToSessionAsync(wsMessage, socketsInSession);
+            var success = await SendMessageAsync(socket.WebSocket, wsMessage);
+            return success;
         }
 
         //TODO: probably shouldn't be sending full session for user and queue updates
@@ -77,5 +85,10 @@ namespace RadioFutureFinal.WebSockets
             await ClientsUpdateSession(session, "updateQueue", socketsInSession);
         }
 
+        // TODO: don't use full WsMessage
+        public static async Task ClientsSendChatMessage(WsMessage message, List<MySocket> socketsInSession)
+        {
+            await SendMessageToSessionAsync(message, socketsInSession);
+        }
     }
 }
