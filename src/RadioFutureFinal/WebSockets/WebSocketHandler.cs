@@ -36,7 +36,11 @@ namespace RadioFutureFinal.WebSockets
             _myContext.SocketDisconnected(socket);
 
             var updatedSession = await _db.RemoveUserFromSessionAsync(sessionId, userId);
-            await ClientMessages.ClientsUpdateSessionUsers(updatedSession, GetSocketsInSession(sessionId));
+            var remainingSockets = GetSocketsInSession(sessionId);
+            if(remainingSockets.Count > 0)
+            {
+                await ClientMessages.ClientsUpdateSessionUsers(updatedSession, remainingSockets);
+            }
         }
 
         // TODO: how neccesary is this being async?
@@ -93,7 +97,8 @@ namespace RadioFutureFinal.WebSockets
             var found = _myContext.ActiveSessions.TryGetValue(sessionId, out socketsInSession);
             if(!found)
             {
-                // TODO: exception
+                // TODO: maybe exception?
+                return new List<MySocket>();
             }
             return socketsInSession;
         }
