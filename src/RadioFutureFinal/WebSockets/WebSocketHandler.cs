@@ -98,6 +98,7 @@ namespace RadioFutureFinal.WebSockets
             return socketsInSession;
         }
 
+        // TODO: significant bug where additional session is created with same name if two request are made in similar times
         private async Task JoinSession(WsMessage message, MySocket socket)
         {
             var sessionName = message.Session.Name;

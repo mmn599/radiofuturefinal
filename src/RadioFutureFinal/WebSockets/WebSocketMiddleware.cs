@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 
 namespace RadioFutureFinal.WebSockets
 {
-    public class WebSocketManagerMiddleware
+    public class WebSocketMiddleware
     {
         private readonly RequestDelegate _next;
         private WebSocketHandler _webSocketHandler { get; set; }
 
-        public WebSocketManagerMiddleware(RequestDelegate next,
+        public WebSocketMiddleware(RequestDelegate next,
                                           WebSocketHandler webSocketHandler)
         {
             _next = next;
