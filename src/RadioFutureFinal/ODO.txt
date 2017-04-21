@@ -1,5 +1,10 @@
-﻿-self user on user list
+﻿-better sync
+-restructure context, cleaner, wssender and wsreceiver. 
+-better message structure
+-typescript
+-self user on user list
 -change the yellow
+-add support for podcasts
 -self delete mechanism
 
 Performance and Code stuff

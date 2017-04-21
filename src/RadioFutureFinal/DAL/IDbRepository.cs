@@ -1,7 +1,4 @@
 ﻿using RadioFutureFinal.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace RadioFutureFinal.DAL
@@ -11,7 +8,6 @@ namespace RadioFutureFinal.DAL
     {
         Task<MyUser> AddNewUserToSessionAsync(string userName, Session session);
         Task<Session> AddMediaToSessionAsync(Media media, int sessionId);
-        Task UpdateUserVideoState(int userId, int ytPlayerState, int videoTime, int queuePosition);
         Task<Session> RemoveUserFromSessionAsync(int sessionId, int userId);
         Task UpdateUserNameAsync(int userId, string newName);
         Task<Session> CreateSessionAsync(string sessionName);

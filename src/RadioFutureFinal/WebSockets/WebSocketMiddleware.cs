@@ -11,13 +11,13 @@ namespace RadioFutureFinal.WebSockets
     public class WebSocketMiddleware
     {
         private readonly RequestDelegate _next;
-        private WebSocketReceiver _webSocketHandler { get; set; }
+        private WebSocketReceiver _webSocketReceiver { get; set; }
 
         public WebSocketMiddleware(RequestDelegate next,
                                           WebSocketReceiver webSocketHandler)
         {
             _next = next;
-            _webSocketHandler = webSocketHandler;
+            _webSocketReceiver = webSocketHandler;
         }
 
         public async Task Invoke(HttpContext context)
@@ -28,19 +28,19 @@ namespace RadioFutureFinal.WebSockets
             }
 
             var socket = await context.WebSockets.AcceptWebSocketAsync();
-            _webSocketHandler.OnConnected(socket);
+            _webSocketReceiver.OnConnected(socket);
 
             await Receive(socket, async (result, buffer) =>
             {
                 if (result.MessageType == WebSocketMessageType.Text)
                 {
-                    await _webSocketHandler.ReceiveAsync(socket, result, buffer);
+                    await _webSocketReceiver.ReceiveAsync(socket, result, buffer);
                     return;
                 }
 
                 else if (result.MessageType == WebSocketMessageType.Close)
                 {
-                    await _webSocketHandler.OnDisconnected(socket);
+                    await _webSocketReceiver.OnDisconnected(socket);
                     return;
                 }
             });

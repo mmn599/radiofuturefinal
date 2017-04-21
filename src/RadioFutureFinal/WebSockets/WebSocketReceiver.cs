@@ -16,12 +16,25 @@ namespace RadioFutureFinal.WebSockets
         MyContext _myContext;
         IDbRepository _db;
         IWebSocketSender _wsSender;
+        Dictionary<string, ResponseFunction> _responses;
+        public delegate Task ResponseFunction(WsMessage message, MySocket socket);
 
         public WebSocketReceiver(IDbRepository db, MyContext myContext, WebSocketSenderFactory wsSenderFactory)
         {
             _myContext = myContext;
             _db = db;
             _wsSender = wsSenderFactory.CreateWebSocketSender(myContext.BadSend);
+
+            // TODO: probably put this somehwere else?
+            _responses = new Dictionary<string, ResponseFunction>()
+            {
+                { "UserJoinSession", JoinSession },
+                { "AddMediaToSession", AddMediaToSession },
+                { "DeleteMediaFromSession", DeleteMediaFromSession },
+                { "SaveUserNameChange", SaveUserNameChange },
+                { "ChatMessage", ChatMessage },
+                { "SyncWithUser", RequestSyncWithUser }
+            };
 
         }
 
@@ -40,40 +53,23 @@ namespace RadioFutureFinal.WebSockets
         {
             var strMessage = Encoding.UTF8.GetString(buffer, 0, result.Count);
             WsMessage wsMessage = JsonConvert.DeserializeObject<WsMessage>(strMessage);
-
             MySocket mySocket = _myContext.GetMySocket(socket);
-            // TODO: better action dictionary
-            if(wsMessage.Action.Equals("UserJoinSession", StringComparison.CurrentCultureIgnoreCase))
+
+            ResponseFunction responseFunction;
+            var validAction = _responses.TryGetValue(wsMessage.Action, out responseFunction);
+            if (validAction)
             {
-                await JoinSession(wsMessage, mySocket);
-            }
-            else if(wsMessage.Action.Equals("AddMediaToSession", StringComparison.CurrentCultureIgnoreCase))
-            {
-                await AddMediaToSession(wsMessage, mySocket);
-            }
-            else if(wsMessage.Action.Equals("DeleteMediaFromSession", StringComparison.CurrentCultureIgnoreCase))
-            {
-                await DeleteMediaFromSession(wsMessage, mySocket);
-            }
-            else if(wsMessage.Action.Equals("SaveUserVideoState", StringComparison.CurrentCultureIgnoreCase))
-            {
-                await SaveUserVideoState(wsMessage, mySocket);
-            }
-            else if(wsMessage.Action.Equals("SaveUserNameChange", StringComparison.CurrentCultureIgnoreCase))
-            {
-                await SaveUserNameChange(wsMessage, mySocket);
-            }
-            else if(wsMessage.Action.Equals("ChatMessage", StringComparison.CurrentCultureIgnoreCase))
-            {
-                await ChatMessage(wsMessage, mySocket);
+                await responseFunction.Invoke(wsMessage, mySocket);
             }
             else
             {
-                // TODO: exception handling
+                // TODO: throw exception
             }
+
         }
 
         // TODO: significant bug where additional session is created with same name if two request are made in similar times
+        // TODO: WsMessage shouldn't be same for every message
         private async Task JoinSession(WsMessage message, MySocket socket)
         {
             var sessionName = message.Session.Name;
@@ -107,11 +103,6 @@ namespace RadioFutureFinal.WebSockets
             var updatedSession = await _db.RemoveMediaAsync(sessionId, message.Media.Id);
             await _wsSender.ClientsUpdateSessionQueue(updatedSession, _myContext.GetSocketsInSession(sessionId));
         }
-        private async Task SaveUserVideoState(WsMessage message, MySocket socket)
-        {
-            var user = message.User;
-            await _db.UpdateUserVideoState(user.Id, user.YTPlayerState, user.VideoTime, user.QueuePosition);
-        }
 
         // TODO: don't use whole session
         private async Task SaveUserNameChange(WsMessage message, MySocket socket)
@@ -126,6 +117,22 @@ namespace RadioFutureFinal.WebSockets
         private async Task ChatMessage(WsMessage message, MySocket socket)
         {
             await _wsSender.ClientsSendChatMessage(message, _myContext.GetSocketsInSession(socket.SessionId));
+        }
+
+        private async Task RequestSyncWithUser(WsMessage message, MySocket socket)
+        {
+            var userIdRequestor = socket.UserId;
+            var userIdRequestee = message.User.Id;
+            var socketRequestee = _myContext.GetSocketIdForUser(socket.SessionId, userIdRequestee);
+            await _wsSender.ClientRequestUserState(userIdRequestor, userIdRequestee, socketRequestee);
+        }
+
+        private async Task ProvideSyncToUser(WsMessage message, MySocket socket)
+        {
+            // TODO: user ID represents the user to send to. this is stupid. WsMessage needs to be split up.
+            var userIdToSendTo = message.User.Id; // <--- dumb!
+            var socketToSendTo = _myContext.GetSocketIdForUser(socket.SessionId, userIdToSendTo);
+            await _wsSender.ClientProvideUserState(message.User, socketToSendTo);
         }
     }
 }

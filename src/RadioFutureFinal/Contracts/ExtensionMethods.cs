@@ -14,10 +14,6 @@ namespace RadioFutureFinal.Contracts
             {
                 MyUserId = user.Id,
                 Name = user.Name,
-                VideoTime = user.VideoTime,
-                QueuePosition = user.QueuePosition,
-                YTPlayerState = user.YTPlayerState,
-                Waiting = user.Waiting
             };
             return userModel;
         }
@@ -28,10 +24,10 @@ namespace RadioFutureFinal.Contracts
             {
                 Id = user.MyUserId,
                 Name = user.Name,
-                VideoTime = user.VideoTime,
-                QueuePosition = user.QueuePosition,
-                YTPlayerState = user.YTPlayerState,
-                Waiting = user.Waiting
+                VideoTime = 0,
+                QueuePosition = -1,
+                YTPlayerState = 0,
+                Waiting = false
             };
             return userContract;
         }

@@ -279,7 +279,7 @@ function deleteVideoInQueue(QueuePosition) {
 	var data =  {
         Media : {Id : id}
 	};
-	mGlobals.socket.emit('deleteMediaFromSession', data);
+	mGlobals.socket.emit('DeleteMediaFromSession', data);
 }
 
 function previousVideoInQueue() {
@@ -330,7 +330,7 @@ function queueSelectedVideo(elmnt) {
 		Media : media
 	};
 	//TODO: local add media
-	mGlobals.socket.emit('addMediaToSession', data);
+	mGlobals.socket.emit('AddMediaToSession', data);
 }
 
 //==================================================================
@@ -338,17 +338,25 @@ function queueSelectedVideo(elmnt) {
 // Basically all the hard stuff
 //==================================================================
 
-function syncWithUser(userId) {
-	var myuser = {}
-    // TODO: hash map
-	for(var i=0;i<mGlobals.current_users.length;i++) {
-		if(mGlobals.current_users[i].Id===userId) {
-			myuser = mGlobals.current_users[i];
-		}
-	}
-	mGlobals.user.QueuePosition = myuser.QueuePosition;
-	mGlobals.user.VideoTime = myuser.VideoTime;
-	mGlobals.user.YtPlayerState = myuser.YtPlayerState;
+function requestSyncWithUser(userId) {
+    mGlobals.socket.emit('SyncWithUser', { User: { Id: userId } });
+}
+
+function onRequestUserState(data) {
+    var userIdRequestor = data.User.Id;
+    var userData = {};
+    userData.Id = userIdRequestor; // TODO: bad bad bad
+    userData.QueuePosition = mGlobals.user.QueuePosition;
+    userData.VideoTime = mGlobals.user.VideoTime;
+    userData.YtPlayerState = mGlobals.user.YtPlayerState;
+    mGlobals.socket.emit('ProvideUserState', { User: userData }); 
+}
+
+function onUserStateProvided(data) {
+    var userToSyncWith = data.user;
+	mGlobals.user.QueuePosition = userToSyncWith.QueuePosition;
+	mGlobals.user.VideoTime = userToSyncWith.VideoTime;
+	mGlobals.user.YtPlayerState = userToSyncWith.YtPlayerState;
 	updateQueueUI(mGlobals.user.QueuePosition + 1);
 	setupVideo();
 }
@@ -363,7 +371,7 @@ function saveUserNameChange(name) {
 	var data = {
 		User : mGlobals.user
 	};
-	mGlobals.socket.emit('saveUserNameChange', data);
+	mGlobals.socket.emit('SaveUserNameChange', data);
 }
 
 
@@ -385,14 +393,6 @@ function saveUserVideoState() {
 	}
 }
 
-
-function synchronizeUsers() {
-    var data = {
-        Session: { Id: mGlobals.sessionId }
-    };
-	mGlobals.socket.emit('synchronizeUsers', data);
-}
-
 //==================================================================
 // WebSocket message response functions
 //==================================================================
@@ -411,7 +411,6 @@ function sessionReady(data) {
 	mGlobals.current_users = session.Users;
     mGlobals.user = data.User;
 	saveUserVideoState();
-	setInterval(saveUserVideoState, 5000);
 	if(mGlobals.queue.length==0) {
 		$("#p_current_content_info").text("Queue up a song!");
 		$("#p_current_recommender_info").text("Use the search bar above.");
@@ -455,7 +454,9 @@ var messageFunctions = {
     'sessionReady': sessionReady,
     'updateUsersList': updateUsersList,
     'updateQueue': updateQueue,
-    'chatMessage': receivedChatMessage
+    'chatMessage': receivedChatMessage,
+    'requestUserState': onRequestUserState,
+    'provideUserState': onUserStateProvided
 }
 
 function setupSockets() {
@@ -517,7 +518,7 @@ function joinJamSession(encodedSessionName) {
 		User : mGlobals.user,
 		Session: { name: encodedSessionName },
 	};
-	mGlobals.socket.emit('userJoinSession', data);
+	mGlobals.socket.emit('UserJoinSession', data);
 };
 
 //==================================================================
@@ -529,7 +530,7 @@ function sendChatMessage(msg) {
 	        ChatMessage: msg,
 	        User: { Name: mGlobals.user.Name }
 	    };
-	    mGlobals.socket.emit('chatMessage', data);
+	    mGlobals.socket.emit('ChatMessage', data);
 	}
 }
 

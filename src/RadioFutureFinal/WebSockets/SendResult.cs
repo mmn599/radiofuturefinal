@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.WebSockets;
 using System.Threading.Tasks;
 
 namespace RadioFutureFinal.WebSockets
@@ -8,12 +9,7 @@ namespace RadioFutureFinal.WebSockets
     public class SendResult
     {
         public bool Success { get; set; }
-        public List<MySocket> FaultySockets { get; set; }
-
-        public SendResult()
-        {
-            FaultySockets = new List<MySocket>();
-        }
+        public WebSocket FaultySocket { get; set; }
 
         public static SendResult CreateSuccess()
         {
@@ -22,11 +18,11 @@ namespace RadioFutureFinal.WebSockets
             return sendResult;
         }
 
-        public static SendResult CreateFailure(List<MySocket> faultySockets)
+        public static SendResult CreateFailure(WebSocket faultySocket)
         {
             var sendResult = new SendResult();
             sendResult.Success = false;
-            sendResult.FaultySockets = faultySockets;
+            sendResult.FaultySocket = faultySocket;
             return sendResult;
         }
     }

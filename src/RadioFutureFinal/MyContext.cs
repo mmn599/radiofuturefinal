@@ -45,6 +45,17 @@ namespace RadioFutureFinal
             return mySocket;
         }
 
+        public MySocket GetSocketIdForUser(int sessionId, int userId)
+        {
+            var socketsInSession = GetSocketsInSession(sessionId);
+            var userSocket = socketsInSession.Find(s => s.UserId == userId);
+            if(userSocket == null)
+            {
+                // TODO: exception 
+            }
+            return userSocket;
+        }
+
         public List<MySocket> GetSocketsInSession(int sessionId)
         {
             List<MySocket> socketsInSession;

@@ -18,6 +18,7 @@ namespace RadioFutureFinal.DAL
             _configuration = configuration;   
         }
 
+        // TODO: use other factory
         private static ApplicationDbContext ContextFactory()
         {
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
@@ -78,19 +79,6 @@ namespace RadioFutureFinal.DAL
                 context.Session.Update(session);
                 await context.SaveChangesAsync();
                 return session;
-            }
-        }
-
-        public async Task UpdateUserVideoState(int userId, int ytPlayerState, int videoTime, int queuePosition)
-        {
-            // TODO: Use modified entries to make this one call
-            using (var context = ContextFactory())
-            {
-                var user = GetUserInternal(userId, context);
-                user.YTPlayerState = ytPlayerState;
-                user.VideoTime = videoTime;
-                user.QueuePosition = queuePosition;
-                await context.SaveChangesAsync();
             }
         }
 
