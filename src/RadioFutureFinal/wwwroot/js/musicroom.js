@@ -246,7 +246,7 @@ function updateUsersListUI(users) {
             currentHTML =
                 '<div style="text-align: left; display: flex; align-items: center;">' +
                        '<div onclick="syncWithUser(' + user.Id + ')" style="display: flex; align-items: center; justify-content: center; float: left; cursor: pointer; margin-right: 16px; height: 48px; width: 48px; background: ' + COLOR_LIST[index % COLOR_LIST.length] + ';">sync</div>' +
-                       '<span style="margin-right: 16px; float: right;">' + user.Name + '<br /><span style="font-size: 12px";>' + videoTitle + '</span></span>' +
+                       '<span style="margin-right: 16px; float: right;">' + user.Name + '</span>' +
                 '</div>';
         }
         html.push(currentHTML);
@@ -290,7 +290,6 @@ function previousVideoInQueue() {
 		setupVideo();
 		mGlobals.user.waiting = false;
 	}
-	saveUserVideoState();
 }
 
 function playVideo() {
@@ -316,7 +315,6 @@ function nextVideoInQueue() {
 	else {
 		mGlobals.user.waiting = true;
 	}
-	saveUserVideoState();
 }
 
 function queueSelectedVideo(elmnt) {
@@ -374,25 +372,6 @@ function saveUserNameChange(name) {
 	mGlobals.socket.emit('SaveUserNameChange', data);
 }
 
-
-function saveUserVideoState() {
-	if(mGlobals.player_ready) {
-        var currentTime = mGlobals.player.getCurrentTime();
-        if (currentTime != null) {
-            mGlobals.user.VideoTime = Math.round(mGlobals.player.getCurrentTime());
-        }
-        else {
-            mGlobals.user.VideoTime = 0;
-        }
-		mGlobals.user.YtPlayerState = mGlobals.player.getPlayerState();
-		var data = {
-		    User: mGlobals.user
-		};
-        console.log(data);
-		mGlobals.socket.emit('SaveUserVideoState', data);	
-	}
-}
-
 //==================================================================
 // WebSocket message response functions
 //==================================================================
@@ -410,7 +389,6 @@ function sessionReady(data) {
 	mGlobals.queue = session.Queue;
 	mGlobals.current_users = session.Users;
     mGlobals.user = data.User;
-	saveUserVideoState();
 	if(mGlobals.queue.length==0) {
 		$("#p_current_content_info").text("Queue up a song!");
 		$("#p_current_recommender_info").text("Use the search bar above.");
@@ -603,8 +581,6 @@ function updatePlayerUI(media, time, recommenderName) {
         '</div>';
         $("#div_cc_results").html(html);
 	}
-
-	synchronizeUsers();
 }
 
 //TODO: Fix CamelCase stuff with JSON

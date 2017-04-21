@@ -65,14 +65,8 @@ namespace RadioFutureFinal
             }
 
             app.UseStaticFiles();
-
             app.UseWebSockets();
-
             app.Map("/ws", (_app) => _app.UseMiddleware<WebSocketMiddleware>(serviceProvider.GetService<WebSocketReceiver>()));
-
-            app.UseIdentity();
-
-            // Add external authentication middleware below. To configure them please see http://go.microsoft.com/fwlink/?LinkID=532715
 
             app.UseMvc(routes =>
             {
