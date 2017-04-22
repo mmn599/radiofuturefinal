@@ -1,4 +1,4 @@
-﻿-better sync
+﻿-get better sync working
 -restructure context, cleaner, wssender and wsreceiver. 
 -better message structure
 -typescript
