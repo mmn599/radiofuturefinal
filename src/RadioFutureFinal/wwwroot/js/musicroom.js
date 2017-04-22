@@ -222,6 +222,37 @@ function updateQueueUI(queue_position) {
 
 COLOR_LIST = ["red", "orange", "yellow", "green", "blue", "violet"];
 
+// lol awful code
+function frameUser(index, userId, userName, thisIsMe) {
+
+    var currentHTML = ""; 
+    if (thisIsMe) {
+        if (mobileBrowser) {
+            currentHTML = '<div class="div_user" style="background: ' + COLOR_LIST[index % COLOR_LIST.length] + ';"> you </div>';
+        }
+        else {
+            currentHTML =
+                '<div style="text-align: left; display: flex; align-items: center;">' +
+                       '<div style="display: flex; align-items: center; justify-content: center; float: left; cursor: pointer; margin-right: 16px; height: 48px; width: 48px; background: ' + COLOR_LIST[index % COLOR_LIST.length] + ';">you</div>' +
+                       '<span style="margin-right: 16px; float: right;">' + userName + '</span>' +
+                '</div>';
+        }
+    }
+    else {
+        if (mobileBrowser) {
+            currentHTML = '<div onclick="requestSyncWithUser(' + userId + ')" class="div_user" style="background: ' + COLOR_LIST[index % COLOR_LIST.length] + ';">sync with ' + userName + '</div>';
+        }
+        else {
+            currentHTML =
+                '<div style="text-align: left; display: flex; align-items: center;">' +
+                       '<div onclick="requestSyncWithUser(' + userId + ')" style="display: flex; align-items: center; justify-content: center; float: left; cursor: pointer; margin-right: 16px; height: 48px; width: 48px; background: ' + COLOR_LIST[index % COLOR_LIST.length] + ';">sync</div>' +
+                       '<span style="margin-right: 16px; float: right;">' + userName + '</span>' +
+                '</div>';
+        }
+    }
+    return currentHTML;
+}
+
 function updateUsersListUI(users) {
     var num = users.length;
     var summary = users.length + " users in the room";
@@ -229,29 +260,14 @@ function updateUsersListUI(users) {
         summary = users.length + " user in the room";
     }
     $("#p_users_summary").text(summary);
-
     var userResults = $("#div_user_results");
     var html = [];
     //TODO: put style in css and make scrolley
     $.each(users, function(index, user) {
-        var videoTitle = 'Nothing';
-        if (user.QueuePosition != -1) {
-            videoTitle = mGlobals.queue[user.QueuePosition].VideoTitle;
-        }
-        var currentHTML = "";
-        if (mobileBrowser) {
-            currentHTML = '<div onclick="syncWithUser(' + user.Id + ')" class="div_user" style="background: ' + COLOR_LIST[index % COLOR_LIST.length] + ';">sync with ' + user.Name + '</div>';
-        }
-        else {
-            currentHTML =
-                '<div style="text-align: left; display: flex; align-items: center;">' +
-                       '<div onclick="syncWithUser(' + user.Id + ')" style="display: flex; align-items: center; justify-content: center; float: left; cursor: pointer; margin-right: 16px; height: 48px; width: 48px; background: ' + COLOR_LIST[index % COLOR_LIST.length] + ';">sync</div>' +
-                       '<span style="margin-right: 16px; float: right;">' + user.Name + '</span>' +
-                '</div>';
-        }
+        var thisIsMe = (user.Id === mGlobals.user.Id);
+        var currentHTML = frameUser(index, user.Id, user.Name, thisIsMe);
         html.push(currentHTML);
     });
-
     userResults.html(html.join(""));
 }
 
@@ -337,23 +353,26 @@ function queueSelectedVideo(elmnt) {
 //==================================================================
 
 function requestSyncWithUser(userId) {
-    mGlobals.socket.emit('SyncWithUser', { User: { Id: userId } });
+    console.log('request sync with user');
+    mGlobals.socket.emit('RequestSyncWithUser', { User: { Id: userId } });
 }
 
-function onRequestUserState(data) {
+function onRequestMyUserState(data) {
+    console.log('on request my user state');
     var userIdRequestor = data.User.Id;
     var userData = {};
     userData.Id = userIdRequestor; // TODO: bad bad bad
     userData.QueuePosition = mGlobals.user.QueuePosition;
-    userData.VideoTime = mGlobals.user.VideoTime;
-    userData.YtPlayerState = mGlobals.user.YtPlayerState;
-    mGlobals.socket.emit('ProvideUserState', { User: userData }); 
+    userData.VideoTime = Math.round(mGlobals.player.getCurrentTime());
+    userData.YtPlayerState = mGlobals.player.getPlayerState();
+    mGlobals.socket.emit('ProvideSyncToUser', { User: userData }); 
 }
 
 function onUserStateProvided(data) {
-    var userToSyncWith = data.user;
+    console.log('on user state provided');
+    var userToSyncWith = data.User;
 	mGlobals.user.QueuePosition = userToSyncWith.QueuePosition;
-	mGlobals.user.VideoTime = userToSyncWith.VideoTime;
+    mGlobals.user.VideoTime = userToSyncWith.VideoTime;
 	mGlobals.user.YtPlayerState = userToSyncWith.YtPlayerState;
 	updateQueueUI(mGlobals.user.QueuePosition + 1);
 	setupVideo();
@@ -376,14 +395,14 @@ function saveUserNameChange(name) {
 // WebSocket message response functions
 //==================================================================
 
-function updateUser(data) {
+function onUpdateUser(data) {
     var user = data.user;
 	if(mGlobals.sessionInitialized) {
 		mGlobals.user = user;	
 	}
 }
 
-function sessionReady(data) {
+function onSessionReady(data) {
     var session = data.Session;
 	mGlobals.sessionId = session.Id;
 	mGlobals.queue = session.Queue;
@@ -399,7 +418,7 @@ function sessionReady(data) {
 	mGlobals.sessionInitialized = true;
 }
 
-function updateUsersList(data) {
+function onUpdateUsersList(data) {
     var users = data.Session.Users;
 	if(mGlobals.sessionInitialized) {
 		mGlobals.current_users = users;
@@ -407,7 +426,7 @@ function updateUsersList(data) {
 	}		
 }
 
-function updateQueue(data) {
+function onUpdateQueue(data) {
     var queue = data.Session.Queue;
 	if(mGlobals.sessionInitialized) {
 		mGlobals.queue = queue;
@@ -418,7 +437,7 @@ function updateQueue(data) {
 	}
 }
 
-function receivedChatMessage(data) {
+function onReceivedChatMessage(data) {
 	var msg = data.ChatMessage;
 	var userName = data.User.Name;
     //TODO: color stuff
@@ -428,12 +447,12 @@ function receivedChatMessage(data) {
 }
 
 var messageFunctions = {
-    'updateUser': updateUser,
-    'sessionReady': sessionReady,
-    'updateUsersList': updateUsersList,
-    'updateQueue': updateQueue,
-    'chatMessage': receivedChatMessage,
-    'requestUserState': onRequestUserState,
+    'updateUser': onUpdateUser,
+    'sessionReady': onSessionReady,
+    'updateUsersList': onUpdateUsersList,
+    'updateQueue': onUpdateQueue,
+    'chatMessage': onReceivedChatMessage,
+    'requestUserState': onRequestMyUserState,
     'provideUserState': onUserStateProvided
 }
 

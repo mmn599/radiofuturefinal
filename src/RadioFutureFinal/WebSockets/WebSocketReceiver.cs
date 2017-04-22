@@ -33,7 +33,8 @@ namespace RadioFutureFinal.WebSockets
                 { "DeleteMediaFromSession", DeleteMediaFromSession },
                 { "SaveUserNameChange", SaveUserNameChange },
                 { "ChatMessage", ChatMessage },
-                { "SyncWithUser", RequestSyncWithUser }
+                { "RequestSyncWithUser", RequestSyncWithUser },
+                { "ProvideSyncToUser", ProvideSyncToUser }
             };
 
         }
@@ -63,7 +64,8 @@ namespace RadioFutureFinal.WebSockets
             }
             else
             {
-                // TODO: throw exception
+                // TODO: real exception
+                throw new Exception();
             }
 
         }
