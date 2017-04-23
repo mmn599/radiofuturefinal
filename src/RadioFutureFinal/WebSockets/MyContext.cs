@@ -8,36 +8,29 @@ using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace RadioFutureFinal
+namespace RadioFutureFinal.WebSockets
 {
-    public class MyContext
+    public class MyContext : IMyContext
     {
         IDbRepository _db;
         IWebSocketSender _wsSender;
-        Timer _cleaningTimer;
 
         // key is session id
-        ConcurrentDictionary<int, List<MySocket>> ActiveSessions { get; }
-        ConcurrentDictionary<WebSocket, MySocket> ActiveSockets { get; }
+        ConcurrentDictionary<int, List<MySocket>> _activeSession;
+        ConcurrentDictionary<WebSocket, MySocket> _activeSockets;
 
         public MyContext(IDbRepository db, WebSocketSenderFactory wsSenderFactory)
         {
             _db = db;
-            ActiveSockets = new ConcurrentDictionary<WebSocket, MySocket>();
-            ActiveSessions = new ConcurrentDictionary<int, List<MySocket>>();
-
-            _wsSender = wsSenderFactory.CreateWebSocketSender(BadSend);
-
-            _cleaningTimer = new Timer((e) =>
-            {
-                SynchronizeUserMediaStates();
-            }, null, 0, 5000);
+            _wsSender = wsSenderFactory.Create(RemoveSocketFromContext);
+            _activeSockets = new ConcurrentDictionary<WebSocket, MySocket>();
+            _activeSession = new ConcurrentDictionary<int, List<MySocket>>();
         }
 
         public MySocket GetMySocket(WebSocket socket)
         {
             MySocket mySocket;
-            var found = ActiveSockets.TryGetValue(socket, out mySocket);
+            var found = _activeSockets.TryGetValue(socket, out mySocket);
             if(!found)
             {
                 // TODO: exception
@@ -59,7 +52,7 @@ namespace RadioFutureFinal
         public List<MySocket> GetSocketsInSession(int sessionId)
         {
             List<MySocket> socketsInSession;
-            var found = ActiveSessions.TryGetValue(sessionId, out socketsInSession);
+            var found = _activeSession.TryGetValue(sessionId, out socketsInSession);
 
             if(!found)
             {
@@ -72,13 +65,13 @@ namespace RadioFutureFinal
         public void SocketConnected(WebSocket socket)
         {
             var mySocket = new MySocket(socket);
-            ActiveSockets.TryAdd(socket, mySocket);
+            _activeSockets.TryAdd(socket, mySocket);
         }
 
         public void SocketJoinSession(MySocket socket, int sessionId, int userId)
         {
             List<MySocket> sessionSockets;
-            var sessionFound = ActiveSessions.TryGetValue(sessionId, out sessionSockets);
+            var sessionFound = _activeSession.TryGetValue(sessionId, out sessionSockets);
 
             if(sessionFound)
             {
@@ -87,7 +80,7 @@ namespace RadioFutureFinal
             else
             {
                 // First socket in the session
-                var result = ActiveSessions.TryAdd(sessionId, new List<MySocket>() { socket });
+                var result = _activeSession.TryAdd(sessionId, new List<MySocket>() { socket });
                 if(result == false)
                 {
                     // TODO: throw exception
@@ -100,7 +93,7 @@ namespace RadioFutureFinal
         private void DeactiveSession(int sessionId)
         {
             List<MySocket> socketsInSession;
-            var found = ActiveSessions.TryRemove(sessionId, out socketsInSession);
+            var found = _activeSession.TryRemove(sessionId, out socketsInSession);
             if(!found)
             {
                 // TODO: throw exception
@@ -114,13 +107,13 @@ namespace RadioFutureFinal
         // TODO: terrible name
         private List<MySocket> RemoveSocketFromDataStructures(MySocket socket)
         {
-            var found = ActiveSockets.TryRemove(socket.WebSocket, out socket);
+            var found = _activeSockets.TryRemove(socket.WebSocket, out socket);
             if(!found)
             {
                 // TODO: throw exception
             }
             List<MySocket> socketsInSession;
-            found = ActiveSessions.TryGetValue(socket.SessionId, out socketsInSession);
+            found = _activeSession.TryGetValue(socket.SessionId, out socketsInSession);
             if(!found)
             {
                 // TODO: throw exception
@@ -153,26 +146,6 @@ namespace RadioFutureFinal
         {
             var mySocket = GetMySocket(socket);
             await RemoveSocketFromContext(mySocket);
-        }
-
-        public async Task BadSend(WebSocket webSocket)
-        {
-            await RemoveSocketFromContext(webSocket);
-        }
-
-        // Long running function that updates user video states across the session
-        // TODO: minimuze clients calling "UpdateUserVideo" state and instead interpolate and update infrequently
-        public async Task SynchronizeUserMediaStates()
-
-        {
-            // TODO: check to make sure at scale this function won't overrun itself
-            foreach(var kvPair in ActiveSessions)
-            {
-                int sessionId = kvPair.Key;
-                List<MySocket> socketsInSession = kvPair.Value;
-                var session = _db.GetSession(sessionId);
-                await _wsSender.ClientsUpdateSessionUsers(session, socketsInSession);
-            }
         }
 
         private string CreateConnectionId()

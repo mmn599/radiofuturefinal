@@ -1,10 +1,14 @@
-﻿-restructure context, cleaner, wssender and wsreceiver. 
--better message structure
+﻿big
+-ui for podcasts
+-better websocket message structure
 -typescript
--self user on user list
+-model support for two types of content: yt videos and podcasts
+-search support for podcasts and yt videos
+
+little
 -change the yellow
--add support for podcasts
 -self delete mechanism
+-add very basic exceptions
 
 Performance and Code stuff
 -TODO: better way of detecting faulty websockets and closing them

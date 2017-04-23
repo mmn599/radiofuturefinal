@@ -13,15 +13,13 @@ namespace RadioFutureFinal.WebSockets
 {
     public class WebSocketSender : IWebSocketSender
     {
-        //TODO: do something with the SendResult returns or take them away
         Func<WebSocket, Task> _onBadSend;
 
-        public WebSocketSender(Func<WebSocket, Task> onBadSend) 
+        public WebSocketSender(Func<WebSocket, Task> onBadSend)
         {
-            _onBadSend = onBadSend; 
+            _onBadSend = onBadSend;
         }
             
-        // TODO: find a better way to deal with removing websockets if they are closed
         private async Task<SendResult> SendMessageAsync(WebSocket socket, WsMessage wsMessage)
         {
             var success = true;
@@ -50,7 +48,7 @@ namespace RadioFutureFinal.WebSockets
 
             if(!success)
             {
-                await _onBadSend?.Invoke(socket);
+                await _onBadSend.Invoke(socket);
                 return SendResult.CreateFailure(socket);
             }
 

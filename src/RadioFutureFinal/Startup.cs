@@ -32,7 +32,6 @@ namespace RadioFutureFinal
         }
 
         public IConfigurationRoot Configuration { get; }
-        public MyContext MyAppContext { get; } 
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -42,9 +41,8 @@ namespace RadioFutureFinal
             services.AddSingleton(Configuration);
             services.AddSingleton<IDbRepository, DbRepository>();
             services.AddSingleton<WebSocketSenderFactory>();
-            services.AddSingleton<MyContext>();
-            // TODO: make a web socket receiver factory?
-            services.AddSingleton<WebSocketReceiver>();
+            services.AddSingleton<IMyContext, MyContext>();
+            services.AddSingleton<IWebSocketReceiver, WebSocketReceiver>();
         }
         
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -66,7 +64,7 @@ namespace RadioFutureFinal
 
             app.UseStaticFiles();
             app.UseWebSockets();
-            app.Map("/ws", (_app) => _app.UseMiddleware<WebSocketMiddleware>(serviceProvider.GetService<WebSocketReceiver>()));
+            app.Map("/ws", (_app) => _app.UseMiddleware<WebSocketMiddleware>(serviceProvider.GetService<IWebSocketReceiver>()));
 
             app.UseMvc(routes =>
             {

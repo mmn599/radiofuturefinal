@@ -11,19 +11,19 @@ using System.Threading.Tasks;
 
 namespace RadioFutureFinal.WebSockets
 {
-    public class WebSocketReceiver
+    public class WebSocketReceiver : IWebSocketReceiver
     {
-        MyContext _myContext;
+        IMyContext _myContext;
         IDbRepository _db;
         IWebSocketSender _wsSender;
         Dictionary<string, ResponseFunction> _responses;
         public delegate Task ResponseFunction(WsMessage message, MySocket socket);
 
-        public WebSocketReceiver(IDbRepository db, MyContext myContext, WebSocketSenderFactory wsSenderFactory)
+        public WebSocketReceiver(IDbRepository db, IMyContext myContext, WebSocketSenderFactory wsSenderFactory)
         {
             _myContext = myContext;
             _db = db;
-            _wsSender = wsSenderFactory.CreateWebSocketSender(myContext.BadSend);
+            _wsSender = wsSenderFactory.Create(myContext.RemoveSocketFromContext);
 
             // TODO: probably put this somehwere else?
             _responses = new Dictionary<string, ResponseFunction>()
