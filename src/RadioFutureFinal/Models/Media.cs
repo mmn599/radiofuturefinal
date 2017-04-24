@@ -13,8 +13,6 @@ namespace RadioFutureFinal.Models
         public string UserName { get; set; }
         public string YTVideoID { get; set; }
         public string VideoTitle { get; set; }
-        public int Likes { get; set; }
-        public int Dislikes { get; set; }
         public string ThumbURL { get; set; }
 
         public Media()

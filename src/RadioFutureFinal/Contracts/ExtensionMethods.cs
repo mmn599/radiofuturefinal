@@ -1,8 +1,5 @@
 ﻿using RadioFutureFinal.Models;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace RadioFutureFinal.Contracts
 {
@@ -24,10 +21,13 @@ namespace RadioFutureFinal.Contracts
             {
                 Id = user.MyUserId,
                 Name = user.Name,
-                VideoTime = 0,
-                QueuePosition = -1,
-                YTPlayerState = 0,
-                Waiting = false
+                State = new UserState()
+                {
+                    Time = 0,
+                    QueuePosition = -1,
+                    YTPlayerState = 0,
+                    Waiting = false
+                }
             };
             return userContract;
         }
@@ -60,8 +60,6 @@ namespace RadioFutureFinal.Contracts
                 UserID = media.UserID,
                 UserName = media.UserName,
                 YTVideoID = media.YTVideoID,
-                Likes = media.Likes,
-                Dislikes = media.Dislikes,
                 VideoTitle = media.VideoTitle,
                 ThumbURL = media.ThumbURL
             };
@@ -76,8 +74,6 @@ namespace RadioFutureFinal.Contracts
                 UserID = media.UserID,
                 UserName = media.UserName,
                 YTVideoID = media.YTVideoID,
-                Likes = media.Likes,
-                Dislikes = media.Dislikes,
                 ThumbURL = media.ThumbURL,
                 VideoTitle = media.VideoTitle
             };

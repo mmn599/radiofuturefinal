@@ -25,12 +25,6 @@ namespace RadioFutureFinal.Contracts
         public string VideoTitle { get; set; }
 
         [JsonProperty]
-        public int Likes { get; set; }
-
-        [JsonProperty]
-        public int Dislikes { get; set; }
-
-        [JsonProperty]
         public string ThumbURL { get; set; }
     }
 }

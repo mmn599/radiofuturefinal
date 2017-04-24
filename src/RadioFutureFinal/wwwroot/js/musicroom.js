@@ -50,11 +50,18 @@ var MyUser = (function () {
 }());
 var mRoomState = new RoomState();
 $(document).ready(function () {
-    var pathname = window.location.pathname;
-    var roomName = null;
-    if (pathname.indexOf('\/rooms\/') > -1) {
-        roomName = pathname.replace('\/rooms/', '');
-    }
+    initialize_ui();
+});
+//==================================================================
+// UI Functions
+//==================================================================
+function initialize_ui() {
+    setup_spinner_ui();
+    setup_info_rollover_ui();
+    setup_input_ui();
+    setup_player_control_ui();
+}
+function setup_spinner_ui() {
     var opts = {
         lines: 13 // The number of lines to draw
         ,
@@ -98,68 +105,63 @@ $(document).ready(function () {
     };
     var target = document.getElementById('div_loading');
     mRoomState.spinner = new Spinner(opts).spin(target);
-    $("#input_search").bind("propertychange input paste", function (event) {
-        searchTextChanged($("#input_search").val());
+}
+function setup_fade_ui(overall, results) {
+    overall.mouseenter(function (e) {
+        if (!results.is(':visible')) {
+            results.fadeIn();
+        }
     });
-    var setupFade = function (overall, results) {
-        overall.mouseenter(function (e) {
-            if (!results.is(':visible')) {
-                results.fadeIn();
+    overall.mouseleave(function (e) {
+        if (results.is(':visible')) {
+            results.fadeOut();
+        }
+    });
+}
+function setup_info_rollover_ui() {
+    if (!mobileBrowser) {
+        setup_fade_ui($("#div_users_overall"), $("#div_user_results"));
+        setup_fade_ui($("#div_queue_overall"), $("#div_queue_results"));
+        setup_fade_ui($("#div_chat_overall"), $("#div_chat_results"));
+        setup_fade_ui($("#div_cc_overall"), $("#div_cc_results"));
+    }
+}
+function setup_input_ui() {
+    var input_search = $("#input_search");
+    input_search.keypress(function (e) {
+        if (e.which == 13) {
+            searchEnterPressed(input_search);
+        }
+    });
+    var input_name = $("#input_name");
+    input_name.keypress(function (e) {
+        if (e.which == 13) {
+            UserNameChange(input_name);
+        }
+    });
+    if (mobileBrowser) {
+        var input_chat = $("#input_chat");
+        input_chat.keypress(function (e) {
+            if (e.which == 13) {
+                sendChatMessage(input_chat.val());
+                input_chat.val("");
             }
         });
-        overall.mouseleave(function (e) {
-            if (results.is(':visible')) {
-                results.fadeOut();
-            }
-        });
-    };
-    setupFade($("#div_users_overall"), $("#div_user_results"));
-    setupFade($("#div_queue_overall"), $("#div_queue_results"));
-    setupFade($("#div_chat_overall"), $("#div_chat_results"));
-    setupFade($("#div_cc_overall"), $("#div_cc_results"));
-    $("#input_search").keypress(function (e) {
-        if (e.which == 13) {
-            searchEnterPressed($("#input_search"));
-        }
-    });
-    $("#input_name").keypress(function (e) {
-        if (e.which == 13) {
-            UserNameChange($("#input_name"));
-        }
-    });
-    var input_chat = $("#input_chat");
-    input_chat.keypress(function (e) {
-        if (e.which == 13) {
-            sendChatMessage(input_chat.val());
-            input_chat.val("");
-        }
-    });
-    $("#btn_previous").click(previousVideoInQueue);
-    $("#btn_pause").click(pauseVideo);
-    $("#btn_play").click(playVideo);
-    $("#btn_next").click(nextVideoInQueue);
+    }
     document.body.addEventListener('click', function () {
         $("#div_search_results").fadeOut();
         $("#input_search").val("");
     }, true);
-    /*
-    $("#txt_email").keypress(function(e) {
-        if(e.which==13) {
-            emailQueue();
-        }
+    $("#input_search").bind("propertychange input paste", function (event) {
+        searchTextChanged($("#input_search").val());
     });
-    */
-});
-//==================================================================
-// Global variables
-//==================================================================
-var mConstants = {
-    "PLAYING": 1,
-    "PAUSED": 2
-};
-//==================================================================
-// UI Functions
-//==================================================================
+}
+function setup_player_control_ui() {
+    $("#btn_previous").click(previousVideoInQueue);
+    $("#btn_pause").click(pauseVideo);
+    $("#btn_play").click(playVideo);
+    $("#btn_next").click(nextVideoInQueue);
+}
 function searchTextChanged(text) {
     var divResults = $("#div_search_results");
     if (text.length == 0) {
@@ -454,8 +456,8 @@ function setupJamSession() {
         mRoomState.entered_jam = true;
     }
     // TODO: this should get out of here
-    $("#div_yt_player").hide();
-    $("#div_podcast_player").show();
+    $("#div_yt_player").show();
+    $("#div_podcast_player").hide();
     var pathname = window.location.pathname;
     var encodedSessionName = null;
     if (pathname.indexOf('\/rooms\/') > -1) {
