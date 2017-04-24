@@ -1,11 +1,12 @@
 ﻿big
--ui for podcasts
--better websocket message structure
 -typescript
+-better websocket message structure
+-ui for podcasts
 -model support for two types of content: yt videos and podcasts
 -search support for podcasts and yt videos
 
 little
+-get css out of html
 -change the yellow
 -self delete mechanism
 -add very basic exceptions

@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": false,
+    "noEmitOnError": true,
+    "sourceMap": true,
+    "target": "es5",
+    "outDir": "./wwwroot/js"
+  },
+  "files": [
+    "./TypeScripts/typings/vendor.d.ts",
+    "./TypeScripts/typings/jquery.d.ts",
+    "./TypeScripts/musicroom.ts"
+  ],
+  "compileOnSave": true
+}
