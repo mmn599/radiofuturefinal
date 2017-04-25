@@ -3,7 +3,7 @@ import { Media } from "./Contracts";
 
 declare var Spinner: any;
 
-export class Callbacks {
+export class UICallbacks {
     previousMedia: any;
     nextMedia: any;
     playMedia: any;
@@ -17,13 +17,14 @@ export class Callbacks {
 export class UI {
 
     private spinner: any;
-    private callbacks: Callbacks;
+    private callbacks: UICallbacks;
     private mobileBrowser: boolean;
     private frameBuilder: FrameBuilder;
 
-    constructor(mobileBrowser: boolean, callbacks: Callbacks) {
+    constructor(mobileBrowser: boolean, callbacks: UICallbacks) {
         this.mobileBrowser = mobileBrowser;
         this.frameBuilder = new FrameBuilder(mobileBrowser);
+        this.callbacks = callbacks;
         this.initialize();
     }
 
@@ -68,12 +69,12 @@ export class UI {
     }
 
     private setupFadeUI(overall, results) {
-        overall.mouseenter(function (e) {
+        overall.mouseenter((e) => {
             if (!results.is(':visible')) {
                 results.fadeIn();
             }
         });
-        overall.mouseleave(function (e) {
+        overall.mouseleave((e) => {
             if (results.is(':visible')) {
                 results.fadeOut();
             }
@@ -98,43 +99,43 @@ export class UI {
 
     private setupInputUI() {
         var inputSearch = $("#input_search");
-        inputSearch.keypress(function (e) {
+        inputSearch.keypress((e) => {
             if (e.which == 13) {
-                this.search_enter_pressed(inputSearch);
+                this.searchEnterPressed(inputSearch);
             }
         });
         var input_name = $("#input_name");
-        input_name.keypress(function (e) {
+        input_name.keypress((e) => {
             if (e.which == 13) {
-                this.UserNameChange(input_name);
+                this.userNameChange(input_name);
             }
         });
         if (this.mobileBrowser) {
             var input_chat = $("#input_chat");
-            input_chat.keypress(function (e) {
+            input_chat.keypress((e) => {
                 if (e.which == 13) {
-                    this.callbacks.send_chat_message(input_chat.val());
+                    this.callbacks.onSendChatMessage(input_chat.val());
                     input_chat.val("");
                 }
             });
         }
-        document.body.addEventListener('click', function () {
+        document.body.addEventListener('click', () => {
             $("#div_search_results").fadeOut();
             $("#input_search").val("");
         }, true);
-        $("#input_search").bind("propertychange input paste", function (event) {
-            this.search_text_changed($("#input_search").val());
+        $("#input_search").bind("propertychange input paste", (event) => {
+            this.searchTextChanged($("#input_search").val());
         });
     }
 
     private setupPlayerControlButtons() {
         $("#btn_previous").click(this.callbacks.previousMedia);
-        $("#btn_pause").click(function () {
+        $("#btn_pause").click(() => {
             $("#btn_pause").hide();
             $("#btn_play").show();
             this.callbacks.pauseMedia();
         });
-        $("#btn_play").click(function () {
+        $("#btn_play").click(() => {
             $("#btn_play").hide();
             $("#btn_uase").show();
             this.callbacks.playMedia();
@@ -145,8 +146,8 @@ export class UI {
     private searchEnterPressed(input_search) {
         var divResults = $("#div_search_results");
         divResults.html("");
-        var response = this.callbacks.search(input_search.val(), function (results) {
-            $.each(response.items, function(index, item) {
+        var response = this.callbacks.search(input_search.val(), (results) => {
+            $.each(response.items, (index, item) => {
                 divResults.html(divResults.html() + "<div class='div_search_result' onClick='queueSelectedVideo(this)' data-VideoId='" + item.id.videoId + "' data-ThumbURL='"+item.snippet.thumbnails.medium.url+"'>" + '<p class="text_search_result">' +  item.snippet.title+ '</p></div>' );
             });
             input_search.blur();
@@ -204,9 +205,15 @@ export class UI {
         var userResults = $("#div_user_results");
         var html = [];
         //TODO: put style in css and make scrolley
-        $.each(users, function(index, user) {
+        $.each(users, (index, user) => {
             var thisIsMe = (user.Id === userIdMe);
-            var currentHTML = this.frame.user(index, user.Id, user.Name, thisIsMe);
+            var currentHTML;
+            if (thisIsMe) {
+                currentHTML = this.frameBuilder.userMe('green', user.Name);
+            }
+            else {
+                currentHTML = this.frameBuilder.user('green', user.Id, user.Name);
+            }
             html.push(currentHTML);
         });
         userResults.html(html.join(""));

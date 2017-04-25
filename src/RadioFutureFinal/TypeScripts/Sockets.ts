@@ -24,7 +24,9 @@ export class MySocket {
 
     public emit(message: WsMessage) {
         if (this.socket.readyState === this.socket.CONNECTING) {
-            setTimeout(function () { this.emit(message) }, 100);
+            setTimeout(() => {
+                this.emit(message);
+            }, 100);
             return;
         }
         this.socket.send(JSON.stringify(message));

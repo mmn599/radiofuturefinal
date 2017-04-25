@@ -3,21 +3,31 @@
 var COLOR_LIST = ["red", "orange", "yellow", "green", "blue", "violet"];
 
 import { MyUser, Media, Session, UserState, WsMessage } from "./Contracts";
-import { Callbacks, UI } from "./ui";
+import { UICallbacks, UI } from "./ui";
 import { MySocket } from "./Sockets"
 import { Player } from "./Player"
 
 declare var mobileBrowser: boolean;
 declare var gapi: any;
 
-var mMeUser: MyUser;
-var mSession: Session;
+var mMeUser = new MyUser();
+var mSession = new Session();
 var mUI: UI;
 var mPlayer: Player;
-var mSocket;
+var mSocket: MySocket;
 
 $(document).ready(function () {
-    mUI = new UI(mobileBrowser, mCallbacks);
+
+    var callbacks = new UICallbacks();
+    callbacks.onSendChatMessage = sendChatMessage;
+    callbacks.nameChange = saveUserNameChange;
+    callbacks.nextMedia = nextVideoInQueue;
+    callbacks.pauseMedia = pauseVideo;
+    callbacks.playMedia = playVideo;
+    callbacks.previousMedia = previousVideoInQueue;
+    callbacks.search = searchVideos;
+
+    mUI = new UI(mobileBrowser, callbacks);
     mPlayer = new Player(mobileBrowser);
     mSocket = new MySocket(mMessageFunctions);
     setupJamSession();
@@ -51,18 +61,24 @@ function deleteVideoInQueue(QueuePosition: number) {
 
     mUI.updateQueue(mSession.Queue, mMeUser.State.QueuePosition + 1);
 
-    var message: WsMessage;
-    var mediaToDelete: Media;
+    var message = new WsMessage();
+    var mediaToDelete = new Media();
     mediaToDelete.Id = id;
     message.Action = 'DeleteMediaFromSession';
     message.Media = mediaToDelete;
-    mSocket.emit('DeleteMediaFromSession', message);
+    mSocket.emit(message);
 }
 
 
 function requestSyncWithUser(userId) {
     console.log('request sync with user');
-    mSocket.emit('RequestSyncWithUser', { User: { Id: userId } });
+
+    var user = new MyUser();
+    user.Id = userId;
+    var message = new WsMessage();
+    message.Action = 'RequestSyncWithUser';
+    message.User = user;
+    mSocket.emit(message);
 }
 
 //==================================================================
@@ -89,12 +105,16 @@ function onUserStateProvided(message: WsMessage) {
 }
 
 function onRequestMyUserState(message: WsMessage) {
-    var userData: MyUser;
+    var userData = new MyUser();
     userData.Id = message.User.Id; // TODO: bad bad bad
     userData.State.QueuePosition = mMeUser.State.QueuePosition;
     userData.State.Time = Math.round(mPlayer.getCurrentTime());
     userData.State.YTPlayerState = mPlayer.getCurrentState();
-    mSocket.emit('ProvideSyncToUser', { User: userData }); 
+
+    var outgoingMsg = new WsMessage();
+    outgoingMsg.Action = 'ProvideSyncToUser';
+    outgoingMsg.User = userData;
+    mSocket.emit(outgoingMsg);
 }
 
 
@@ -143,7 +163,7 @@ function setupJamSession() {
     mSession.Name = decodeURI(encodedSessionName);
     mMeUser.Name = 'Anonymous';
 
-    var message: WsMessage;
+    var message = new WsMessage();
     message.Action = 'UserJoinSession';
     message.User = mMeUser;
     message.Session = mSession;
@@ -151,17 +171,8 @@ function setupJamSession() {
 	mSocket.emit(message);
 }
 
-var mCallbacks = new Callbacks();
-mCallbacks.onSendChatMessage = sendChatMessage;
-mCallbacks.nameChange = saveUserNameChange;
-mCallbacks.nextMedia = nextVideoInQueue;
-mCallbacks.pauseMedia = pauseVideo;
-mCallbacks.playMedia = playVideo;
-mCallbacks.previousMedia = previousVideoInQueue;
-mCallbacks.search = searchVideos;
-
 function sendChatMessage(msg: string) {
-    var message: WsMessage;
+    var message = new WsMessage();
     message.Action = 'ChatMessage';
     message.ChatMessage = msg;
     message.User = mMeUser;
@@ -181,7 +192,7 @@ function searchVideos(query, callback) {
 
 function saveUserNameChange(newName) {
     mMeUser.Name = newName;
-    var message: WsMessage;
+    var message = new WsMessage();
     message.User = mMeUser;
     message.Action = 'SaveUserNameChange';
     mSocket.emit(message);
@@ -228,17 +239,21 @@ function queueSelectedVideo(elmnt) {
 	var VideoId = elmnt.getAttribute('data-VideoId');
 	var Title = elmnt.innerText || elmnt.textContent;
 	var ThumbURL = elmnt.getAttribute('data-ThumbURL');
-    var media: Media;
+
+    var media = new Media();
     media.VideoTitle = Title;
     media.VideoTitle = VideoId;
     media.ThumbURL = ThumbURL;
     media.UserId = mMeUser.Id;
     media.UserName = mMeUser.Name;
-    var message: WsMessage;
+
+    var message = new WsMessage();
     message.Action = 'AddMediaToSession';
     message.Media = media;
+
     //TODO: local add media
-    mSocket.emit(media);
+
+    mSocket.emit(message);
 }
 
 

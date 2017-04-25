@@ -1,15 +1,16 @@
 "use strict";
 var frame_1 = require("./frame");
-var Callbacks = (function () {
-    function Callbacks() {
+var UICallbacks = (function () {
+    function UICallbacks() {
     }
-    return Callbacks;
+    return UICallbacks;
 }());
-exports.Callbacks = Callbacks;
+exports.UICallbacks = UICallbacks;
 var UI = (function () {
     function UI(mobileBrowser, callbacks) {
         this.mobileBrowser = mobileBrowser;
         this.frameBuilder = new frame_1.FrameBuilder(mobileBrowser);
+        this.callbacks = callbacks;
         this.initialize();
     }
     UI.prototype.initialize = function () {
@@ -95,23 +96,24 @@ var UI = (function () {
         }
     };
     UI.prototype.setupInputUI = function () {
+        var _this = this;
         var inputSearch = $("#input_search");
         inputSearch.keypress(function (e) {
             if (e.which == 13) {
-                this.search_enter_pressed(inputSearch);
+                _this.searchEnterPressed(inputSearch);
             }
         });
         var input_name = $("#input_name");
         input_name.keypress(function (e) {
             if (e.which == 13) {
-                this.UserNameChange(input_name);
+                _this.userNameChange(input_name);
             }
         });
         if (this.mobileBrowser) {
             var input_chat = $("#input_chat");
             input_chat.keypress(function (e) {
                 if (e.which == 13) {
-                    this.callbacks.send_chat_message(input_chat.val());
+                    _this.callbacks.onSendChatMessage(input_chat.val());
                     input_chat.val("");
                 }
             });
@@ -121,20 +123,21 @@ var UI = (function () {
             $("#input_search").val("");
         }, true);
         $("#input_search").bind("propertychange input paste", function (event) {
-            this.search_text_changed($("#input_search").val());
+            _this.searchTextChanged($("#input_search").val());
         });
     };
     UI.prototype.setupPlayerControlButtons = function () {
+        var _this = this;
         $("#btn_previous").click(this.callbacks.previousMedia);
         $("#btn_pause").click(function () {
             $("#btn_pause").hide();
             $("#btn_play").show();
-            this.callbacks.pauseMedia();
+            _this.callbacks.pauseMedia();
         });
         $("#btn_play").click(function () {
             $("#btn_play").hide();
             $("#btn_uase").show();
-            this.callbacks.playMedia();
+            _this.callbacks.playMedia();
         });
         $("#btn_next").click(this.callbacks.nextMedia);
     };
@@ -185,6 +188,7 @@ var UI = (function () {
         queueResults.html(html.join(""));
     };
     UI.prototype.updateUsersList = function (users, userIdMe) {
+        var _this = this;
         var num = users.length;
         var summary = users.length + " users in the room";
         if (num == 1) {
@@ -196,7 +200,13 @@ var UI = (function () {
         //TODO: put style in css and make scrolley
         $.each(users, function (index, user) {
             var thisIsMe = (user.Id === userIdMe);
-            var currentHTML = this.frame.user(index, user.Id, user.Name, thisIsMe);
+            var currentHTML;
+            if (thisIsMe) {
+                currentHTML = _this.frameBuilder.userMe('green', user.Name);
+            }
+            else {
+                currentHTML = _this.frameBuilder.user('green', user.Id, user.Name);
+            }
             html.push(currentHTML);
         });
         userResults.html(html.join(""));

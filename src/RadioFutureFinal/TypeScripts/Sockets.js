@@ -17,8 +17,11 @@ var MySocket = (function () {
         this.socket = socket;
     }
     MySocket.prototype.emit = function (message) {
+        var _this = this;
         if (this.socket.readyState === this.socket.CONNECTING) {
-            setTimeout(function () { this.emit(message); }, 100);
+            setTimeout(function () {
+                _this.emit(message);
+            }, 100);
             return;
         }
         this.socket.send(JSON.stringify(message));

@@ -1,4 +1,4 @@
-﻿export interface Media {
+﻿export class Media {
     Id: number;
     UserId: number;
     UserName: string;
@@ -7,27 +7,27 @@
     ThumbURL: string;
 }
 
-export interface MyUser {
+export class MyUser {
     Id: number;
     Name: string;
     State: UserState;
 }
 
-export interface UserState {
+export class UserState {
     Time: number;
     QueuePosition: number;
     YTPlayerState: number;
     Waiting: boolean;
 }
 
-export interface Session {
+export class Session {
     Id: number;
     Name: string;
     Users: MyUser[];
     Queue: Media[];
 }
 
-export interface WsMessage {
+export class WsMessage {
     Action: string;
     Session: Session;
     Media: Media;
