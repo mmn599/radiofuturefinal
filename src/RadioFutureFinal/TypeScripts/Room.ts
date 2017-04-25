@@ -94,7 +94,8 @@ function onUserStateProvided(message: WsMessage) {
     mUI.updateQueue(mSession.Queue, mUser.State.QueuePosition);
 
     var currentMedia = mSession.Queue[mUser.State.QueuePosition];
-    mPlayer.setPlayerContent(currentMedia, mUser.State.Time);
+
+    userStateChange();
 }
 
 function onRequestMyUserState(message: WsMessage) {
@@ -175,18 +176,32 @@ function saveUserNameChange(newName) {
     mSocket.emit(message);
 }
 
+function userStateChange() {
+    if (mUser.State.QueuePosition >= 0 && mUser.State.QueuePosition < mSession.Queue.length) {
+        mPlayer.setPlayerContent(mSession.Queue[mUser.State.QueuePosition], mUser.State.Time); 
+        mUser.State.Waiting = false;
+    }
+    else if (mUser.State.QueuePosition < 0) {
+        mUser.State.Waiting = true;
+    }
+    else if (mUser.State.QueuePosition == mSession.Queue.length) {
+        // TODO: set player content to 'waiting on next video'
+        mUser.State.Waiting = true;
+    }
+}
+
 function nextVideoInQueue() {
     mUser.State.Time = 0;
     var queue = mSession.Queue;
 
 	if(mUser.State.QueuePosition + 1 < queue.length) {
         mUser.State.QueuePosition = mUser.State.QueuePosition + 1;
-        mPlayer.setPlayerContent(mSession.Queue[mUser.State.QueuePosition], mUser.State.Time);
-        mUser.State.Waiting = false;
 	}
     else {
-        mUser.State.Waiting = true;
+        mUser.State.QueuePosition = queue.length;
 	}
+
+    userStateChange();
 }
 
 function pauseVideo() {
@@ -202,8 +217,7 @@ function previousVideoInQueue() {
     var queue = mSession.Queue;
 	if(mUser.State.QueuePosition > 0) {
         mUser.State.QueuePosition = mUser.State.QueuePosition - 1;
-        mPlayer.setPlayerContent(mSession.Queue[mUser.State.QueuePosition], mUser.State.Time);
-		mUser.State.Waiting = false;
+        userStateChange();
 	}
 }
 
@@ -246,17 +260,21 @@ function queueSelectedVideo(elmnt) {
     mSocket.emit(message);
 }
 
-// TODO: fix this
-function deleteVideoInQueue(QueuePosition: number) {
-	var id = mSession.Queue[QueuePosition].Id;
-	mSession.Queue.splice(QueuePosition, 1);
+function deleteMedia(mediaId: number, position: number) {
 
+    mSession.Queue.splice(position, 1);
+    if (mUser.State.QueuePosition >= position) {
+        mUser.State.QueuePosition -= 1;
+        userStateChange();
+    }
     mUI.updateQueue(mSession.Queue, mUser.State.QueuePosition);
 
-    var message = new WsMessage();
     var mediaToDelete = new Media();
-    mediaToDelete.Id = id;
+    mediaToDelete.Id = mediaId;
+
+    var message = new WsMessage();
     message.Action = 'DeleteMediaFromSession';
     message.Media = mediaToDelete;
+
     mSocket.emit(message);
 }

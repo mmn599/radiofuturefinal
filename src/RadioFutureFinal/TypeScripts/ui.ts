@@ -9,7 +9,6 @@ export class UICallbacks {
     playMedia: any;
     pauseMedia: any;
     onSendChatMessage: any;
-    // search(query: string, callback: (results: any) => void): any;
     search: any;
     nameChange: any;
 }
@@ -137,7 +136,7 @@ export class UI {
         });
         $("#btn_play").click(() => {
             $("#btn_play").hide();
-            $("#btn_uase").show();
+            $("#btn_pause").show();
             this.callbacks.playMedia();
         });
         $("#btn_next").click(this.callbacks.nextMedia);

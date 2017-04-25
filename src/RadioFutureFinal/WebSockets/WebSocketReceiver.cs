@@ -36,7 +36,6 @@ namespace RadioFutureFinal.WebSockets
                 { "RequestSyncWithUser", RequestSyncWithUser },
                 { "ProvideSyncToUser", ProvideSyncToUser }
             };
-
         }
 
         public void OnConnected(WebSocket socket)

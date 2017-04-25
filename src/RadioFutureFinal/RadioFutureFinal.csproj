@@ -14,10 +14,6 @@
   <ItemGroup>
     <Content Include="wwwroot\css\homepagemobile.css" />
     <Content Include="wwwroot\css\homepagemobile.min.css" />
-    <Content Include="wwwroot\js\homepage - Copy.js">
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-    <Content Include="wwwroot\js\stupid.js" />
   </ItemGroup>
 
   <ItemGroup>

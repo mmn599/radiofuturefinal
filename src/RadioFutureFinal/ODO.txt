@@ -6,10 +6,10 @@
 -search support for podcasts and yt videos
 
 little
+-self delete mechanism
 -lightup current video in queue
 -get css out of html
 -get colors working
--self delete mechanism
 -add very basic exceptions
 
 Performance and Code stuff

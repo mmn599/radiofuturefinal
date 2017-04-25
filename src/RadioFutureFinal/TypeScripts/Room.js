@@ -72,7 +72,7 @@ function onUserStateProvided(message) {
     mUser.State.YTPlayerState = userToSyncWith.State.YTPlayerState;
     mUI.updateQueue(mSession.Queue, mUser.State.QueuePosition);
     var currentMedia = mSession.Queue[mUser.State.QueuePosition];
-    mPlayer.setPlayerContent(currentMedia, mUser.State.Time);
+    userStateChange();
 }
 function onRequestMyUserState(message) {
     var userData = new Contracts_1.MyUser();
@@ -140,17 +140,29 @@ function saveUserNameChange(newName) {
     message.Action = 'SaveUserNameChange';
     mSocket.emit(message);
 }
+function userStateChange() {
+    if (mUser.State.QueuePosition >= 0 && mUser.State.QueuePosition < mSession.Queue.length) {
+        mPlayer.setPlayerContent(mSession.Queue[mUser.State.QueuePosition], mUser.State.Time);
+        mUser.State.Waiting = false;
+    }
+    else if (mUser.State.QueuePosition < 0) {
+        mUser.State.Waiting = true;
+    }
+    else if (mUser.State.QueuePosition == mSession.Queue.length) {
+        // TODO: set player content to 'waiting on next video'
+        mUser.State.Waiting = true;
+    }
+}
 function nextVideoInQueue() {
     mUser.State.Time = 0;
     var queue = mSession.Queue;
     if (mUser.State.QueuePosition + 1 < queue.length) {
         mUser.State.QueuePosition = mUser.State.QueuePosition + 1;
-        mPlayer.setPlayerContent(mSession.Queue[mUser.State.QueuePosition], mUser.State.Time);
-        mUser.State.Waiting = false;
     }
     else {
-        mUser.State.Waiting = true;
+        mUser.State.QueuePosition = queue.length;
     }
+    userStateChange();
 }
 function pauseVideo() {
     mPlayer.pause();
@@ -163,8 +175,7 @@ function previousVideoInQueue() {
     var queue = mSession.Queue;
     if (mUser.State.QueuePosition > 0) {
         mUser.State.QueuePosition = mUser.State.QueuePosition - 1;
-        mPlayer.setPlayerContent(mSession.Queue[mUser.State.QueuePosition], mUser.State.Time);
-        mUser.State.Waiting = false;
+        userStateChange();
     }
 }
 //==================================================================
@@ -197,14 +208,16 @@ function queueSelectedVideo(elmnt) {
     //TODO: local add media
     mSocket.emit(message);
 }
-// TODO: fix this
-function deleteVideoInQueue(QueuePosition) {
-    var id = mSession.Queue[QueuePosition].Id;
-    mSession.Queue.splice(QueuePosition, 1);
+function deleteMedia(mediaId, position) {
+    mSession.Queue.splice(position, 1);
+    if (mUser.State.QueuePosition >= position) {
+        mUser.State.QueuePosition -= 1;
+        userStateChange();
+    }
     mUI.updateQueue(mSession.Queue, mUser.State.QueuePosition);
-    var message = new Contracts_1.WsMessage();
     var mediaToDelete = new Contracts_1.Media();
-    mediaToDelete.Id = id;
+    mediaToDelete.Id = mediaId;
+    var message = new Contracts_1.WsMessage();
     message.Action = 'DeleteMediaFromSession';
     message.Media = mediaToDelete;
     mSocket.emit(message);

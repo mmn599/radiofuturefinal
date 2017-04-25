@@ -136,7 +136,7 @@ var UI = (function () {
         });
         $("#btn_play").click(function () {
             $("#btn_play").hide();
-            $("#btn_uase").show();
+            $("#btn_pause").show();
             _this.callbacks.playMedia();
         });
         $("#btn_next").click(this.callbacks.nextMedia);
