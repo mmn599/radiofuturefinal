@@ -154,7 +154,7 @@ var UI = (function () {
             divResults.fadeIn();
         }
     };
-    UI.prototype.updateQueue = function (queue, queuePosition) {
+    UI.prototype.updateQueue = function (queue, userIdMe, queuePosition) {
         var length = queue.length;
         var lengthUpNext = queue.length - (queuePosition + 1);
         var summary = lengthUpNext + " things up next";
@@ -169,17 +169,7 @@ var UI = (function () {
         var html = [];
         for (var i = (queuePosition + 1); i < length; i++) {
             var media = queue[i];
-            var currentHTML = "";
-            if (this.mobileBrowser) {
-                currentHTML = '<img style="float: left; width: 33.33%; height: 20vw;" src="' + media.ThumbURL + '"/>';
-            }
-            else {
-                currentHTML =
-                    '<div style="text-align: left; display: flex; align-items: center;">' +
-                        '<img style="height: 90px; width: 160px; margin-right: 16px;" src="' + media.ThumbURL + '"/>' +
-                        '<span style="margin-right: 16px;">' + media.VideoTitle + '</span>' +
-                        '</div>';
-            }
+            var currentHTML = this.frameBuilder.media(media, i, media.UserId === userIdMe);
             html.push(currentHTML);
         }
         queueResults.html(html.join(""));
@@ -197,13 +187,7 @@ var UI = (function () {
         //TODO: put style in css and make scrolley
         $.each(users, function (index, user) {
             var thisIsMe = (user.Id === userIdMe);
-            var currentHTML;
-            if (thisIsMe) {
-                currentHTML = _this.frameBuilder.userMe('green', user.Name);
-            }
-            else {
-                currentHTML = _this.frameBuilder.user('green', user.Id, user.Name);
-            }
+            var currentHTML = _this.frameBuilder.user('green', user.Id, user.Name, thisIsMe);
             html.push(currentHTML);
         });
         userResults.html(html.join(""));
@@ -221,4 +205,4 @@ var UI = (function () {
     return UI;
 }());
 exports.UI = UI;
-//# sourceMappingURL=ui.js.map
+//# sourceMappingURL=UI.js.map

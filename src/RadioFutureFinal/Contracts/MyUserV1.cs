@@ -4,6 +4,12 @@ namespace RadioFutureFinal.Contracts
 {
     public class MyUserV1
     {
+        public MyUserV1()
+        {
+            // TODO: this is wacky
+            State = new UserState();
+        }
+
         [JsonProperty]
         public int Id { get; set; }
 

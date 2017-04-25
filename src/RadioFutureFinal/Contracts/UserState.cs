@@ -8,6 +8,14 @@ namespace RadioFutureFinal.Contracts
 {
     public class UserState
     {
+        public UserState()
+        {
+            Time = 0;
+            YTPlayerState = 0;
+            Waiting = true;
+            QueuePosition = -1;
+        }
+
         [JsonProperty]
         public int Time { get; set; }
 

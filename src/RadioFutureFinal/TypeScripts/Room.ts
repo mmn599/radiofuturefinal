@@ -5,6 +5,7 @@
 (<any>window).ytApiReady = ytApiReady;
 (<any>window).queueSelectedVideo = queueSelectedVideo;
 (<any>window).requestSyncWithUser = requestSyncWithUser;
+(<any>window).deleteMedia = deleteMedia;
 
 import { MyUser, Media, Session, UserState, WsMessage } from "./Contracts";
 import { UICallbacks, UI } from "./UI";
@@ -93,7 +94,7 @@ function onUserStateProvided(message: WsMessage) {
     mUser.State.Time = userToSyncWith.State.Time;
     mUser.State.YTPlayerState = userToSyncWith.State.YTPlayerState;
 
-    mUI.updateQueue(mSession.Queue, mUser.State.QueuePosition);
+    mUI.updateQueue(mSession.Queue, mUser.Id, mUser.State.QueuePosition);
 
     var currentMedia = mSession.Queue[mUser.State.QueuePosition];
 
@@ -142,7 +143,7 @@ function onUpdateQueue(message: WsMessage) {
     if (mUser.State.Waiting) {
         nextVideoInQueue();
     }
-    mUI.updateQueue(mSession.Queue, mUser.State.QueuePosition);
+    mUI.updateQueue(mSession.Queue, mUser.Id, mUser.State.QueuePosition);
 }
 
 function onReceivedChatMessage(message: WsMessage) {
@@ -269,7 +270,7 @@ function deleteMedia(mediaId: number, position: number) {
         mUser.State.QueuePosition -= 1;
         userStateChange();
     }
-    mUI.updateQueue(mSession.Queue, mUser.State.QueuePosition);
+    mUI.updateQueue(mSession.Queue, mUser.Id, mUser.State.QueuePosition);
 
     var mediaToDelete = new Media();
     mediaToDelete.Id = mediaId;

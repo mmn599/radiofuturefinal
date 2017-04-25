@@ -9,8 +9,8 @@
     "./TypeScripts/typings/jquery.d.ts",
     "./TypeScripts/Contracts.ts",
     "./TypeScripts/Sockets.ts",
-    "./TypeScripts/frame.ts",
-    "./TypeScripts/ui.ts",
+    "./TypeScripts/FrameBuilder.ts",
+    "./TypeScripts/UI.ts",
     "./TypeScripts/Room.ts"
   ],
   "compileOnSave": true

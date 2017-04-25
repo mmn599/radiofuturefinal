@@ -19,6 +19,14 @@ export class MyUser {
 }
 
 export class UserState {
+
+    constructor() {
+        this.Time = 0;
+        this.QueuePosition = -1;
+        this.YTPlayerState = 0;
+        this.Waiting = false;
+    }
+
     Time: number;
     QueuePosition: number;
     YTPlayerState: number;

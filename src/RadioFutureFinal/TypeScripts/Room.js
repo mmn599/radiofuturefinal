@@ -5,6 +5,7 @@ window.onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
 window.ytApiReady = ytApiReady;
 window.queueSelectedVideo = queueSelectedVideo;
 window.requestSyncWithUser = requestSyncWithUser;
+window.deleteMedia = deleteMedia;
 var Contracts_1 = require("./Contracts");
 var UI_1 = require("./UI");
 var Sockets_1 = require("./Sockets");
@@ -71,7 +72,7 @@ function onUserStateProvided(message) {
     mUser.State.QueuePosition = userToSyncWith.State.QueuePosition;
     mUser.State.Time = userToSyncWith.State.Time;
     mUser.State.YTPlayerState = userToSyncWith.State.YTPlayerState;
-    mUI.updateQueue(mSession.Queue, mUser.State.QueuePosition);
+    mUI.updateQueue(mSession.Queue, mUser.Id, mUser.State.QueuePosition);
     var currentMedia = mSession.Queue[mUser.State.QueuePosition];
     userStateChange();
 }
@@ -111,7 +112,7 @@ function onUpdateQueue(message) {
     if (mUser.State.Waiting) {
         nextVideoInQueue();
     }
-    mUI.updateQueue(mSession.Queue, mUser.State.QueuePosition);
+    mUI.updateQueue(mSession.Queue, mUser.Id, mUser.State.QueuePosition);
 }
 function onReceivedChatMessage(message) {
     var chatMessage = message.ChatMessage;
@@ -215,7 +216,7 @@ function deleteMedia(mediaId, position) {
         mUser.State.QueuePosition -= 1;
         userStateChange();
     }
-    mUI.updateQueue(mSession.Queue, mUser.State.QueuePosition);
+    mUI.updateQueue(mSession.Queue, mUser.Id, mUser.State.QueuePosition);
     var mediaToDelete = new Contracts_1.Media();
     mediaToDelete.Id = mediaId;
     var message = new Contracts_1.WsMessage();

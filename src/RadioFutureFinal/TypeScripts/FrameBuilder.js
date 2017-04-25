@@ -3,30 +3,35 @@ var FrameBuilder = (function () {
     function FrameBuilder(mobileBrowser) {
         this.mobileBrowser = mobileBrowser;
     }
-    FrameBuilder.prototype.userMe = function (color, userName) {
+    FrameBuilder.prototype.user = function (color, userId, userName, thisIsMe) {
         var currentHTML = "";
+        var meHtml = thisIsMe ? 'onclick="requestSyncWithUser(' + userId + ')" ' : "";
+        var syncHTML = thisIsMe ? 'you' : 'sync';
+        var syncHTMLMobile = thisIsMe ? 'you' : 'sync with ' + userName;
         if (this.mobileBrowser) {
-            currentHTML = '<div class="div_user" style="background: ' + color + ';"> you </div>';
+            currentHTML = '<div ' + meHtml + 'class="div_user" style="background: ' + color + ';"> ' + syncHTMLMobile + '</div>';
         }
         else {
             currentHTML =
                 '<div style="text-align: left; display: flex; align-items: center;">' +
-                    '<div style="display: flex; align-items: center; justify-content: center; float: left; cursor: pointer; margin-right: 16px; height: 48px; width: 48px; background: ' + color + ';">you</div>' +
+                    '<div ' + meHtml + 'style="display: flex; align-items: center; justify-content: center; float: left; cursor: pointer; margin-right: 16px; height: 48px; width: 48px; background: ' + color + ';">' + syncHTML + '</div>' +
                     '<span style="margin-right: 16px; float: right;">' + userName + '</span>' +
                     '</div>';
         }
         return currentHTML;
     };
-    FrameBuilder.prototype.user = function (color, userId, userName) {
+    FrameBuilder.prototype.media = function (media, position, recommendedByMe) {
         var currentHTML = "";
         if (this.mobileBrowser) {
-            currentHTML = '<div onclick="requestSyncWithUser(' + userId + ')" class="div_user" style="background: ' + color + ';">sync with ' + userName + '</div>';
+            // TODO: add delete UI
+            currentHTML = '<img style="float: left; width: 33.33%; height: 20vw;" src="' + media.ThumbURL + '"/>';
         }
         else {
             currentHTML =
-                '<div style="text-align: left; display: flex; align-items: center;">' +
-                    '<div onclick="requestSyncWithUser(' + userId + ')" style="display: flex; align-items: center; justify-content: center; float: left; cursor: pointer; margin-right: 16px; height: 48px; width: 48px; background: ' + color + ';">sync</div>' +
-                    '<span style="margin-right: 16px; float: right;">' + userName + '</span>' +
+                // TODO: perfect UI
+                '<div onclick="deleteMedia(' + media.Id + ', ' + position + ')" style="cursor: click; text-align: left; display: flex; align-items: center;">' +
+                    '<img style="height: 90px; width: 160px; margin-right: 16px;" src="' + media.ThumbURL + '"/>' +
+                    '<span style="margin-right: 16px;">' + media.VideoTitle + '</span>' +
                     '</div>';
         }
         return currentHTML;
