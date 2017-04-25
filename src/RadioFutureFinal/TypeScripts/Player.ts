@@ -42,7 +42,7 @@ export class Player {
     public setPlayerContent(media: Media, time: number) {
         if (!this.playerReady) {
             console.log('player not ready!');
-            setTimeout((media, time) => { this.setPlayerContent(media, time) }, 50);
+            setTimeout(() => { this.setPlayerContent(media, time) }, 50);
         }
         else {
             this.updatePlayerUI(media, time);

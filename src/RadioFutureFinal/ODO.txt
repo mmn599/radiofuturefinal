@@ -1,4 +1,7 @@
 ﻿little
+-find out weirdo bug
+
+little
 -delete working on mobile
 -general mobile ui improvements
 -can i recreate that ytPlayerReady notready bug on IE?

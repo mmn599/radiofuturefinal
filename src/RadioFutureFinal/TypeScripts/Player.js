@@ -31,7 +31,7 @@ var Player = (function () {
         var _this = this;
         if (!this.playerReady) {
             console.log('player not ready!');
-            setTimeout(function (media, time) { _this.setPlayerContent(media, time); }, 50);
+            setTimeout(function () { _this.setPlayerContent(media, time); }, 50);
         }
         else {
             this.updatePlayerUI(media, time);

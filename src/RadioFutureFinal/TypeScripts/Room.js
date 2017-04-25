@@ -12,9 +12,9 @@ var Sockets_1 = require("./Sockets");
 var Player_1 = require("./Player");
 var mUser = new Contracts_1.MyUser();
 var mSession = new Contracts_1.Session();
-var mUI;
-var mPlayer;
+var mPlayer = new Player_1.Player(mobileBrowser);
 var mSocket;
+var mUI;
 $(document).ready(function () {
     var callbacks = new UI_1.UICallbacks();
     callbacks.onSendChatMessage = sendChatMessage;
@@ -25,7 +25,6 @@ $(document).ready(function () {
     callbacks.previousMedia = previousVideoInQueue;
     callbacks.search = searchVideos;
     mUI = new UI_1.UI(mobileBrowser, callbacks);
-    mPlayer = new Player_1.Player(mobileBrowser);
     mSocket = new Sockets_1.MySocket(mMessageFunctions);
     setupJamSession();
 });
@@ -94,11 +93,13 @@ function onUpdateMeUser(message) {
 function onSessionReady(message) {
     mSession = message.Session;
     mUser = message.User;
+    // TODO: get rid of this bullshit
     if (mSession.Queue.length == 0) {
         $("#p_current_content_info").text("Queue up a song!");
         $("#p_current_recommender_info").text("Use the search bar above.");
     }
     nextVideoInQueue();
+    mUI.updateQueue(mSession.Queue, mUser.Id, mUser.State.QueuePosition);
     mUI.updateUsersList(mSession.Users, mUser.Id);
     mUI.sessionReady();
 }

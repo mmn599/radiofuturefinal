@@ -17,9 +17,9 @@ declare var gapi: any;
 
 var mUser = new MyUser();
 var mSession = new Session();
-var mUI: UI;
-var mPlayer: Player;
+var mPlayer = new Player(mobileBrowser);
 var mSocket: MySocket;
+var mUI: UI;
 
 $(document).ready(function () {
 
@@ -33,7 +33,6 @@ $(document).ready(function () {
     callbacks.search = searchVideos;
 
     mUI = new UI(mobileBrowser, callbacks);
-    mPlayer = new Player(mobileBrowser);
     mSocket = new MySocket(mMessageFunctions);
 
     setupJamSession();
@@ -123,11 +122,15 @@ function onUpdateMeUser(message: WsMessage) {
 function onSessionReady(message: WsMessage) {
     mSession = message.Session;
     mUser = message.User;
+
+    // TODO: get rid of this bullshit
     if (mSession.Queue.length == 0) {
 		$("#p_current_content_info").text("Queue up a song!");
 		$("#p_current_recommender_info").text("Use the search bar above.");
 	}
+
     nextVideoInQueue();
+    mUI.updateQueue(mSession.Queue, mUser.Id, mUser.State.QueuePosition);
     mUI.updateUsersList(mSession.Users, mUser.Id);
     mUI.sessionReady();
 }
