@@ -1,7 +1,7 @@
 "use strict";
+// TODO: find a better way to expose these functions to html?
 window.onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
 window.ytApiReady = ytApiReady;
-// TODO: find a better way to expose these functions to html?
 window.queueSelectedVideo = queueSelectedVideo;
 window.requestSyncWithUser = requestSyncWithUser;
 var Contracts_1 = require("./Contracts");
@@ -61,7 +61,7 @@ var mMessageFunctions = {
     'sessionReady': onSessionReady,
     'updateUsersList': onUpdateUsersList,
     'updateQueue': onUpdateQueue,
-    'chatMessage': onReceivedChatMessage,
+    'ChatMessage': onReceivedChatMessage,
     'requestUserState': onRequestMyUserState,
     'provideUserState': onUserStateProvided
 };
@@ -186,7 +186,7 @@ function queueSelectedVideo(elmnt) {
     var Title = elmnt.innerText || elmnt.textContent;
     var ThumbURL = elmnt.getAttribute('data-ThumbURL');
     var media = new Contracts_1.Media();
-    media.Id = VideoId;
+    media.YTVideoID = VideoId;
     media.VideoTitle = Title;
     media.ThumbURL = ThumbURL;
     media.UserId = mUser.Id;

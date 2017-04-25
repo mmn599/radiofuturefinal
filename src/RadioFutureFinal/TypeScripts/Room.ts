@@ -1,6 +1,6 @@
-﻿(<any>window).onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
+﻿// TODO: find a better way to expose these functions to html?
+(<any>window).onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
 (<any>window).ytApiReady = ytApiReady;
-// TODO: find a better way to expose these functions to html?
 (<any>window).queueSelectedVideo = queueSelectedVideo;
 (<any>window).requestSyncWithUser = requestSyncWithUser;
 
@@ -79,7 +79,7 @@ var mMessageFunctions = {
     'sessionReady': onSessionReady,
     'updateUsersList': onUpdateUsersList,
     'updateQueue': onUpdateQueue,
-    'chatMessage': onReceivedChatMessage,
+    'ChatMessage': onReceivedChatMessage,
     'requestUserState': onRequestMyUserState,
     'provideUserState': onUserStateProvided
 }
@@ -232,7 +232,7 @@ function queueSelectedVideo(elmnt) {
 	var ThumbURL = elmnt.getAttribute('data-ThumbURL');
 
     var media = new Media();
-    media.Id = VideoId;
+    media.YTVideoID = VideoId;
     media.VideoTitle = Title;
     media.ThumbURL = ThumbURL;
     media.UserId = mUser.Id;

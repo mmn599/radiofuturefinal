@@ -7,6 +7,7 @@ var Media = (function () {
 exports.Media = Media;
 var MyUser = (function () {
     function MyUser() {
+        this.State = new UserState();
     }
     return MyUser;
 }());

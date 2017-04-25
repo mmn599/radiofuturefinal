@@ -6,7 +6,6 @@ export class Player {
 
     private ytPlayer: any;
     private mobileBrowser: boolean;
-
     public playerReady: boolean;
 
     constructor(mobileBrowser: boolean) {
@@ -15,6 +14,7 @@ export class Player {
     }
 
     public initializeYtPlayer(onPlayerStateChange) {
+
         this.ytPlayer = new YT.Player('div_yt_player', {
             height: 'auto',
             width: '100%',
@@ -24,6 +24,7 @@ export class Player {
                 autoplay: 0
             },
             events: {
+                'onReady' : this.onPlayerReady,
                 'onStateChange': onPlayerStateChange
             }
         });
@@ -34,10 +35,19 @@ export class Player {
         }
     }
 
+    public onPlayerReady = () => {
+        this.playerReady = true;
+    }
+
     public setPlayerContent(media: Media, time: number) {
-        var media = media;
-        this.updatePlayerUI(media, time);
-        this.play();
+        if (!this.playerReady) {
+            console.log('player not ready!');
+            setTimeout((media, time) => { this.setPlayerContent(media, time) }, 50);
+        }
+        else {
+            this.updatePlayerUI(media, time);
+            this.play();
+        }
     }
 
     public play() {
@@ -47,6 +57,15 @@ export class Player {
     public pause() {
         this.ytPlayer.pauseVideo();
     }
+
+    public getCurrentTime(): number {
+        return Math.round(this.ytPlayer.getCurrentTime());
+    }
+
+    public getCurrentState(): number {
+        return Math.round(this.ytPlayer.getPlayerState());
+    }
+
 
     private updatePlayerUI(media: Media, time: number) {
         this.ytPlayer.loadVideoById(media.YTVideoID, time, "large");	
@@ -59,14 +78,6 @@ export class Player {
             '</div>';
             $("#div_cc_results").html(html);
         }
-    }
-
-    public getCurrentTime(): number {
-        return Math.round(this.ytPlayer.getCurrentTime());
-    }
-
-    public getCurrentState(): number {
-        return Math.round(this.ytPlayer.getPlayerState());
     }
 
 }

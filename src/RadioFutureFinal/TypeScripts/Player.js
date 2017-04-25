@@ -1,6 +1,10 @@
 "use strict";
 var Player = (function () {
     function Player(mobileBrowser) {
+        var _this = this;
+        this.onPlayerReady = function () {
+            _this.playerReady = true;
+        };
         this.playerReady = false;
         this.mobileBrowser = mobileBrowser;
     }
@@ -14,6 +18,7 @@ var Player = (function () {
                 autoplay: 0
             },
             events: {
+                'onReady': this.onPlayerReady,
                 'onStateChange': onPlayerStateChange
             }
         });
@@ -23,15 +28,27 @@ var Player = (function () {
         }
     };
     Player.prototype.setPlayerContent = function (media, time) {
-        var media = media;
-        this.updatePlayerUI(media, time);
-        this.play();
+        var _this = this;
+        if (!this.playerReady) {
+            console.log('player not ready!');
+            setTimeout(function (media, time) { _this.setPlayerContent(media, time); }, 50);
+        }
+        else {
+            this.updatePlayerUI(media, time);
+            this.play();
+        }
     };
     Player.prototype.play = function () {
         this.ytPlayer.playVideo();
     };
     Player.prototype.pause = function () {
         this.ytPlayer.pauseVideo();
+    };
+    Player.prototype.getCurrentTime = function () {
+        return Math.round(this.ytPlayer.getCurrentTime());
+    };
+    Player.prototype.getCurrentState = function () {
+        return Math.round(this.ytPlayer.getPlayerState());
     };
     Player.prototype.updatePlayerUI = function (media, time) {
         this.ytPlayer.loadVideoById(media.YTVideoID, time, "large");
@@ -43,12 +60,6 @@ var Player = (function () {
                 '</div>';
             $("#div_cc_results").html(html);
         }
-    };
-    Player.prototype.getCurrentTime = function () {
-        return Math.round(this.ytPlayer.getCurrentTime());
-    };
-    Player.prototype.getCurrentState = function () {
-        return Math.round(this.ytPlayer.getPlayerState());
     };
     return Player;
 }());

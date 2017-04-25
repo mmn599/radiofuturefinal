@@ -8,6 +8,11 @@
 }
 
 export class MyUser {
+
+    constructor() {
+        this.State = new UserState();
+    }
+
     Id: number;
     Name: string;
     State: UserState;

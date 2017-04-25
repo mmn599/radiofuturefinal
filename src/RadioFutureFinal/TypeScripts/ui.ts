@@ -110,7 +110,7 @@ export class UI {
                 this.userNameChange(input_name);
             }
         });
-        if (this.mobileBrowser) {
+        if (!this.mobileBrowser) {
             var input_chat = $("#input_chat");
             input_chat.keypress((e) => {
                 if (e.which == 13) {
@@ -159,7 +159,7 @@ export class UI {
 
     public updateQueue(queue: Media[], queuePosition: number) {
         var length = queue.length;
-        var lengthUpNext = queue.length - queuePosition;
+        var lengthUpNext = queue.length - (queuePosition + 1);
         var summary = lengthUpNext + " things up next";
         if (lengthUpNext == 1) {
             summary = lengthUpNext + " thing up next";
@@ -171,7 +171,7 @@ export class UI {
 
         var queueResults = $("#div_queue_results");
         var html = [];
-        for (var i = 0; i < length; i++) {
+        for (var i = (queuePosition + 1); i < length; i++) {
             var media = queue[i];
             var currentHTML = "";
             if (this.mobileBrowser) {
