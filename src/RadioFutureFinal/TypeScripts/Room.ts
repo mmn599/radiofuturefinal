@@ -151,7 +151,7 @@ function setupJamSession() {
 	mSocket.emit(message);
 }
 
-var mCallbacks: Callbacks;
+var mCallbacks = new Callbacks();
 mCallbacks.onSendChatMessage = sendChatMessage;
 mCallbacks.nameChange = saveUserNameChange;
 mCallbacks.nextMedia = nextVideoInQueue;

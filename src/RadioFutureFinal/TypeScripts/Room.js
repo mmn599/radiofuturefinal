@@ -120,7 +120,7 @@ function setupJamSession() {
     message.Session = mSession;
     mSocket.emit(message);
 }
-var mCallbacks;
+var mCallbacks = new ui_1.Callbacks();
 mCallbacks.onSendChatMessage = sendChatMessage;
 mCallbacks.nameChange = saveUserNameChange;
 mCallbacks.nextMedia = nextVideoInQueue;
@@ -199,3 +199,4 @@ function queueSelectedVideo(elmnt) {
     //TODO: local add media
     mSocket.emit(media);
 }
+//# sourceMappingURL=Room.js.map

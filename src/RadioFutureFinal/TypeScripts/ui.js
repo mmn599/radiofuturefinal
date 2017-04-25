@@ -1,5 +1,11 @@
 "use strict";
 var frame_1 = require("./frame");
+var Callbacks = (function () {
+    function Callbacks() {
+    }
+    return Callbacks;
+}());
+exports.Callbacks = Callbacks;
 var UI = (function () {
     function UI(mobileBrowser, callbacks) {
         this.mobileBrowser = mobileBrowser;
@@ -208,3 +214,4 @@ var UI = (function () {
     return UI;
 }());
 exports.UI = UI;
+//# sourceMappingURL=ui.js.map

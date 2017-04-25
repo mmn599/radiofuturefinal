@@ -34,3 +34,4 @@ var FrameBuilder = (function () {
     return FrameBuilder;
 }());
 exports.FrameBuilder = FrameBuilder;
+//# sourceMappingURL=frame.js.map

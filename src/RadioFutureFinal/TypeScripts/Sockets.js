@@ -27,3 +27,4 @@ var MySocket = (function () {
     return MySocket;
 }());
 exports.MySocket = MySocket;
+//# sourceMappingURL=Sockets.js.map

@@ -59,3 +59,4 @@ var Player = (function () {
     return Player;
 }());
 exports.Player = Player;
+//# sourceMappingURL=Player.js.map

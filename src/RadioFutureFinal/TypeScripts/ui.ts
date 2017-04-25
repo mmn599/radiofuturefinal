@@ -3,14 +3,15 @@ import { Media } from "./Contracts";
 
 declare var Spinner: any;
 
-export interface Callbacks {
-    previousMedia(): void;
-    nextMedia(): void;
-    playMedia(): void;
-    pauseMedia(): void;
-    onSendChatMessage(message: string): void;
-    search(query: string, callback: (results: any) => void): any;
-    nameChange(newName: string): void;
+export class Callbacks {
+    previousMedia: any;
+    nextMedia: any;
+    playMedia: any;
+    pauseMedia: any;
+    onSendChatMessage: any;
+    // search(query: string, callback: (results: any) => void): any;
+    search: any;
+    nameChange: any;
 }
 
 export class UI {
@@ -32,7 +33,6 @@ export class UI {
         this.setupInputUI();
         this.setupPlayerControlButtons();
     }
-
 
     public sessionReady() {
         $("#div_loading").hide();

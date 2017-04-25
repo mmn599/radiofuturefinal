@@ -12,7 +12,7 @@ gulp.task("default", function () {
         cache: {},
         packageCache: {}
     })
-        .plugin(tsify, { noImplicitAny: false })
+        .plugin(tsify, { noImplicitAny: false, inlineSourceMap: true, inlineSources: true })
         .bundle()
         .pipe(source('bundle.js'))
         .pipe(gulp.dest("wwwroot/js"));
