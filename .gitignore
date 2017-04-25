@@ -241,4 +241,5 @@ ModelManifest.xml
 # FAKE - F# Make
 .fake/
 
+src/RadioFutureFinal/wwwroot/js/bundle.js
 src/RadioFutureFinal/TypeScripts/*.js.map
