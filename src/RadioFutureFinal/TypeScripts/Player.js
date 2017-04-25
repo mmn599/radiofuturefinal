@@ -22,11 +22,9 @@ var Player = (function () {
             div_player.height(div_player.width() * 9.0 / 16.0);
         }
     };
-    Player.prototype.setPlayerContent = function (queue, userState) {
-        if (userState.QueuePosition != -1) {
-            var media = queue[userState.QueuePosition];
-            this.updatePlayerUI(media, userState.Time);
-        }
+    Player.prototype.setPlayerContent = function (media, time) {
+        var media = media;
+        this.updatePlayerUI(media, time);
         this.play();
     };
     Player.prototype.play = function () {

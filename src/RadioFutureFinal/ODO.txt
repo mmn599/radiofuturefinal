@@ -1,13 +1,14 @@
 ﻿big
--typescript
+-typescript implicit any compilation
 -better websocket message structure
 -ui for podcasts
 -model support for two types of content: yt videos and podcasts
 -search support for podcasts and yt videos
 
 little
+-lightup current video in queue
 -get css out of html
--change the yellow
+-get colors working
 -self delete mechanism
 -add very basic exceptions
 

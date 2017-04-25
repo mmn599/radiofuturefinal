@@ -1,8 +1,8 @@
 ﻿(<any>window).onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
 (<any>window).ytApiReady = ytApiReady;
-//TODO: All this code is miserably awful. At some point it should be completely reworked.
-
-var COLOR_LIST = ["red", "orange", "yellow", "green", "blue", "violet"];
+// TODO: find a better way to expose these functions to html?
+(<any>window).queueSelectedVideo = queueSelectedVideo;
+(<any>window).requestSyncWithUser = requestSyncWithUser;
 
 import { MyUser, Media, Session, UserState, WsMessage } from "./Contracts";
 import { UICallbacks, UI } from "./ui";
@@ -12,7 +12,7 @@ import { Player } from "./Player"
 declare var mobileBrowser: boolean;
 declare var gapi: any;
 
-var mMeUser = new MyUser();
+var mUser = new MyUser();
 var mSession = new Session();
 var mUI: UI;
 var mPlayer: Player;
@@ -37,6 +37,21 @@ $(document).ready(function () {
 });
 
 
+function setupJamSession() {
+	var pathname = window.location.pathname;
+	var encodedSessionName = pathname.replace('\/rooms/', '');
+
+    mSession.Name = decodeURI(encodedSessionName);
+    mUser.Name = 'Anonymous';
+
+    var message = new WsMessage();
+    message.Action = 'UserJoinSession';
+    message.User = mUser;
+    message.Session = mSession;
+
+	mSocket.emit(message);
+}
+
 //==================================================================
 // Functions automatically called when youtube api's are ready
 //==================================================================
@@ -56,23 +71,6 @@ function onPlayerStateChange(event) {
 }
 
 //==================================================================
-// Backend video and queue control functions
-//==================================================================
-function deleteVideoInQueue(QueuePosition: number) {
-	var id = mSession.Queue[QueuePosition].Id;
-	mSession.Queue.splice(QueuePosition, 1);
-
-    mUI.updateQueue(mSession.Queue, mMeUser.State.QueuePosition + 1);
-
-    var message = new WsMessage();
-    var mediaToDelete = new Media();
-    mediaToDelete.Id = id;
-    message.Action = 'DeleteMediaFromSession';
-    message.Media = mediaToDelete;
-    mSocket.emit(message);
-}
-
-//==================================================================
 // WebSocket message response functions
 //==================================================================
 
@@ -88,17 +86,21 @@ var mMessageFunctions = {
 
 function onUserStateProvided(message: WsMessage) {
     var userToSyncWith = message.User;
-    mMeUser.State.QueuePosition = userToSyncWith.State.QueuePosition;
-    mMeUser.State.Time = userToSyncWith.State.Time;
-    mMeUser.State.YTPlayerState = userToSyncWith.State.YTPlayerState;
-    mUI.updateQueue(mSession.Queue, mMeUser.State.QueuePosition + 1);
-    mPlayer.setPlayerContent(mSession.Queue, mMeUser.State);
+
+    mUser.State.QueuePosition = userToSyncWith.State.QueuePosition;
+    mUser.State.Time = userToSyncWith.State.Time;
+    mUser.State.YTPlayerState = userToSyncWith.State.YTPlayerState;
+
+    mUI.updateQueue(mSession.Queue, mUser.State.QueuePosition);
+
+    var currentMedia = mSession.Queue[mUser.State.QueuePosition];
+    mPlayer.setPlayerContent(currentMedia, mUser.State.Time);
 }
 
 function onRequestMyUserState(message: WsMessage) {
     var userData = new MyUser();
     userData.Id = message.User.Id; // TODO: bad bad bad
-    userData.State.QueuePosition = mMeUser.State.QueuePosition;
+    userData.State.QueuePosition = mUser.State.QueuePosition;
     userData.State.Time = Math.round(mPlayer.getCurrentTime());
     userData.State.YTPlayerState = mPlayer.getCurrentState();
 
@@ -111,62 +113,46 @@ function onRequestMyUserState(message: WsMessage) {
 
 function onUpdateMeUser(message: WsMessage) {
     var user = message.User;
-    mMeUser = user;	
+    mUser = user;	
 }
 
 function onSessionReady(message: WsMessage) {
     mSession = message.Session;
-    mMeUser = message.User;
+    mUser = message.User;
     if (mSession.Queue.length == 0) {
 		$("#p_current_content_info").text("Queue up a song!");
 		$("#p_current_recommender_info").text("Use the search bar above.");
 	}
     nextVideoInQueue();
-    mUI.updateUsersList(mSession.Users, mMeUser.Id);
+    mUI.updateUsersList(mSession.Users, mUser.Id);
     mUI.sessionReady();
 }
 
 function onUpdateUsersList(message: WsMessage) {
     var users = message.Session.Users;
     mSession.Users = users;
-    mUI.updateUsersList(mSession.Users, mMeUser.Id);	
+    mUI.updateUsersList(mSession.Users, mUser.Id);	
 }
 
 function onUpdateQueue(message: WsMessage) {
-    var queue = message.Session.Queue;
-    mSession.Queue = queue;
-    mUI.updateQueue(queue, mMeUser.State.QueuePosition + 1);
-    if (mMeUser.State.Waiting) {
+    mSession.Queue = message.Session.Queue;
+    if (mUser.State.Waiting) {
         nextVideoInQueue();
     }
+    mUI.updateQueue(mSession.Queue, mUser.State.QueuePosition);
 }
 
-function onReceivedChatMessage(data) {
-	var msg = data.ChatMessage;
-    var userName = data.User.Name;
-    mUI.onChatMessage(userName, msg);
-}
-
-function setupJamSession() {
-	var pathname = window.location.pathname;
-	var encodedSessionName = pathname.replace('\/rooms/', '');
-
-    mSession.Name = decodeURI(encodedSessionName);
-    mMeUser.Name = 'Anonymous';
-
-    var message = new WsMessage();
-    message.Action = 'UserJoinSession';
-    message.User = mMeUser;
-    message.Session = mSession;
-
-	mSocket.emit(message);
+function onReceivedChatMessage(message: WsMessage) {
+    var chatMessage = message.ChatMessage;
+    var userName = message.User.Name;
+    mUI.onChatMessage(userName, chatMessage);
 }
 
 function sendChatMessage(msg: string) {
     var message = new WsMessage();
     message.Action = 'ChatMessage';
     message.ChatMessage = msg;
-    message.User = mMeUser;
+    message.User = mUser;
     mSocket.emit(message);
 }
 
@@ -182,23 +168,24 @@ function searchVideos(query, callback) {
 }
 
 function saveUserNameChange(newName) {
-    mMeUser.Name = newName;
+    mUser.Name = newName;
     var message = new WsMessage();
-    message.User = mMeUser;
+    message.User = mUser;
     message.Action = 'SaveUserNameChange';
     mSocket.emit(message);
 }
 
 function nextVideoInQueue() {
-    mMeUser.State.Time = 0;
+    mUser.State.Time = 0;
     var queue = mSession.Queue;
-	if((mMeUser.State.QueuePosition+1)<queue.length) {
-        mMeUser.State.QueuePosition = mMeUser.State.QueuePosition + 1;
-        mPlayer.setPlayerContent(mSession.Queue, mMeUser.State);
-        mMeUser.State.Waiting = false;
+
+	if(mUser.State.QueuePosition + 1 < queue.length) {
+        mUser.State.QueuePosition = mUser.State.QueuePosition + 1;
+        mPlayer.setPlayerContent(mSession.Queue[mUser.State.QueuePosition], mUser.State.Time);
+        mUser.State.Waiting = false;
 	}
     else {
-        mMeUser.State.Waiting = true;
+        mUser.State.Waiting = true;
 	}
 }
 
@@ -211,12 +198,12 @@ function playVideo() {
 }
 
 function previousVideoInQueue() {
-    mMeUser.State.Time = 0;
+    mUser.State.Time = 0;
     var queue = mSession.Queue;
-	if(mMeUser.State.QueuePosition > 0) {
-        mMeUser.State.QueuePosition = mMeUser.State.QueuePosition - 1;
-        mPlayer.setPlayerContent(mSession.Queue, mMeUser.State);
-		mMeUser.State.Waiting = false;
+	if(mUser.State.QueuePosition > 0) {
+        mUser.State.QueuePosition = mUser.State.QueuePosition - 1;
+        mPlayer.setPlayerContent(mSession.Queue[mUser.State.QueuePosition], mUser.State.Time);
+		mUser.State.Waiting = false;
 	}
 }
 
@@ -224,9 +211,6 @@ function previousVideoInQueue() {
 //==================================================================
 // These functions are called directly embedded into the html... kinda weird
 //==================================================================
-// TODO: find a better way to expose these functions
-(<any>window).queueSelectedVideo = queueSelectedVideo;
-(<any>window).requestSyncWithUser = requestSyncWithUser;
 
 function requestSyncWithUser(userId) {
     console.log('request sync with user');
@@ -248,16 +232,31 @@ function queueSelectedVideo(elmnt) {
 	var ThumbURL = elmnt.getAttribute('data-ThumbURL');
 
     var media = new Media();
+    media.Id = VideoId;
     media.VideoTitle = Title;
-    media.VideoTitle = VideoId;
     media.ThumbURL = ThumbURL;
-    media.UserId = mMeUser.Id;
-    media.UserName = mMeUser.Name;
+    media.UserId = mUser.Id;
+    media.UserName = mUser.Name;
 
     var message = new WsMessage();
     message.Action = 'AddMediaToSession';
     message.Media = media;
 
     //TODO: local add media
+    mSocket.emit(message);
+}
+
+// TODO: fix this
+function deleteVideoInQueue(QueuePosition: number) {
+	var id = mSession.Queue[QueuePosition].Id;
+	mSession.Queue.splice(QueuePosition, 1);
+
+    mUI.updateQueue(mSession.Queue, mUser.State.QueuePosition);
+
+    var message = new WsMessage();
+    var mediaToDelete = new Media();
+    mediaToDelete.Id = id;
+    message.Action = 'DeleteMediaFromSession';
+    message.Media = mediaToDelete;
     mSocket.emit(message);
 }

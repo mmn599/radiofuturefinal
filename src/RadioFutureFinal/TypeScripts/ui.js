@@ -167,23 +167,20 @@ var UI = (function () {
         $("#p_queue_summary").text(summary);
         var queueResults = $("#div_queue_results");
         var html = [];
-        if (lengthUpNext > 0) {
-            //TODO: put style in css and make scrolley
-            for (var i = queuePosition; i < length; i++) {
-                var media = queue[i];
-                var currentHTML = "";
-                if (this.mobileBrowser) {
-                    currentHTML = '<img style="float: left; width: 33.33%; height: 20vw;" src="' + media.ThumbURL + '"/>';
-                }
-                else {
-                    currentHTML =
-                        '<div style="text-align: left; display: flex; align-items: center;">' +
-                            '<img style="height: 90px; width: 160px; margin-right: 16px;" src="' + media.ThumbURL + '"/>' +
-                            '<span style="margin-right: 16px;">' + media.VideoTitle + '</span>' +
-                            '</div>';
-                }
-                html.push(currentHTML);
+        for (var i = 0; i < length; i++) {
+            var media = queue[i];
+            var currentHTML = "";
+            if (this.mobileBrowser) {
+                currentHTML = '<img style="float: left; width: 33.33%; height: 20vw;" src="' + media.ThumbURL + '"/>';
             }
+            else {
+                currentHTML =
+                    '<div style="text-align: left; display: flex; align-items: center;">' +
+                        '<img style="height: 90px; width: 160px; margin-right: 16px;" src="' + media.ThumbURL + '"/>' +
+                        '<span style="margin-right: 16px;">' + media.VideoTitle + '</span>' +
+                        '</div>';
+            }
+            html.push(currentHTML);
         }
         queueResults.html(html.join(""));
     };

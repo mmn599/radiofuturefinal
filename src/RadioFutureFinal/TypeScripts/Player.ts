@@ -34,11 +34,9 @@ export class Player {
         }
     }
 
-    public setPlayerContent(queue: Media[], userState: UserState) {
-        if (userState.QueuePosition != -1) {
-            var media = queue[userState.QueuePosition];
-            this.updatePlayerUI(media, userState.Time);		
-        }
+    public setPlayerContent(media: Media, time: number) {
+        var media = media;
+        this.updatePlayerUI(media, time);
         this.play();
     }
 
