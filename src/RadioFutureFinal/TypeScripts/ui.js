@@ -8,6 +8,7 @@ var UICallbacks = (function () {
 exports.UICallbacks = UICallbacks;
 var UI = (function () {
     function UI(mobileBrowser, callbacks) {
+        this.colors = ['red', 'orange', 'yellow', 'green', 'blue', 'violet'];
         this.mobileBrowser = mobileBrowser;
         this.frameBuilder = new FrameBuilder_1.FrameBuilder(mobileBrowser);
         this.callbacks = callbacks;
@@ -175,7 +176,6 @@ var UI = (function () {
         queueResults.html(html.join(""));
     };
     UI.prototype.updateUsersList = function (users, userIdMe) {
-        var _this = this;
         var num = users.length;
         var summary = users.length + " users in the room";
         if (num == 1) {
@@ -184,12 +184,12 @@ var UI = (function () {
         $("#p_users_summary").text(summary);
         var userResults = $("#div_user_results");
         var html = [];
-        //TODO: put style in css and make scrolley
-        $.each(users, function (index, user) {
+        for (var i = 0; i < users.length; i++) {
+            var user = users[i];
             var thisIsMe = (user.Id === userIdMe);
-            var currentHTML = _this.frameBuilder.user('green', user.Id, user.Name, thisIsMe);
+            var currentHTML = this.frameBuilder.user(this.colors[i % this.colors.length], user.Id, user.Name, thisIsMe);
             html.push(currentHTML);
-        });
+        }
         userResults.html(html.join(""));
     };
     UI.prototype.userNameChange = function (name_input) {

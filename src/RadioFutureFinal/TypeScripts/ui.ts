@@ -15,12 +15,14 @@ export class UICallbacks {
 
 export class UI {
 
+    private colors: any;
     private spinner: any;
     private callbacks: UICallbacks;
     private mobileBrowser: boolean;
     private frameBuilder: FrameBuilder;
 
     constructor(mobileBrowser: boolean, callbacks: UICallbacks) {
+        this.colors = ['red', 'orange', 'yellow', 'green', 'blue', 'violet'];
         this.mobileBrowser = mobileBrowser;
         this.frameBuilder = new FrameBuilder(mobileBrowser);
         this.callbacks = callbacks;
@@ -189,12 +191,12 @@ export class UI {
         $("#p_users_summary").text(summary);
         var userResults = $("#div_user_results");
         var html = [];
-        //TODO: put style in css and make scrolley
-        $.each(users, (index, user) => {
+        for (var i = 0; i < users.length; i++) {
+            var user = users[i];
             var thisIsMe = (user.Id === userIdMe);
-            var currentHTML = this.frameBuilder.user('green', user.Id, user.Name, thisIsMe);
+            var currentHTML = this.frameBuilder.user(this.colors[i % this.colors.length], user.Id, user.Name, thisIsMe);
             html.push(currentHTML);
-        });
+        }
         userResults.html(html.join(""));
     }
 

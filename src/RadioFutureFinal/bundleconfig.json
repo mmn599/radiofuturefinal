@@ -10,9 +10,9 @@
   },
 
   {
-    "outputFileName": "wwwroot/js/musicroom.min.js",
+    "outputFileName": "wwwroot/js/bundle.min.js",
     "inputFiles": [
-      "wwwroot/js/musicroom.js"
+      "wwwroot/js/bundle.js"
     ],
     // Optionally specify minification options
     "minify": {
@@ -20,7 +20,7 @@
       "renameLocals": true
     },
     // Optinally generate .map file
-    "sourceMap": false
+    "sourceMap": true
   },
 
   {

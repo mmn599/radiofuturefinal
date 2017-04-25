@@ -1,14 +1,7 @@
 ﻿little
--stop current video if deleted
--lightup current video in queue
--check ui on desktop and mobile
--get user colors working
-
-=============================
-
-little
 -delete working on mobile
 -general mobile ui improvements
+-can i recreate that ytPlayerReady notready bug on IE?
 
 big
 -typescript implicit any compilation
