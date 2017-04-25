@@ -4,7 +4,8 @@
     "noEmitOnError": true,
     "sourceMap": true,
     "target": "es5",
-    "outDir": "./wwwroot/js"
+    "module": "system",
+    "outFile": "./wwwroot/js/musicroom.js"
   },
   "files": [
     "./TypeScripts/typings/jquery.d.ts",

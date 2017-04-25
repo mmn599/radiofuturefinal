@@ -14,8 +14,6 @@
   <ItemGroup>
     <Content Include="wwwroot\css\homepagemobile.css" />
     <Content Include="wwwroot\css\homepagemobile.min.css" />
-    <Content Include="wwwroot\js\musicroom.js" />
-    <Content Include="wwwroot\js\musicroom.min.js" />
     <Content Include="wwwroot\js\room\musicroom.js" />
     <Content Include="wwwroot\js\room\musicroom.min.js" />
     <Content Include="wwwroot\js\room\ui.js" />
