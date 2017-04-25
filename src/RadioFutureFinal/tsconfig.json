@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": false,
+    "noEmitOnError": true,
+    "sourceMap": true,
+    "target": "es5"
+  },
+  "files": [
+    "./TypeScripts/typings/jquery.d.ts",
+    "./TypeScripts/Contracts.ts",
+    "./TypeScripts/Sockets.ts",
+    "./TypeScripts/frame.ts",
+    "./TypeScripts/ui.ts",
+    "./TypeScripts/Room.ts"
+  ],
+  "compileOnSave": true
+}
