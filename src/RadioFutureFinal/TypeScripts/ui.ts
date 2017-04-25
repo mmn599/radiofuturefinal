@@ -170,9 +170,10 @@ export class UI {
 
         var queueResults = $("#div_queue_results");
         var html = [];
-        for (var i = (queuePosition + 1); i < length; i++) {
+        for (var i = 0; i < length; i++) {
             var media = queue[i];
-            var currentHTML = this.frameBuilder.media(media, i, media.UserId === userIdMe);
+            var onThis = i === queuePosition;
+            var currentHTML = this.frameBuilder.media(media, i, media.UserId === userIdMe, onThis);
             html.push(currentHTML);
         }
 

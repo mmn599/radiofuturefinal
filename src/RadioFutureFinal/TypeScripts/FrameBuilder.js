@@ -20,7 +20,7 @@ var FrameBuilder = (function () {
         }
         return currentHTML;
     };
-    FrameBuilder.prototype.media = function (media, position, recommendedByMe) {
+    FrameBuilder.prototype.media = function (media, position, recommendedByMe, onThis) {
         var currentHTML = "";
         if (this.mobileBrowser) {
             // TODO: add delete UI

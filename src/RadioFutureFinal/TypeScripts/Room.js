@@ -147,12 +147,11 @@ function userStateChange() {
         mPlayer.setPlayerContent(mSession.Queue[mUser.State.QueuePosition], mUser.State.Time);
         mUser.State.Waiting = false;
     }
-    else if (mUser.State.QueuePosition < 0) {
+    else if (mUser.State.QueuePosition < 0 || mUser.State.QueuePosition == mSession.Queue.length) {
+        // TODO: set player content to 'waiting on next video'
         mUser.State.Waiting = true;
     }
     else if (mUser.State.QueuePosition == mSession.Queue.length) {
-        // TODO: set player content to 'waiting on next video'
-        mUser.State.Waiting = true;
     }
 }
 function nextVideoInQueue() {
@@ -161,7 +160,7 @@ function nextVideoInQueue() {
     if (mUser.State.QueuePosition + 1 < queue.length) {
         mUser.State.QueuePosition = mUser.State.QueuePosition + 1;
     }
-    else {
+    else if (mUser.State.QueuePosition >= 0) {
         mUser.State.QueuePosition = queue.length;
     }
     userStateChange();

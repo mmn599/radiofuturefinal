@@ -1,19 +1,20 @@
-﻿big
+﻿little
+-self delete mechanism
+-lightup current video in queue
+-check ui on desktop and mobile
+-get colors working
+
+big
 -typescript implicit any compilation
 -better websocket message structure
 -ui for podcasts
 -model support for two types of content: yt videos and podcasts
 -search support for podcasts and yt videos
 
-little
--self delete mechanism
--lightup current video in queue
--get css out of html
--get colors working
--add very basic exceptions
-
 Performance and Code stuff
--TODO: better way of detecting faulty websockets and closing them
+-add very basic exceptions
+-get css out of html
+-better way of detecting faulty websockets and closing them
 -Make a websocket receiver factory?
 -Setup typescript
 -Do a real analysis of which websocket requests should be async

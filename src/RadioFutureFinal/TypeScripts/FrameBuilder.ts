@@ -26,7 +26,7 @@ export class FrameBuilder {
         return currentHTML;
     }
 
-    public media(media: Media, position: number, recommendedByMe: boolean) {
+    public media(media: Media, position: number, recommendedByMe: boolean, onThis: boolean) {
         var currentHTML = ""
         if (this.mobileBrowser) {
             // TODO: add delete UI
