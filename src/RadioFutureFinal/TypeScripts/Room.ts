@@ -1,4 +1,6 @@
-﻿//TODO: All this code is miserably awful. At some point it should be completely reworked.
+﻿(<any>window).onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
+(<any>window).ytApiReady = ytApiReady;
+//TODO: All this code is miserably awful. At some point it should be completely reworked.
 
 var COLOR_LIST = ["red", "orange", "yellow", "green", "blue", "violet"];
 
@@ -30,6 +32,7 @@ $(document).ready(function () {
     mUI = new UI(mobileBrowser, callbacks);
     mPlayer = new Player(mobileBrowser);
     mSocket = new MySocket(mMessageFunctions);
+
     setupJamSession();
 });
 
@@ -41,7 +44,7 @@ function onYouTubeIframeAPIReady() {
     mPlayer.initializeYtPlayer(onPlayerStateChange);
 }
 
-function youtubeAPIInit() {
+function ytApiReady() {
 	gapi.client.setApiKey("AIzaSyC4A-dsGk-ha_b-eDpbxaVQt5bR7cOUddc");
 	gapi.client.load("youtube", "v3", function() {});
 }

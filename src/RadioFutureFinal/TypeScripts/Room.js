@@ -1,5 +1,7 @@
-//TODO: All this code is miserably awful. At some point it should be completely reworked.
 "use strict";
+window.onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
+window.ytApiReady = ytApiReady;
+//TODO: All this code is miserably awful. At some point it should be completely reworked.
 var COLOR_LIST = ["red", "orange", "yellow", "green", "blue", "violet"];
 var Contracts_1 = require("./Contracts");
 var ui_1 = require("./ui");
@@ -30,7 +32,7 @@ $(document).ready(function () {
 function onYouTubeIframeAPIReady() {
     mPlayer.initializeYtPlayer(onPlayerStateChange);
 }
-function youtubeAPIInit() {
+function ytApiReady() {
     gapi.client.setApiKey("AIzaSyC4A-dsGk-ha_b-eDpbxaVQt5bR7cOUddc");
     gapi.client.load("youtube", "v3", function () { });
 }
