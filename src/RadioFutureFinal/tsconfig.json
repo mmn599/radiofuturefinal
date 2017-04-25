@@ -2,7 +2,7 @@
   "compilerOptions": {
     "noImplicitAny": false,
     "noEmitOnError": true,
-    "target": "es5",
+    "target": "es5"
   },
   "files": [
     "./TypeScripts/typings/jquery.d.ts",
