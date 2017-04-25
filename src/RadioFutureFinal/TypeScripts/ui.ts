@@ -146,8 +146,8 @@ export class UI {
     private searchEnterPressed(input_search) {
         var divResults = $("#div_search_results");
         divResults.html("");
-        var response = this.callbacks.search(input_search.val(), (results) => {
-            $.each(response.items, (index, item) => {
+        this.callbacks.search(input_search.val(), (results) => {
+            $.each(results.items, (index, item) => {
                 divResults.html(divResults.html() + "<div class='div_search_result' onClick='queueSelectedVideo(this)' data-VideoId='" + item.id.videoId + "' data-ThumbURL='"+item.snippet.thumbnails.medium.url+"'>" + '<p class="text_search_result">' +  item.snippet.title+ '</p></div>' );
             });
             input_search.blur();

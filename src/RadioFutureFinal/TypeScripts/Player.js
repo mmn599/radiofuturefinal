@@ -14,7 +14,6 @@ var Player = (function () {
                 autoplay: 0
             },
             events: {
-                'onReady': this.onPlayerReady,
                 'onStateChange': onPlayerStateChange
             }
         });
@@ -52,9 +51,6 @@ var Player = (function () {
     };
     Player.prototype.getCurrentState = function () {
         return Math.round(this.ytPlayer.getPlayerState());
-    };
-    Player.prototype.onPlayerReady = function (event) {
-        this.playerReady = true;
     };
     return Player;
 }());

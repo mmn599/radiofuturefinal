@@ -55,15 +55,6 @@ function deleteVideoInQueue(QueuePosition) {
     message.Media = mediaToDelete;
     mSocket.emit(message);
 }
-function requestSyncWithUser(userId) {
-    console.log('request sync with user');
-    var user = new Contracts_1.MyUser();
-    user.Id = userId;
-    var message = new Contracts_1.WsMessage();
-    message.Action = 'RequestSyncWithUser';
-    message.User = user;
-    mSocket.emit(message);
-}
 //==================================================================
 // WebSocket message response functions
 //==================================================================
@@ -192,6 +183,18 @@ function previousVideoInQueue() {
 //==================================================================
 // These functions are called directly embedded into the html... kinda weird
 //==================================================================
+// TODO: find a better way to expose these functions
+window.queueSelectedVideo = queueSelectedVideo;
+window.requestSyncWithUser = requestSyncWithUser;
+function requestSyncWithUser(userId) {
+    console.log('request sync with user');
+    var user = new Contracts_1.MyUser();
+    user.Id = userId;
+    var message = new Contracts_1.WsMessage();
+    message.Action = 'RequestSyncWithUser';
+    message.User = user;
+    mSocket.emit(message);
+}
 function queueSelectedVideo(elmnt) {
     $("#div_search_results").fadeOut();
     $("#input_search").val("");

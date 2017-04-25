@@ -24,7 +24,6 @@ export class Player {
                 autoplay: 0
             },
             events: {
-                'onReady': this.onPlayerReady,
                 'onStateChange': onPlayerStateChange
             }
         });
@@ -71,12 +70,5 @@ export class Player {
     public getCurrentState(): number {
         return Math.round(this.ytPlayer.getPlayerState());
     }
-
-    private onPlayerReady(event) {
-        this.playerReady = true;
-    }
-
-
-
 
 }
