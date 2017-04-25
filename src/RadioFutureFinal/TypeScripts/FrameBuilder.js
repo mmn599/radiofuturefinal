@@ -22,6 +22,9 @@ var FrameBuilder = (function () {
     };
     FrameBuilder.prototype.media = function (media, position, recommendedByMe, onThis) {
         var currentHTML = "";
+        var canDeleteThis = recommendedByMe && !onThis;
+        var deleteThisHTML = canDeleteThis ? 'title="Click to delete this from the queue!" onclick="deleteMedia(' + media.Id + ', ' + position + ')" ' : "";
+        var styleHTML = canDeleteThis ? "cursor: pointer; " : "";
         if (this.mobileBrowser) {
             // TODO: add delete UI
             currentHTML = '<img style="float: left; width: 33.33%; height: 20vw;" src="' + media.ThumbURL + '"/>';
@@ -29,7 +32,7 @@ var FrameBuilder = (function () {
         else {
             currentHTML =
                 // TODO: perfect UI
-                '<div onclick="deleteMedia(' + media.Id + ', ' + position + ')" style="cursor: click; text-align: left; display: flex; align-items: center;">' +
+                '<div ' + deleteThisHTML + 'style="' + styleHTML + 'text-align: left; display: flex; align-items: center;">' +
                     '<img style="height: 90px; width: 160px; margin-right: 16px;" src="' + media.ThumbURL + '"/>' +
                     '<span style="margin-right: 16px;">' + media.VideoTitle + '</span>' +
                     '</div>';

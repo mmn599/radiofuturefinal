@@ -156,13 +156,12 @@ var UI = (function () {
     };
     UI.prototype.updateQueue = function (queue, userIdMe, queuePosition) {
         var length = queue.length;
-        var lengthUpNext = queue.length - (queuePosition + 1);
-        var summary = lengthUpNext + " things up next";
-        if (lengthUpNext == 1) {
-            summary = lengthUpNext + " thing up next";
+        var summary = length + " things in the playlist";
+        if (length == 1) {
+            summary = length + " thing in the playlist";
         }
-        else if (lengthUpNext <= 0) {
-            summary = "Nothing up next. Queue something!";
+        else if (length <= 0) {
+            summary = "Nothing in the playlist. Queue something!";
         }
         $("#p_queue_summary").text(summary);
         var queueResults = $("#div_queue_results");

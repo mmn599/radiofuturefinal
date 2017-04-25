@@ -1,8 +1,15 @@
 ﻿little
 -self delete mechanism
+-stop current video if deleted
 -lightup current video in queue
 -check ui on desktop and mobile
 -get colors working
+
+=============================
+
+little
+-delete working on mobile
+-general mobile ui improvements
 
 big
 -typescript implicit any compilation
@@ -10,6 +17,7 @@ big
 -ui for podcasts
 -model support for two types of content: yt videos and podcasts
 -search support for podcasts and yt videos
+
 
 Performance and Code stuff
 -add very basic exceptions

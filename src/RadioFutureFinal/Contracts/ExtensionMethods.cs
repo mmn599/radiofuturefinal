@@ -57,7 +57,7 @@ namespace RadioFutureFinal.Contracts
             var mediaModel = new Media()
             {
                 MediaID = media.Id,
-                UserID = media.UserID,
+                UserID = media.UserId,
                 UserName = media.UserName,
                 YTVideoID = media.YTVideoID,
                 VideoTitle = media.VideoTitle,
@@ -71,7 +71,7 @@ namespace RadioFutureFinal.Contracts
             var mediaContract = new MediaV1()
             {
                 Id = media.MediaID,
-                UserID = media.UserID,
+                UserId = media.UserID,
                 UserName = media.UserName,
                 YTVideoID = media.YTVideoID,
                 ThumbURL = media.ThumbURL,
