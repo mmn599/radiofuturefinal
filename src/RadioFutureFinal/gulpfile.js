@@ -8,7 +8,7 @@ gulp.task("default", function () {
     return browserify({
         basedir: '.',
         debug: true,
-        entries: ['TypeScripts/Contracts.ts', 'TypeScripts/frame.ts', 'TypeScripts/Player.ts', 'TypeScripts/Room.ts', 'TypeScripts/Sockets.ts', 'TypeScripts/ui.ts'],
+        entries: ['TypeScripts/Contracts.ts', 'TypeScripts/FrameBuilder.ts', 'TypeScripts/Player.ts', 'TypeScripts/Room.ts', 'TypeScripts/Sockets.ts', 'TypeScripts/UI.ts'],
         cache: {},
         packageCache: {}
     })

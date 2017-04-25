@@ -1,5 +1,5 @@
 "use strict";
-var frame_1 = require("./frame");
+var FrameBuilder_1 = require("./FrameBuilder");
 var UICallbacks = (function () {
     function UICallbacks() {
     }
@@ -9,7 +9,7 @@ exports.UICallbacks = UICallbacks;
 var UI = (function () {
     function UI(mobileBrowser, callbacks) {
         this.mobileBrowser = mobileBrowser;
-        this.frameBuilder = new frame_1.FrameBuilder(mobileBrowser);
+        this.frameBuilder = new FrameBuilder_1.FrameBuilder(mobileBrowser);
         this.callbacks = callbacks;
         this.initialize();
     }

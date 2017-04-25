@@ -1,11 +1,13 @@
-﻿// TODO: find a better way to expose these functions to html?
+﻿// This is all pretty bad code. Should be thoroughly reorganized.
+
+// TODO: find a better way to expose these functions to html?
 (<any>window).onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
 (<any>window).ytApiReady = ytApiReady;
 (<any>window).queueSelectedVideo = queueSelectedVideo;
 (<any>window).requestSyncWithUser = requestSyncWithUser;
 
 import { MyUser, Media, Session, UserState, WsMessage } from "./Contracts";
-import { UICallbacks, UI } from "./ui";
+import { UICallbacks, UI } from "./UI";
 import { MySocket } from "./Sockets"
 import { Player } from "./Player"
 

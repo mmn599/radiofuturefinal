@@ -1,4 +1,4 @@
-﻿import { FrameBuilder } from "./frame";
+﻿import { FrameBuilder } from "./FrameBuilder";
 import { Media } from "./Contracts";
 
 declare var Spinner: any;

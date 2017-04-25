@@ -1,3 +1,4 @@
+// This is all pretty bad code. Should be thoroughly reorganized.
 "use strict";
 // TODO: find a better way to expose these functions to html?
 window.onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
@@ -5,7 +6,7 @@ window.ytApiReady = ytApiReady;
 window.queueSelectedVideo = queueSelectedVideo;
 window.requestSyncWithUser = requestSyncWithUser;
 var Contracts_1 = require("./Contracts");
-var ui_1 = require("./ui");
+var UI_1 = require("./UI");
 var Sockets_1 = require("./Sockets");
 var Player_1 = require("./Player");
 var mUser = new Contracts_1.MyUser();
@@ -14,7 +15,7 @@ var mUI;
 var mPlayer;
 var mSocket;
 $(document).ready(function () {
-    var callbacks = new ui_1.UICallbacks();
+    var callbacks = new UI_1.UICallbacks();
     callbacks.onSendChatMessage = sendChatMessage;
     callbacks.nameChange = saveUserNameChange;
     callbacks.nextMedia = nextVideoInQueue;
@@ -22,7 +23,7 @@ $(document).ready(function () {
     callbacks.playMedia = playVideo;
     callbacks.previousMedia = previousVideoInQueue;
     callbacks.search = searchVideos;
-    mUI = new ui_1.UI(mobileBrowser, callbacks);
+    mUI = new UI_1.UI(mobileBrowser, callbacks);
     mPlayer = new Player_1.Player(mobileBrowser);
     mSocket = new Sockets_1.MySocket(mMessageFunctions);
     setupJamSession();
