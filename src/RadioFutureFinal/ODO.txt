@@ -1,9 +1,8 @@
 ﻿little
--self delete mechanism
 -stop current video if deleted
 -lightup current video in queue
 -check ui on desktop and mobile
--get colors working
+-get user colors working
 
 =============================
 

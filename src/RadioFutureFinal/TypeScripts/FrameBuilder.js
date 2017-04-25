@@ -24,15 +24,15 @@ var FrameBuilder = (function () {
         var currentHTML = "";
         var canDeleteThis = recommendedByMe && !onThis;
         var deleteThisHTML = canDeleteThis ? 'title="Click to delete this from the queue!" onclick="deleteMedia(' + media.Id + ', ' + position + ')" ' : "";
-        var styleHTML = canDeleteThis ? "cursor: pointer; " : "";
+        var canDeleteStyle = canDeleteThis ? "cursor: pointer; " : "";
+        var onThisStyle = onThis ? "border: 1px solid blue; " : "";
         if (this.mobileBrowser) {
             // TODO: add delete UI
-            currentHTML = '<img style="float: left; width: 33.33%; height: 20vw;" src="' + media.ThumbURL + '"/>';
+            currentHTML = '<img style="' + onThisStyle + 'float: left; width: 33.33%; height: 20vw;" src="' + media.ThumbURL + '"/>';
         }
         else {
             currentHTML =
-                // TODO: perfect UI
-                '<div ' + deleteThisHTML + 'style="' + styleHTML + 'text-align: left; display: flex; align-items: center;">' +
+                '<div ' + deleteThisHTML + 'style="' + canDeleteStyle + onThisStyle + 'text-align: left; display: flex; align-items: center;">' +
                     '<img style="height: 90px; width: 160px; margin-right: 16px;" src="' + media.ThumbURL + '"/>' +
                     '<span style="margin-right: 16px;">' + media.VideoTitle + '</span>' +
                     '</div>';
