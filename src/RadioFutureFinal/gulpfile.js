@@ -1,4 +1,5 @@
-﻿var gulp = require("gulp");
+﻿/// <binding BeforeBuild='default' />
+var gulp = require("gulp");
 var browserify = require("browserify");
 var source = require('vinyl-source-stream');
 var tsify = require("tsify");
@@ -11,7 +12,7 @@ gulp.task("default", function () {
         cache: {},
         packageCache: {}
     })
-        .plugin(tsify, { noImplicitAny: true })
+        .plugin(tsify, { noImplicitAny: false })
         .bundle()
         .pipe(source('bundle.js'))
         .pipe(gulp.dest("wwwroot/js"));
