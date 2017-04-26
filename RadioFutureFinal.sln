@@ -9,6 +9,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RadioFutureFinal", "src\RadioFutureFinal\RadioFutureFinal.csproj", "{939C9613-C0C7-45F2-9456-A15BC6A0206D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RadioFutureFinal.Tests", "RadioFutureFinal.Tests\RadioFutureFinal.Tests.csproj", "{E12AD657-73FC-40AB-8691-18F561E32240}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -19,11 +21,16 @@ Global
 		{939C9613-C0C7-45F2-9456-A15BC6A0206D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{939C9613-C0C7-45F2-9456-A15BC6A0206D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{939C9613-C0C7-45F2-9456-A15BC6A0206D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E12AD657-73FC-40AB-8691-18F561E32240}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E12AD657-73FC-40AB-8691-18F561E32240}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E12AD657-73FC-40AB-8691-18F561E32240}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E12AD657-73FC-40AB-8691-18F561E32240}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{939C9613-C0C7-45F2-9456-A15BC6A0206D} = {6EDE94D8-87F1-4BA4-9EB2-5579A9C927B8}
+		{E12AD657-73FC-40AB-8691-18F561E32240} = {6EDE94D8-87F1-4BA4-9EB2-5579A9C927B8}
 	EndGlobalSection
 EndGlobal
