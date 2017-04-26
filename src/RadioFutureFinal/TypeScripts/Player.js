@@ -23,7 +23,7 @@ var Player = (function () {
             }
         });
         if (this.mobileBrowser) {
-            var div_player = $("#div_player");
+            var div_player = $("#div_yt_player");
             div_player.height(div_player.width() * 9.0 / 16.0);
         }
     };
