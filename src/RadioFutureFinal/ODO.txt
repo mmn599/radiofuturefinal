@@ -1,7 +1,5 @@
 ﻿little
 -find out weirdo bug
-
-little
 -delete working on mobile
 -general mobile ui improvements
 -can i recreate that ytPlayerReady notready bug on IE?
@@ -13,8 +11,8 @@ big
 -model support for two types of content: yt videos and podcasts
 -search support for podcasts and yt videos
 
-
 Performance and Code stuff
+-basic testing framework
 -add very basic exceptions
 -get css out of html
 -better way of detecting faulty websockets and closing them
