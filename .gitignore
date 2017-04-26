@@ -243,3 +243,5 @@ ModelManifest.xml
 
 src/RadioFutureFinal/wwwroot/js/bundle.js
 src/RadioFutureFinal/TypeScripts/*.js.map
+src/RadioFutureFinal/wwwroot/js/bundle.min.js
+src/RadioFutureFinal/wwwroot/js/bundle.min.js.map
