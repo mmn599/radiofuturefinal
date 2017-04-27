@@ -4,7 +4,7 @@ using System.Linq;
 using System.Net.WebSockets;
 using System.Threading.Tasks;
 
-namespace RadioFutureFinal.WebSockets
+namespace RadioFutureFinal.Messaging
 {
     public interface IMyContext
     {
@@ -12,8 +12,7 @@ namespace RadioFutureFinal.WebSockets
         MySocket GetSocketIdForUser(int sessionId, int userId);
         List<MySocket> GetSocketsInSession(int sessionId);
         void SocketConnected(WebSocket socket);
+        Task SocketDisconnected(WebSocket socket);
         void SocketJoinSession(MySocket socket, int sessionId, int userId);
-        Task RemoveSocketFromContext(MySocket mySocket);
-        Task RemoveSocketFromContext(WebSocket socket);
     }
 }

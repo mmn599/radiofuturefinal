@@ -1,5 +1,5 @@
 ﻿using RadioFutureFinal.DAL;
-using RadioFutureFinal.WebSockets;
+using RadioFutureFinal.Messaging;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -8,21 +8,21 @@ using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace RadioFutureFinal.WebSockets
+namespace RadioFutureFinal.Messaging
 {
     public class MyContext : IMyContext
     {
         IDbRepository _db;
-        IWebSocketSender _wsSender;
+        IMessageSender _wsSender;
 
         // key is session id
         ConcurrentDictionary<int, List<MySocket>> _activeSession;
         ConcurrentDictionary<WebSocket, MySocket> _activeSockets;
 
-        public MyContext(IDbRepository db, WebSocketSenderFactory wsSenderFactory)
+        public MyContext(IDbRepository db, IMessageSender wsSender)
         {
             _db = db;
-            _wsSender = wsSenderFactory.Create(RemoveSocketFromContext);
+            _wsSender = wsSender;
             _activeSockets = new ConcurrentDictionary<WebSocket, MySocket>();
             _activeSession = new ConcurrentDictionary<int, List<MySocket>>();
         }
@@ -123,8 +123,10 @@ namespace RadioFutureFinal.WebSockets
             return socketsInSession;
         }
 
-        public async Task RemoveSocketFromContext(MySocket mySocket)
+        public async Task SocketDisconnected(WebSocket socket)
         {
+            var mySocket = GetMySocket(socket);
+
             var sessionId = mySocket.SessionId;
             var userId = mySocket.UserId;
 
@@ -140,12 +142,6 @@ namespace RadioFutureFinal.WebSockets
             {
                 await _wsSender.ClientsUpdateSessionUsers(updatedSession, remainingSocketsInSession);
             }
-        }
-
-        public async Task RemoveSocketFromContext(WebSocket socket)
-        {
-            var mySocket = GetMySocket(socket);
-            await RemoveSocketFromContext(mySocket);
         }
 
         private string CreateConnectionId()

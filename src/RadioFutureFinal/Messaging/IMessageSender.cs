@@ -1,13 +1,11 @@
 ﻿using RadioFutureFinal.Contracts;
 using RadioFutureFinal.Models;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
-namespace RadioFutureFinal.WebSockets
+namespace RadioFutureFinal.Messaging
 {
-    interface IWebSocketSender
+    public interface IMessageSender
     {
         Task<SendResult> ClientSessionReady(MySocket socket, Session session, MyUser user);
         Task<SendResult> ClientRequestUserState(int userIdRequestor, int userIdRequestee, MySocket userSocket); 

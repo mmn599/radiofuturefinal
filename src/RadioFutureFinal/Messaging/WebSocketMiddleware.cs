@@ -6,18 +6,20 @@ using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace RadioFutureFinal.WebSockets
+namespace RadioFutureFinal.Messaging
 {
     public class WebSocketMiddleware
     {
         private readonly RequestDelegate _next;
-        private IWebSocketReceiver _webSocketReceiver { get; set; }
+        private IMessageReceiverBase _messageReceiveBase { get; set; }
+        private IMyContext _myContext { get; set; }
 
         public WebSocketMiddleware(RequestDelegate next,
-                                          IWebSocketReceiver webSocketReceiver)
+                                          IMessageReceiverBase receiver, IMyContext context)
         {
             _next = next;
-            _webSocketReceiver = webSocketReceiver;
+            _messageReceiveBase = receiver;
+            _myContext = context;
         }
 
         public async Task Invoke(HttpContext context)
@@ -28,19 +30,19 @@ namespace RadioFutureFinal.WebSockets
             }
 
             var socket = await context.WebSockets.AcceptWebSocketAsync();
-            _webSocketReceiver.OnConnected(socket);
+            _myContext.SocketConnected(socket);
 
             await Receive(socket, async (result, buffer) =>
             {
                 if (result.MessageType == WebSocketMessageType.Text)
                 {
-                    await _webSocketReceiver.ReceiveAsync(socket, result, buffer);
+                    await _messageReceiveBase.ReceiveMessageAsync(socket, result, buffer);
                     return;
                 }
 
                 else if (result.MessageType == WebSocketMessageType.Close)
                 {
-                    await _webSocketReceiver.OnDisconnected(socket);
+                    await _myContext.SocketDisconnected(socket);
                     return;
                 }
             });

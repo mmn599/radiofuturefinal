@@ -8,21 +8,22 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RadioFutureFinal.WebSockets
+namespace RadioFutureFinal.Messaging
 {
-    public class WebSocketReceiver : IWebSocketReceiver
+    public class MessageReceiver : IMessageReceiver
     {
         IMyContext _myContext;
         IDbRepository _db;
-        IWebSocketSender _wsSender;
+        IMessageSender _sender;
         Dictionary<string, ResponseFunction> _responses;
+
         public delegate Task ResponseFunction(WsMessage message, MySocket socket);
 
-        public WebSocketReceiver(IDbRepository db, IMyContext myContext, WebSocketSenderFactory wsSenderFactory)
+        public MessageReceiver(IDbRepository db, IMyContext myContext, IMessageSender sender)
         {
             _myContext = myContext;
             _db = db;
-            _wsSender = wsSenderFactory.Create(myContext.RemoveSocketFromContext);
+            _sender = sender;
 
             // TODO: probably put this somehwere else?
             _responses = new Dictionary<string, ResponseFunction>()
@@ -37,23 +38,9 @@ namespace RadioFutureFinal.WebSockets
             };
         }
 
-        public void OnConnected(WebSocket socket)
+        public async Task HandleMessage(WsMessage wsMessage, WebSocket senderSocket)
         {
-            _myContext.SocketConnected(socket);
-        }
-
-        public async Task OnDisconnected(WebSocket socket)
-        {
-            await _myContext.RemoveSocketFromContext(socket);
-        }
-
-        // TODO: how neccesary is this being async?
-        public async Task ReceiveAsync(WebSocket socket, WebSocketReceiveResult result, byte[] buffer)
-        {
-            var strMessage = Encoding.UTF8.GetString(buffer, 0, result.Count);
-            WsMessage wsMessage = JsonConvert.DeserializeObject<WsMessage>(strMessage);
-            MySocket mySocket = _myContext.GetMySocket(socket);
-
+            MySocket mySocket = _myContext.GetMySocket(senderSocket);
             ResponseFunction responseFunction;
             var validAction = _responses.TryGetValue(wsMessage.Action, out responseFunction);
             if (validAction)
@@ -65,12 +52,11 @@ namespace RadioFutureFinal.WebSockets
                 // TODO: real exception
                 throw new Exception();
             }
-
         }
 
-        // TODO: significant bug where additional session is created with same name if two request are made in similar times
+        // TODO: significant bug where additional session is created with same name if two request are made in similar times. I may have fixed it
         // TODO: WsMessage shouldn't be same for every message
-        private async Task JoinSession(WsMessage message, MySocket socket)
+        public async Task JoinSession(WsMessage message, MySocket socket)
         {
             var sessionName = message.Session.Name;
             Session session = null;
@@ -86,53 +72,53 @@ namespace RadioFutureFinal.WebSockets
 
             _myContext.SocketJoinSession(socket, sessionId, user.MyUserId);
 
-            await _wsSender.ClientSessionReady(socket, session, user);
-            await _wsSender.ClientsUpdateSessionUsers(session, _myContext.GetSocketsInSession(sessionId));
+            await _sender.ClientSessionReady(socket, session, user);
+            await _sender.ClientsUpdateSessionUsers(session, _myContext.GetSocketsInSession(sessionId));
         }
 
-        private async Task AddMediaToSession(WsMessage message, MySocket socket)
+        public async Task AddMediaToSession(WsMessage message, MySocket socket)
         {
             var sessionId = socket.SessionId;
             var updatedSession = await _db.AddMediaToSessionAsync(message.Media.ToModel(), sessionId);
-            await _wsSender.ClientsUpdateSessionQueue(updatedSession, _myContext.GetSocketsInSession(sessionId));
+            await _sender.ClientsUpdateSessionQueue(updatedSession, _myContext.GetSocketsInSession(sessionId));
         }
 
-        private async Task DeleteMediaFromSession(WsMessage message, MySocket socket)
+        public async Task DeleteMediaFromSession(WsMessage message, MySocket socket)
         {
             var sessionId = socket.SessionId;
             var updatedSession = await _db.RemoveMediaAsync(sessionId, message.Media.Id);
-            await _wsSender.ClientsUpdateSessionQueue(updatedSession, _myContext.GetSocketsInSession(sessionId));
+            await _sender.ClientsUpdateSessionQueue(updatedSession, _myContext.GetSocketsInSession(sessionId));
         }
 
         // TODO: don't use whole session
-        private async Task SaveUserNameChange(WsMessage message, MySocket socket)
+        public async Task SaveUserNameChange(WsMessage message, MySocket socket)
         {
             var user = message.User;
             await _db.UpdateUserNameAsync(user.Id, user.Name);
             var sessionId = socket.SessionId;
             var session = _db.GetSession(sessionId);
-            await _wsSender.ClientsUpdateSessionUsers(session, _myContext.GetSocketsInSession(sessionId));
+            await _sender.ClientsUpdateSessionUsers(session, _myContext.GetSocketsInSession(sessionId));
         }
 
-        private async Task ChatMessage(WsMessage message, MySocket socket)
+        public async Task ChatMessage(WsMessage message, MySocket socket)
         {
-            await _wsSender.ClientsSendChatMessage(message, _myContext.GetSocketsInSession(socket.SessionId));
+            await _sender.ClientsSendChatMessage(message, _myContext.GetSocketsInSession(socket.SessionId));
         }
 
-        private async Task RequestSyncWithUser(WsMessage message, MySocket socket)
+        public async Task RequestSyncWithUser(WsMessage message, MySocket socket)
         {
             var userIdRequestor = socket.UserId;
             var userIdRequestee = message.User.Id;
             var socketRequestee = _myContext.GetSocketIdForUser(socket.SessionId, userIdRequestee);
-            await _wsSender.ClientRequestUserState(userIdRequestor, userIdRequestee, socketRequestee);
+            await _sender.ClientRequestUserState(userIdRequestor, userIdRequestee, socketRequestee);
         }
 
-        private async Task ProvideSyncToUser(WsMessage message, MySocket socket)
+        public async Task ProvideSyncToUser(WsMessage message, MySocket socket)
         {
             // TODO: user ID represents the user to send to. this is stupid. WsMessage needs to be split up.
             var userIdToSendTo = message.User.Id; // <--- dumb!
             var socketToSendTo = _myContext.GetSocketIdForUser(socket.SessionId, userIdToSendTo);
-            await _wsSender.ClientProvideUserState(message.User, socketToSendTo);
+            await _sender.ClientProvideUserState(message.User, socketToSendTo);
         }
     }
 }

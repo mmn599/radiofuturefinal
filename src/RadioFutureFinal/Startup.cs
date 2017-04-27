@@ -11,7 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using RadioFutureFinal.Data;
 using RadioFutureFinal.Models;
-using RadioFutureFinal.WebSockets;
+using RadioFutureFinal.Messaging;
 using RadioFutureFinal.DAL;
 using Microsoft.AspNetCore.Http;
 using System.Reflection;
@@ -40,9 +40,12 @@ namespace RadioFutureFinal
 
             services.AddSingleton(Configuration);
             services.AddSingleton<IDbRepository, DbRepository>();
-            services.AddSingleton<WebSocketSenderFactory>();
+
             services.AddSingleton<IMyContext, MyContext>();
-            services.AddSingleton<IWebSocketReceiver, WebSocketReceiver>();
+            services.AddSingleton<IMessageSenderBase, MessageSenderBase>();
+            services.AddSingleton<IMessageReceiverBase, IMessageReceiverBase>();
+            services.AddSingleton<IMessageSender, MessageSender>();
+            services.AddSingleton<IMessageReceiver, MessageReceiver>();
         }
         
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -64,7 +67,7 @@ namespace RadioFutureFinal
 
             app.UseStaticFiles();
             app.UseWebSockets();
-            app.Map("/ws", (_app) => _app.UseMiddleware<WebSocketMiddleware>(serviceProvider.GetService<IWebSocketReceiver>()));
+            app.Map("/ws", (_app) => _app.UseMiddleware<WebSocketMiddleware>(serviceProvider.GetService<IMessageReceiver>()));
 
             app.UseMvc(routes =>
             {
