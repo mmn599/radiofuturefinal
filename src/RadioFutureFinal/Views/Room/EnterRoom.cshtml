@@ -8,64 +8,57 @@
     <link href="https://fonts.googleapis.com/css?family=Cousine" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:300" rel="stylesheet" type="text/css">
     <script src="~/js/spin.js"></script>
-    <script>var mobileBrowser = false;</script> 
-    <script src="~/js/bundle.js"></script>
+    <script>var mobileBrowser = false;</script>
+    <script src="~/js/roombundle.js"></script>
     <script src="https://apis.google.com/js/client.js?onload=ytApiReady"></script>
     <script src="https://www.youtube.com/iframe_api"></script>
 </head>
 <body style="overflow: hidden;">
     <div class="everything" id="div_loading"></div>
     <div class="everything" id="div_everything">
+
         <div id="div_all_info">
-            <div id="div_users_overall" style="padding-left: 1%; justify-content: flex-start; width: 24%;" class="info">
-                <img style="margin-right: 8px;" src="~/images/drop-down.png" />
+            <div id="div_users_overall" class="info">
+                <img class="img_drop_right" src="~/images/drop-down.png" />
                 <p id="p_users_summary"></p>
-                <div id="div_user_results" class="results">
-                </div>
+                <div id="div_user_results" class="results"></div>
             </div>
-            <div class="info" style="width: 50%; justify-content: center;">
+            <div class="info" id="div_search">
                 <input class="myinput" id="input_name" placeholder="type in your name and press enter">
                 <input class="myinput" id="input_search" placeholder="type in an artist and song name and press enter">
                 <div id="div_search_results" class="results"></div>
             </div>
-            <div style="width: 24%; padding-right: 1%; justify-content: flex-end;" id="div_queue_overall" class="info">
+            <div id="div_queue_overall" class="info">
                 <p id="p_queue_summary">Nothing in the playlist. Queue something!</p>
-                <img style="margin-left: 8px;" src="~/images/drop-down.png" />
-                <div id="div_queue_results" class="results">
-                </div>
+                <img class="img_drop_left" src="~/images/drop-down.png" />
+                <div id="div_queue_results" class="results"></div>
             </div>
         </div>
+
         <div id="div_current_content">
             <div class="div_player" id="div_yt_player"></div>
-            <!--
-            <div class="div_player" id="div_podcast_player">
-                <audio controls style="margin-top: 22.5%;">
-                    <source id="player_podcasts" src="https://dfkfj8j276wwv.cloudfront.net/episodes/09d23b4f-a0b1-4e7e-814c-671665752644/5970f9b6c107f4b18d3c15734611a455ed72cd7d70da9fb90012beca34d8b09b58cf425ba99cb2161771bc1dff3b10cfe5f389a4d18da8b09c453f7a960ac9d9/PSA%20-%20042017.mp3" type="audio/mp3">
-                </audio>
-            </div>
-            -->
         </div>
+
         <div id="div_current_content_info">
-            <div id="div_cc_overall" style="justify-content: flex-start; padding-left: 1%; width: 32.33%;" class="info">
-                <div id="div_cc_results" class="results">
-                </div>
-                <img style="margin-right: 8px;" src="~/images/drop-up.png" />
+            <div id="div_cc_overall" class="info">
+                <div id="div_cc_results" class="results"></div>
+                <img class="img_drop_right" src="~/images/drop-up.png" />
                 <p id="p_cc_summary">Queue up a video!</p>
             </div>
-            <div style="width: 33.33%; justify-content: center;"  class="info">
-                <img id="btn_previous" src="../images/arrows-1.png" style="cursor: pointer"/>
-                <img id="btn_pause" src="../images/pause-button.png" style="margin-left: 5%; margin-right: 5%; cursor: pointer" />
-                <img id="btn_play" src="../images/play-button.png" style="margin-left: 5%; margin-right: 5%; cursor: pointer" />
-                <img id="btn_next" src="../images/arrows.png" style="cursor: pointer"/>
+            <div id="div_player_controls" class="info">
+                <img id="btn_previous" class="btn_controls" src="../images/arrows-1.png" />
+                <img id="btn_pause" class="btn_controls" src="../images/pause-button.png" />
+                <img id="btn_play" class="btn_controls" src="../images/play-button.png" />
+                <img id="btn_next" class="btn_controls" src="../images/arrows.png" />
             </div>
-            <div id="div_chat_overall" style="padding-right: 1%; justify-content: flex-end; width: 32.33%;" class="info">
-                <div id="div_chat_results" style="display: none; padding: 0; overflow: auto;" class="results">
-                    <ul style="margin: 2%; padding: 0; list-style: none;" id="ul_chat">
-                    </ul>
+            <div id="div_chat_overall" class="info">
+                <div id="div_chat_results" class="results">
+                    <ul id="ul_chat"></ul>
                 </div>
-                <input class="myinput" id="input_chat" placeholder="Enter your chat message"/>
+                <input class="myinput" id="input_chat" placeholder="Enter your chat message" />
             </div>
         </div>
+
     </div>
 </body>
 </html>
