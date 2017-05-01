@@ -22,7 +22,7 @@ var FrameBuilder = (function () {
     };
     FrameBuilder.prototype.media = function (media, position, recommendedByMe, onThis) {
         var currentHTML = "";
-        var canDeleteThis = recommendedByMe && !onThis;
+        var canDeleteThis = recommendedByMe; //&& !onThis;
         var deleteThisHTML = canDeleteThis ? 'title="Click to delete this from the queue!" onclick="deleteMedia(' + media.Id + ', ' + position + ')" ' : "";
         var canDeleteStyle = canDeleteThis ? "cursor: pointer; " : "";
         var onThisStyle = onThis ? "border: 1px solid blue; " : "";

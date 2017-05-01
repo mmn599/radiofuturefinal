@@ -202,7 +202,6 @@ input:focus {
 
 #div_chat_results {
     right: 0;
-    display: inline-block;
     width: 20%;
     height: 12%;
     bottom: 5%;

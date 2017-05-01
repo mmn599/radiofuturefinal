@@ -28,7 +28,7 @@ export class FrameBuilder {
 
     public media(media: Media, position: number, recommendedByMe: boolean, onThis: boolean) {
         var currentHTML = "";
-        var canDeleteThis = recommendedByMe && !onThis;
+        var canDeleteThis = recommendedByMe; //&& !onThis;
         var deleteThisHTML = canDeleteThis ? 'title="Click to delete this from the queue!" onclick="deleteMedia(' + media.Id + ', ' + position + ')" ' : "";
         var canDeleteStyle = canDeleteThis ? "cursor: pointer; " : "";
         var onThisStyle = onThis ? "border: 1px solid blue; " : "";
