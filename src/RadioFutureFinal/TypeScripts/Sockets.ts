@@ -1,24 +1,46 @@
 ﻿import { WsMessage } from "./Contracts";
 
+export interface ClientActions {
+
+    clientUpdateUser: (message: WsMessage) => void;
+    clientSessionReady: (message: WsMessage) => void;
+    clientUpdateUsersList: (message: WsMessage) => void;
+    clientUpdateQueue: (message: WsMessage) => void;
+    clientChatMessage: (message: WsMessage) => void;
+    clientRequestUserState: (message: WsMessage) => void;
+    clientProvideUserState: (message: WsMessage) => void;
+
+}
+
 export class MySocket {
 
     private socket: WebSocket;
-    private response_functions: { [action: string]: (data: any) => void };
+    private clientActions: ClientActions;
 
-    constructor(response_functions: { [action: string]: (message: WsMessage) => void }) {
-        this.response_functions = response_functions;
+    constructor(clientActions: ClientActions) {
+
+        this.clientActions = clientActions;
+
         var uri = "ws://" + window.location.host + "/ws";
         var socket = new WebSocket(uri);
         socket.onopen = function (event) {};
         socket.onclose = function (event) {};
-        socket.onmessage = function (event) {
+
+        socket.onmessage = (event) => {
             var message = JSON.parse(event.data);
             var action = message.Action;
-            var responsefunc = response_functions[action];
-            // TODO: exception when not found
-            responsefunc(message);
+            if (clientActions[action]) {
+                clientActions[action](action); 
+            }
+            else {
+                // TODO: exception
+            }
         };
-        socket.onerror = function (event) {};
+
+        socket.onerror = function (event) {
+            // TODO: handle
+        };
+
         this.socket = socket;
     }
 
@@ -26,7 +48,7 @@ export class MySocket {
         if (this.socket.readyState === this.socket.CONNECTING) {
             setTimeout(() => {
                 this.emit(message);
-            }, 100);
+            }, 50);
             return;
         }
         this.socket.send(JSON.stringify(message));

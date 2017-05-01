@@ -4,7 +4,7 @@ import { Media } from "./Contracts";
 declare var Spinner: any;
 
 // TODO: make this an interface
-export class UICallbacks {
+export interface UICallbacks {
     previousMedia: any;
     nextMedia: any;
     playMedia: any;

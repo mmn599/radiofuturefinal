@@ -18,7 +18,7 @@ namespace RadioFutureFinal.Messaging
         {
             // TODO: How can I make sure this is somewhat updated properly?
             var wsMessage = new WsMessage();
-            wsMessage.Action = "sessionReady";
+            wsMessage.Action = "clientSessionReady";
             wsMessage.Session = session.ToContract(); 
             wsMessage.User = user.ToContract();
 
@@ -28,7 +28,7 @@ namespace RadioFutureFinal.Messaging
         public async Task<SendResult> ClientRequestUserState(int userIdRequestor, int userIdRequestee, MySocket userSocket)
         {
             var wsMessage = new WsMessage();
-            wsMessage.Action = "requestUserState";
+            wsMessage.Action = "clientRequestUserState";
             wsMessage.User = new MyUserV1();
             wsMessage.User.Id = userIdRequestor;
 
@@ -38,7 +38,7 @@ namespace RadioFutureFinal.Messaging
         public async Task<SendResult> ClientProvideUserState(MyUserV1 userInfo, MySocket userToSendTo)
         {
             var wsMessage = new WsMessage();
-            wsMessage.Action = "provideUserState";
+            wsMessage.Action = "clientProvideUserState";
             wsMessage.User = userInfo;
             wsMessage.User.Id = -1; // TODO: this is because of crappy message system
 
@@ -56,18 +56,19 @@ namespace RadioFutureFinal.Messaging
         // TODO: don't use full WsMessage
         public async Task<List<SendResult>> ClientsSendChatMessage(WsMessage message, List<MySocket> socketsInSession)
         {
+            message.ChatMessage = "clientChatMessage";
             return await _senderBase.SendMessageToSessionAsync(message, socketsInSession);
         }
 
         //TODO: probably shouldn't be sending full session for user and queue updates
         public async Task<List<SendResult>> ClientsUpdateSessionUsers(Session session, List<MySocket> socketsInSession)
         {
-            return await ClientsUpdateSession(session, "updateUsersList", socketsInSession);
+            return await ClientsUpdateSession(session, "clientUpdateUsersList", socketsInSession);
         }
 
         public async Task<List<SendResult>> ClientsUpdateSessionQueue(Session session, List<MySocket> socketsInSession)
         {
-            return await ClientsUpdateSession(session, "updateQueue", socketsInSession);
+            return await ClientsUpdateSession(session, "clientUpdateQueue", socketsInSession);
         }
     }
 }

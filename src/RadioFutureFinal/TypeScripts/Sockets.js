@@ -1,7 +1,7 @@
 "use strict";
 var MySocket = (function () {
-    function MySocket(response_functions) {
-        this.response_functions = response_functions;
+    function MySocket(clientActions) {
+        this.clientActions = clientActions;
         var uri = "ws://" + window.location.host + "/ws";
         var socket = new WebSocket(uri);
         socket.onopen = function (event) { };
@@ -9,11 +9,15 @@ var MySocket = (function () {
         socket.onmessage = function (event) {
             var message = JSON.parse(event.data);
             var action = message.Action;
-            var responsefunc = response_functions[action];
-            // TODO: exception when not found
-            responsefunc(message);
+            if (clientActions[action]) {
+                clientActions[action](action);
+            }
+            else {
+            }
         };
-        socket.onerror = function (event) { };
+        socket.onerror = function (event) {
+            // TODO: handle
+        };
         this.socket = socket;
     }
     MySocket.prototype.emit = function (message) {
@@ -21,7 +25,7 @@ var MySocket = (function () {
         if (this.socket.readyState === this.socket.CONNECTING) {
             setTimeout(function () {
                 _this.emit(message);
-            }, 100);
+            }, 50);
             return;
         }
         this.socket.send(JSON.stringify(message));
