@@ -13,22 +13,11 @@ namespace RadioFutureFinal.Controllers
         {
             ViewData["roomName"] = roomName;
             ViewData["roomType"] = roomType;
-            if(roomType == "podcasts")
+            if(Utils.BroserIsMobile(HttpContext))
             {
-                return View("~/Views/Room/PodcastRoom.cshtml");
+                return View("~/Views/Room/RoomViewMobile.cshtml");
             }
-            else if(roomType == "youtube")
-            {
-                if(Utils.BroserIsMobile(HttpContext))
-                {
-                    return View("~/Views/Room/YTRoomMobile.cshtml");
-                }
-                return View("~/Views/Room/YTRoom.cshtml");
-            }
-            else
-            {
-                return View("~/Views/Error/Error.cshtml");
-            }
+            return View("~/Views/Room/RoomView.cshtml");
         }
     }
 }
