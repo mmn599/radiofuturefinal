@@ -20,7 +20,7 @@ gulp.task("default", function () {
             "./TypeScripts/YtPlayer.ts",
             "./TypeScripts/ISearcher.ts",
             "./TypeScripts/PodcastSearcher.ts",
-            "./TypeScripts/YtSearcher.ts",
+            "./TypeScripts/YtSearcher.ts"
         ],
         cache: {},
         packageCache: {}
