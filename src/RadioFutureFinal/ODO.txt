@@ -1,11 +1,10 @@
 ﻿little
--find out weirdo bug
 -delete working on mobile
 -general mobile ui improvements
--can i recreate that ytPlayerReady notready bug on IE?
 -update bundle config
 
 big
+-make sure podcast/youtube sessions dont cross over
 -typescript implicit any compilation
 -better websocket message structure
 -ui for podcasts
