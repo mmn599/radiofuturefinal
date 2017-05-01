@@ -1,7 +1,6 @@
 ﻿// This is all pretty bad code. Should be thoroughly reorganized.
 
 // TODO: find a better way to expose these functions to html?
-(<any>window).ytApiReady = ytApiReady;
 (<any>window).queueSelectedVideo = queueSelectedVideo;
 (<any>window).requestSyncWithUser = requestSyncWithUser;
 (<any>window).deleteMedia = deleteMedia;
@@ -12,6 +11,8 @@ import { MySocket } from "./Sockets";
 import { IPlayer } from "./IPlayer";
 import { PodcastPlayer } from "./PodcastPlayer";
 import { YtPlayer } from "./YtPlayer";
+import { ISearcher } from "./ISearcher";
+import { YtSearcher } from "./YtSearcher";
 
 declare var mobileBrowser: boolean;
 // declare var playerType: string;
@@ -19,14 +20,16 @@ declare var gapi: any;
 
 var mUser = new MyUser();
 var mSession = new Session();
+var mSearcher: ISearcher;
 var mPlayer: IPlayer; 
 var mSocket: MySocket;
 var mUI: UI; 
 
 $(document).ready(function () {
 
+    // TODO: this will go away once callbacks is an interface
     var callbacks = new UICallbacks();
-    callbacks.onSendChatMessage = sendChatMessage;
+    callbacks.onSendChatMessage = onSendChatMessage;
     callbacks.nameChange = saveUserNameChange;
     callbacks.nextMedia = nextMedia;
     callbacks.pauseMedia = onBtnPause;
@@ -36,12 +39,13 @@ $(document).ready(function () {
 
     // TODO: remove
     var playerType = "podcasts";
-
     if (playerType == "podcasts") {
         mPlayer = new PodcastPlayer(mobileBrowser);
     }
     else {
         mPlayer = new YtPlayer(mobileBrowser);
+        // TODO: get rid of this key
+        mSearcher = new YtSearcher('AIzaSyC4A-dsGk-ha_b-eDpbxaVQt5bR7cOUddc');
     }
 
     mUI = new UI(mobileBrowser, callbacks);
@@ -68,23 +72,8 @@ function setupJamSession() {
 }
 
 //==================================================================
-// Functions automatically called when youtube api's are ready
-//==================================================================
-function ytApiReady() {
-	gapi.client.setApiKey("AIzaSyC4A-dsGk-ha_b-eDpbxaVQt5bR7cOUddc");
-	gapi.client.load("youtube", "v3", function() {});
-}
-
-function onPlayerStateChange(event) {
-    if(event.data==0) {
-    	nextMedia();
-    }
-}
-
-//==================================================================
 // WebSocket message response functions
 //==================================================================
-
 var mMessageFunctions = {
     'updateUser': onUpdateMeUser,
     'sessionReady': onSessionReady,
@@ -164,7 +153,11 @@ function onReceivedChatMessage(message: WsMessage) {
     mUI.onChatMessage(userName, chatMessage);
 }
 
-function sendChatMessage(msg: string) {
+//
+// Mostly UI callback functions
+//
+
+function onSendChatMessage(msg: string) {
     var message = new WsMessage();
     message.Action = 'ChatMessage';
     message.ChatMessage = msg;
@@ -172,27 +165,16 @@ function sendChatMessage(msg: string) {
     mSocket.emit(message);
 }
 
+function onPlayerStateChange(event) {
+    if(event.data==0) {
+    	nextMedia();
+    }
+}
+
 function onSearchVideos(query, callback: (media: Media[]) => void) {
 
-	var request = gapi.client.youtube.search.list({
-        part: "snippet",
-        type: "video",
-	    q: encodeURIComponent(query).replace(/%20/g, "+"),
-	    maxResults: 5
-    });
 
-    request.execute((results) => {
-        var medias = [];
-        for (var i = 0; i < results.length; i++) {
-            var result = results[i];
-            var media = new Media();
-            media.YTVideoID = result.id.videoId;
-            media.ThumbURL = result.snippet.thumbnails.medium.url;
-            media.Title = result.snippet.title;
-            medias.push(media);
-        } 
-        callback(medias);
-    });
+
 }
 
 function saveUserNameChange(newName) {

@@ -1,4 +1,4 @@
-﻿import { Media, Session, UserState } from "./Contracts";
+﻿import { Media } from "./Contracts";
 
 export interface IPlayer {
 

@@ -1,7 +1,6 @@
 // This is all pretty bad code. Should be thoroughly reorganized.
 "use strict";
 // TODO: find a better way to expose these functions to html?
-window.ytApiReady = ytApiReady;
 window.queueSelectedVideo = queueSelectedVideo;
 window.requestSyncWithUser = requestSyncWithUser;
 window.deleteMedia = deleteMedia;
@@ -10,14 +9,17 @@ var UI_1 = require("./UI");
 var Sockets_1 = require("./Sockets");
 var PodcastPlayer_1 = require("./PodcastPlayer");
 var YtPlayer_1 = require("./YtPlayer");
+var YtSearcher_1 = require("./YtSearcher");
 var mUser = new Contracts_1.MyUser();
 var mSession = new Contracts_1.Session();
+var mSearcher;
 var mPlayer;
 var mSocket;
 var mUI;
 $(document).ready(function () {
-    var callbacks = new UICallbacks();
-    callbacks.onSendChatMessage = sendChatMessage;
+    // TODO: this will go away once callbacks is an interface
+    var callbacks = new UI_1.UICallbacks();
+    callbacks.onSendChatMessage = onSendChatMessage;
     callbacks.nameChange = saveUserNameChange;
     callbacks.nextMedia = nextMedia;
     callbacks.pauseMedia = onBtnPause;
@@ -31,6 +33,8 @@ $(document).ready(function () {
     }
     else {
         mPlayer = new YtPlayer_1.YtPlayer(mobileBrowser);
+        // TODO: get rid of this key
+        mSearcher = new YtSearcher_1.YtSearcher('AIzaSyC4A-dsGk-ha_b-eDpbxaVQt5bR7cOUddc');
     }
     mUI = new UI_1.UI(mobileBrowser, callbacks);
     mSocket = new Sockets_1.MySocket(mMessageFunctions);
@@ -47,18 +51,6 @@ function setupJamSession() {
     message.User = mUser;
     message.Session = mSession;
     mSocket.emit(message);
-}
-//==================================================================
-// Functions automatically called when youtube api's are ready
-//==================================================================
-function ytApiReady() {
-    gapi.client.setApiKey("AIzaSyC4A-dsGk-ha_b-eDpbxaVQt5bR7cOUddc");
-    gapi.client.load("youtube", "v3", function () { });
-}
-function onPlayerStateChange(event) {
-    if (event.data == 0) {
-        nextMedia();
-    }
 }
 //==================================================================
 // WebSocket message response functions
@@ -126,32 +118,22 @@ function onReceivedChatMessage(message) {
     var userName = message.User.Name;
     mUI.onChatMessage(userName, chatMessage);
 }
-function sendChatMessage(msg) {
+//
+// Mostly UI callback functions
+//
+function onSendChatMessage(msg) {
     var message = new Contracts_1.WsMessage();
     message.Action = 'ChatMessage';
     message.ChatMessage = msg;
     message.User = mUser;
     mSocket.emit(message);
 }
+function onPlayerStateChange(event) {
+    if (event.data == 0) {
+        nextMedia();
+    }
+}
 function onSearchVideos(query, callback) {
-    var request = gapi.client.youtube.search.list({
-        part: "snippet",
-        type: "video",
-        q: encodeURIComponent(query).replace(/%20/g, "+"),
-        maxResults: 5
-    });
-    request.execute(function (results) {
-        var medias = [];
-        for (var i = 0; i < results.length; i++) {
-            var result = results[i];
-            var media = new Contracts_1.Media();
-            media.YTVideoID = result.id.videoId;
-            media.ThumbURL = result.snippet.thumbnails.medium.url;
-            media.Title = result.snippet.title;
-            medias.push(media);
-        }
-        callback(medias);
-    });
 }
 function saveUserNameChange(newName) {
     mUser.Name = newName;
