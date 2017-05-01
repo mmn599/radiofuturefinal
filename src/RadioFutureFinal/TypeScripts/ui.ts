@@ -19,9 +19,11 @@ export class UI {
     private spinner: any;
     private callbacks: UICallbacks;
     private mobileBrowser: boolean;
+    private podcasts: boolean;
     private frameBuilder: FrameBuilder;
 
-    constructor(mobileBrowser: boolean, callbacks: UICallbacks) {
+    constructor(mobileBrowser: boolean, podcasts: boolean, callbacks: UICallbacks) {
+        this.podcasts = podcasts;
         this.colors = ['red', 'orange', 'yellow', 'green', 'blue', 'violet'];
         this.mobileBrowser = mobileBrowser;
         this.frameBuilder = new FrameBuilder(mobileBrowser);
@@ -36,7 +38,15 @@ export class UI {
         this.setupPlayerControlButtons();
     }
 
-    public sessionReady() {
+    public sessionReady = () => {
+        if (this.podcasts) {
+            $("#div_yt_player").hide();
+            $("#div_podcast_player").show();
+        }
+        else {
+            $("#div_yt_player").show();
+            $("#div_podcast_player").hide();
+        }
         $("#div_loading").hide();
         this.spinner.stop();
         $("#div_everything").animate({opacity: 1}, 'fast');

@@ -13,11 +13,13 @@ import { MySocket } from "./Sockets"
 import { Player } from "./Player"
 
 declare var mobileBrowser: boolean;
+// declare var playerType: string;
+var playerType = "podcasts";
 declare var gapi: any;
 
 var mUser = new MyUser();
 var mSession = new Session();
-var mPlayer = new Player(mobileBrowser);
+var mPlayer: Player; 
 var mSocket: MySocket;
 var mUI: UI;
 
@@ -32,10 +34,17 @@ $(document).ready(function () {
     callbacks.previousMedia = previousVideoInQueue;
     callbacks.search = searchVideos;
 
-    mUI = new UI(mobileBrowser, callbacks);
+    var podcasts = false;
+    if (playerType == "podcasts") {
+        podcasts = true;
+    }
+
+    mPlayer = new Player(mobileBrowser, podcasts);
+    mUI = new UI(mobileBrowser, podcasts, callbacks);
     mSocket = new MySocket(mMessageFunctions);
 
     setupJamSession();
+    mPlayer.initPlayer(onPlayerStateChange);
 });
 
 
@@ -58,7 +67,7 @@ function setupJamSession() {
 // Functions automatically called when youtube api's are ready
 //==================================================================
 function onYouTubeIframeAPIReady() {
-    mPlayer.initializeYtPlayer(onPlayerStateChange);
+    // mPlayer.initPlayer(onPlayerStateChange);
 }
 
 function ytApiReady() {

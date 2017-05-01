@@ -6,28 +6,44 @@ export class Player {
 
     private ytPlayer: any;
     private mobileBrowser: boolean;
+    private podcasts: boolean;
     public playerReady: boolean;
 
-    constructor(mobileBrowser: boolean) {
+
+    constructor(mobileBrowser: boolean, podcasts: boolean) {
         this.playerReady = false;
         this.mobileBrowser = mobileBrowser;
+        this.podcasts = podcasts;
     }
 
-    public initializeYtPlayer(onPlayerStateChange) {
+    public initPlayer(onPlayerStateChange) {
 
-        this.ytPlayer = new YT.Player('div_yt_player', {
-            height: 'auto',
-            width: '100%',
-            playerVars: {
-                controls: 1,
-                showinfo: 0,
-                autoplay: 0
-            },
-            events: {
-                'onReady' : this.onPlayerReady,
-                'onStateChange': onPlayerStateChange
+        if (!this.podcasts) {
+            $("#div_yt_player").show();
+            $("#div_podcast_player").hide();
+            if (YT && YT.Player) {
+                this.ytPlayer = new YT.Player('div_yt_player', {
+                    height: 'auto',
+                    width: '100%',
+                    playerVars: {
+                        controls: 1,
+                        showinfo: 0,
+                        autoplay: 0
+                    },
+                    events: {
+                        'onReady' : this.onPlayerReady,
+                        'onStateChange': onPlayerStateChange
+                    }
+                });
             }
-        });
+            else {
+                setTimeout(() => { this.initPlayer(onPlayerStateChange) }, 50);
+            }
+        }
+        else {
+            $("#div_yt_player").hide();
+            $("#div_podcast_player").show();
+        }
 
         if (this.mobileBrowser) {
             var div_player = $("#div_yt_player");

@@ -10,9 +10,11 @@ var Contracts_1 = require("./Contracts");
 var UI_1 = require("./UI");
 var Sockets_1 = require("./Sockets");
 var Player_1 = require("./Player");
+// declare var playerType: string;
+var playerType = "podcasts";
 var mUser = new Contracts_1.MyUser();
 var mSession = new Contracts_1.Session();
-var mPlayer = new Player_1.Player(mobileBrowser);
+var mPlayer;
 var mSocket;
 var mUI;
 $(document).ready(function () {
@@ -24,9 +26,15 @@ $(document).ready(function () {
     callbacks.playMedia = playVideo;
     callbacks.previousMedia = previousVideoInQueue;
     callbacks.search = searchVideos;
-    mUI = new UI_1.UI(mobileBrowser, callbacks);
+    var podcasts = false;
+    if (playerType == "podcasts") {
+        podcasts = true;
+    }
+    mPlayer = new Player_1.Player(mobileBrowser, podcasts);
+    mUI = new UI_1.UI(mobileBrowser, podcasts, callbacks);
     mSocket = new Sockets_1.MySocket(mMessageFunctions);
     setupJamSession();
+    mPlayer.initPlayer(onPlayerStateChange);
 });
 function setupJamSession() {
     var pathname = window.location.pathname;
@@ -43,7 +51,7 @@ function setupJamSession() {
 // Functions automatically called when youtube api's are ready
 //==================================================================
 function onYouTubeIframeAPIReady() {
-    mPlayer.initializeYtPlayer(onPlayerStateChange);
+    // mPlayer.initPlayer(onPlayerStateChange);
 }
 function ytApiReady() {
     gapi.client.setApiKey("AIzaSyC4A-dsGk-ha_b-eDpbxaVQt5bR7cOUddc");
