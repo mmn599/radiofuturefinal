@@ -1,9 +1,16 @@
 {
   "compilerOptions": {
-    "noImplicitAny": false,
-    "noEmitOnError": true,
+    "target": "es5",
+    "module": "commonjs",
+    "moduleResolution": "node",
     "sourceMap": true,
-    "target": "es5"
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "removeComments": false,
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "suppressImplicitAnyIndexErrors": true
   },
   "files": [
     "./TypeScripts/Contracts.ts",
