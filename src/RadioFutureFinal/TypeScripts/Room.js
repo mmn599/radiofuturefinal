@@ -18,7 +18,7 @@ var RoomManager = (function () {
     RoomManager.prototype.init = function () {
         this.user = new Contracts_1.MyUser();
         this.session = new Contracts_1.Session();
-        if (playerType == "podcasts") {
+        if (this.playerType == "podcasts") {
             this.player = new PodcastPlayer_1.PodcastPlayer(this.mobileBrowser);
             this.searcher = new PodcastSearcher_1.PodcastSearcher();
         }

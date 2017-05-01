@@ -32,7 +32,7 @@ class RoomManager implements UICallbacks, ClientActions {
     public init() {
         this.user = new MyUser();
         this.session = new Session();
-        if (playerType == "podcasts") {
+        if (this.playerType == "podcasts") {
             this.player = new PodcastPlayer(this.mobileBrowser);
             this.searcher = new PodcastSearcher();
         }
