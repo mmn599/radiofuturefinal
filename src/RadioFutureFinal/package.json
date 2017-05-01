@@ -13,7 +13,11 @@
     "tsify": "^3.0.1",
     "typescript": "^2.2.2",
     "vinyl-source-stream": "^1.1.0",
-    "@types/jquery": "^2.0.41",
-    "audiosearch-client-node" : "1.0.0"
+    "@types/jquery": "^2.0.41"
+  },
+  "dependencies": {
+    "events": "^1.0.2",
+    "promise": "^7.0.4",
+    "request": "^2.61.0"
   }
 }
