@@ -19,11 +19,11 @@ namespace RadioFutureFinal.Messaging
 
         public delegate Task ResponseFunction(WsMessage message, MySocket socket);
 
-        public MessageReceiver(IDbRepository db, IMyContext myContext, IMessageSender sender)
+        public MessageReceiver(IDbRepository db, IMyContext myContext, MessageSenderFactory senderFactory)
         {
             _myContext = myContext;
             _db = db;
-            _sender = sender;
+            _sender = senderFactory.Create(_myContext.SocketDisconnected);
 
             // TODO: probably put this somehwere else?
             _responses = new Dictionary<string, ResponseFunction>()

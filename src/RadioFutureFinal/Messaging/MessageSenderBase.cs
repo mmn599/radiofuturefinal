@@ -12,12 +12,12 @@ namespace RadioFutureFinal.Messaging
 {
     public class MessageSenderBase : IMessageSenderBase
     {
+        // TODO: there's probably a better way to avoid circular dependency
+        Func<WebSocket, Task> _onDisconnect;
 
-        IMyContext _myContext;
-
-        public MessageSenderBase(IMyContext myContext)
+        public MessageSenderBase(Func<WebSocket, Task> onDisconnect)
         {
-            _myContext = myContext;
+            _onDisconnect = onDisconnect;
         }
 
         public async Task<SendResult> SendMessageAsync(WebSocket socket, WsMessage wsMessage)
@@ -48,7 +48,7 @@ namespace RadioFutureFinal.Messaging
 
             if(!success)
             {
-                await _myContext.SocketDisconnected(socket);
+                await _onDisconnect(socket);
                 return SendResult.CreateFailure(socket);
             }
 

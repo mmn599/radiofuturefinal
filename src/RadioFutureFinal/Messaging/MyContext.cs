@@ -19,10 +19,10 @@ namespace RadioFutureFinal.Messaging
         ConcurrentDictionary<int, List<MySocket>> _activeSession;
         ConcurrentDictionary<WebSocket, MySocket> _activeSockets;
 
-        public MyContext(IDbRepository db, IMessageSender wsSender)
+        public MyContext(IDbRepository db, MessageSenderFactory senderFactory)
         {
             _db = db;
-            _wsSender = wsSender;
+            _wsSender = senderFactory.Create(SocketDisconnected);
             _activeSockets = new ConcurrentDictionary<WebSocket, MySocket>();
             _activeSession = new ConcurrentDictionary<int, List<MySocket>>();
         }

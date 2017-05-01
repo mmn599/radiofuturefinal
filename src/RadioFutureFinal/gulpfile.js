@@ -14,6 +14,6 @@ gulp.task("default", function () {
     })
         .plugin(tsify, { noImplicitAny: false, inlineSourceMap: true, inlineSources: true })
         .bundle()
-        .pipe(source('bundle.js'))
+        .pipe(source('roombundle.js'))
         .pipe(gulp.dest("wwwroot/js"));
 });
