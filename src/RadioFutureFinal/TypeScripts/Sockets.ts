@@ -9,7 +9,8 @@ export interface ClientActions {
     clientChatMessage: (message: WsMessage) => void;
     clientRequestUserState: (message: WsMessage) => void;
     clientProvideUserState: (message: WsMessage) => void;
-
+    clientSetupYTAPI: (message: WsMessage) => void;
+    clientSetupAudioAPI: (message: WsMessage) => void;
 }
 
 export class MySocket {

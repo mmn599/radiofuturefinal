@@ -45,6 +45,25 @@ namespace RadioFutureFinal.Messaging
             return await _senderBase.SendMessageAsync(userToSendTo.WebSocket, wsMessage);
         }
 
+        public async Task<SendResult> ClientSetupYTAPI(MySocket socket, string secret)
+        {
+            var wsMessage = new WsMessage();
+            wsMessage.Action = "clientSetupYTAPI";
+            // TODO: dumb
+            wsMessage.Media = new MediaV1() { VideoTitle = secret };
+            return await _senderBase.SendMessageAsync(socket.WebSocket, wsMessage);
+        }
+
+        public async Task<SendResult> ClientSetupAudioAPI(MySocket socket, string id, string secret)
+        {
+            var wsMessage = new WsMessage();
+            wsMessage.Action = "clientSetupAudioAPI";
+            // TODO: dumb
+            wsMessage.User = new MyUserV1() { Name = id };
+            wsMessage.Media = new MediaV1() { VideoTitle = secret };
+            return await _senderBase.SendMessageAsync(socket.WebSocket, wsMessage);
+        }
+
         private async Task<List<SendResult>> ClientsUpdateSession(Session session, string action, List<MySocket> socketsInSession)
         {
             var wsMessage = new WsMessage();

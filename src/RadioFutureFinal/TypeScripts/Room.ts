@@ -1,7 +1,4 @@
-﻿// This is all pretty bad code. Should be thoroughly reorganized.
-
-
-import { MyUser, Media, Session, UserState, WsMessage } from "./Contracts";
+﻿import { MyUser, Media, Session, UserState, WsMessage } from "./Contracts";
 import { UICallbacks, UI } from "./UI";
 import { MySocket, ClientActions } from "./Sockets";
 import { IPlayer } from "./IPlayer";
@@ -9,48 +6,45 @@ import { PodcastPlayer } from "./PodcastPlayer";
 import { YtPlayer } from "./YtPlayer";
 import { ISearcher } from "./ISearcher";
 import { YtSearcher } from "./YtSearcher";
-
-declare var mobileBrowser: boolean;
-// declare var playerType: string;
-declare var gapi: any;
-
+import { PodcastSearcher } from "./PodcastSearcher";
 
 class RoomManager implements UICallbacks, ClientActions {
 
-    mUser: MyUser;
-    mSession: Session;
-    mSearcher: ISearcher;
-    mPlayer: IPlayer; 
-    mSocket: MySocket;
-    mUI: UI;
+    user: MyUser;
+    session: Session;
+    searcher: ISearcher;
+    player: IPlayer; 
+    socket: MySocket;
+    ui: UI;
 
-    constructor() {
+    playerType: string;
+    mobileBrowser: boolean;
 
+    constructor(playerType: string, mobileBrowser: boolean) {
         // TODO: find a better way to expose these functions to html?
         (<any>window).queueSelectedVideo = this.queueSelectedVideo;
         (<any>window).requestSyncWithUser = this.requestSyncWithUser;
         (<any>window).deleteMedia = this.deleteMedia;
+        this.playerType = playerType;
+        this.mobileBrowser = mobileBrowser;
+    }
 
-        this.mUser = new MyUser();
-        this.mSession = new Session();
-
-        // TODO: remove
-        var playerType = "podcasts";
+    public init() {
+        this.user = new MyUser();
+        this.session = new Session();
         if (playerType == "podcasts") {
-            this.mPlayer = new PodcastPlayer(mobileBrowser);
+            this.player = new PodcastPlayer(this.mobileBrowser);
+            this.searcher = new PodcastSearcher();
         }
         else {
-            this.mPlayer = new YtPlayer(mobileBrowser);
             // TODO: get rid of this key
-            this.mSearcher = new YtSearcher('AIzaSyC4A-dsGk-ha_b-eDpbxaVQt5bR7cOUddc');
+            this.searcher = new YtSearcher('AIzaSyC4A-dsGk-ha_b-eDpbxaVQt5bR7cOUddc');
+            this.player = new YtPlayer(this.mobileBrowser);
         }
-
-        this.mUI = new UI(mobileBrowser, this);
-        this.mSocket = new MySocket(this);
-
+        this.ui = new UI(this.mobileBrowser, this);
+        this.socket = new MySocket(this);
         this.setupJamSession();
-        this.mPlayer.initPlayer(this.onPlayerStateChange);
-
+        this.player.initPlayer(this.onPlayerStateChange);
     }
 
 
@@ -58,15 +52,15 @@ class RoomManager implements UICallbacks, ClientActions {
         var pathname = window.location.pathname;
         var encodedSessionName = pathname.replace('\/rooms/', '');
 
-        this.mSession.Name = decodeURI(encodedSessionName);
-        this.mUser.Name = 'Anonymous';
+        this.session.Name = decodeURI(encodedSessionName);
+        this.user.Name = 'Anonymous';
 
         var message = new WsMessage();
         message.Action = 'UserJoinSession';
-        message.User = this.mUser;
-        message.Session = this.mSession;
+        message.User = this.user;
+        message.Session = this.session;
 
-        this.mSocket.emit(message);
+        this.socket.emit(message);
     }
 
     //==================================================================
@@ -76,13 +70,13 @@ class RoomManager implements UICallbacks, ClientActions {
     clientProvideUserState(message: WsMessage) {
         var userToSyncWith = message.User;
 
-        this.mUser.State.QueuePosition = userToSyncWith.State.QueuePosition;
-        this.mUser.State.Time = userToSyncWith.State.Time;
-        this.mUser.State.YTPlayerState = userToSyncWith.State.YTPlayerState;
+        this.user.State.QueuePosition = userToSyncWith.State.QueuePosition;
+        this.user.State.Time = userToSyncWith.State.Time;
+        this.user.State.YTPlayerState = userToSyncWith.State.YTPlayerState;
 
-        this.mUI.updateQueue(this.mSession.Queue, this.mUser.Id, this.mUser.State.QueuePosition);
+        this.ui.updateQueue(this.session.Queue, this.user.Id, this.user.State.QueuePosition);
 
-        var currentMedia = this.mSession.Queue[this.mUser.State.QueuePosition];
+        var currentMedia = this.session.Queue[this.user.State.QueuePosition];
 
         this.userStateChange();
     }
@@ -90,56 +84,74 @@ class RoomManager implements UICallbacks, ClientActions {
     clientRequestUserState(message: WsMessage) {
         var userData = new MyUser();
         userData.Id = message.User.Id; // TODO: bad bad bad
-        userData.State.QueuePosition = this.mUser.State.QueuePosition;
-        userData.State.Time = Math.round(this.mPlayer.getCurrentTime());
-        userData.State.YTPlayerState = this.mPlayer.getCurrentState();
+        userData.State.QueuePosition = this.user.State.QueuePosition;
+        userData.State.Time = Math.round(this.player.getCurrentTime());
+        userData.State.YTPlayerState = this.player.getCurrentState();
 
         var outgoingMsg = new WsMessage();
         outgoingMsg.Action = 'ProvideSyncToUser';
         outgoingMsg.User = userData;
-        this.mSocket.emit(outgoingMsg);
+        this.socket.emit(outgoingMsg);
     }
 
 
     clientUpdateUser(message: WsMessage) {
         var user = message.User;
-        this.mUser = user;	
+        this.user = user;	
     }
 
     clientSessionReady(message: WsMessage) {
-        this.mSession = message.Session;
-        this.mUser = message.User;
+        this.session = message.Session;
+        this.user = message.User;
 
         // TODO: get rid of this bullshit
-        if (this.mSession.Queue.length == 0) {
+        if (this.session.Queue.length == 0) {
             $("#p_current_content_info").text("Queue up a song!");
             $("#p_current_recommender_info").text("Use the search bar above.");
         }
 
         this.nextMedia();
-        this.mUI.updateQueue(this.mSession.Queue, this.mUser.Id, this.mUser.State.QueuePosition);
-        this.mUI.updateUsersList(this.mSession.Users, this.mUser.Id);
-        this.mUI.sessionReady();
+        this.ui.updateQueue(this.session.Queue, this.user.Id, this.user.State.QueuePosition);
+        this.ui.updateUsersList(this.session.Users, this.user.Id);
+        this.ui.sessionReady();
     }
 
     clientUpdateUsersList(message: WsMessage) {
         var users = message.Session.Users;
-        this.mSession.Users = users;
-        this.mUI.updateUsersList(this.mSession.Users, this.mUser.Id);	
+        this.session.Users = users;
+        this.ui.updateUsersList(this.session.Users, this.user.Id);	
     }
 
     clientUpdateQueue(message: WsMessage) {
-        this.mSession.Queue = message.Session.Queue;
-        if (this.mUser.State.Waiting) {
+        this.session.Queue = message.Session.Queue;
+        if (this.user.State.Waiting) {
             this.nextMedia();
         }
-        this.mUI.updateQueue(this.mSession.Queue, this.mUser.Id, this.mUser.State.QueuePosition);
+        this.ui.updateQueue(this.session.Queue, this.user.Id, this.user.State.QueuePosition);
     }
 
     clientChatMessage(message: WsMessage) {
         var chatMessage = message.ChatMessage;
         var userName = message.User.Name;
-        this.mUI.onChatMessage(userName, chatMessage);
+        this.ui.onChatMessage(userName, chatMessage);
+    }
+
+    clientSetupAudioAPI(message: WsMessage) {
+        // TODO: better mechanism for different players
+        if (this.playerType == "podcasts") {
+            // TODO: better message structure
+            // TODO: ensure this isn't awfully insecure
+            var id = message.User.Name;
+            var secret = message.Media.Title;
+            this.searcher.init(secret, id);
+        }
+    }
+
+    clientSetupYTAPI(message: WsMessage) {
+        if (this.playerType != "podcasts") {
+            var secret = message.Media.Title;
+            this.searcher.init(secret);
+        }
     }
 
     //
@@ -150,8 +162,8 @@ class RoomManager implements UICallbacks, ClientActions {
         var message = new WsMessage();
         message.Action = 'ChatMessage';
         message.ChatMessage = msg;
-        message.User = this.mUser;
-        this.mSocket.emit(message);
+        message.User = this.user;
+        this.socket.emit(message);
     }
 
     onPlayerStateChange(event) {
@@ -161,57 +173,57 @@ class RoomManager implements UICallbacks, ClientActions {
     }
 
     search(query, callback: (media: Media[]) => void) {
-
+        this.searcher.search(query, callback);
     }
 
     nameChange(newName) {
-        this.mUser.Name = newName;
+        this.user.Name = newName;
         var message = new WsMessage();
-        message.User = this.mUser;
+        message.User = this.user;
         message.Action = 'SaveUserNameChange';
-        this.mSocket.emit(message);
+        this.socket.emit(message);
     }
 
     userStateChange() {
-        if (this.mUser.State.QueuePosition >= 0 && this.mUser.State.QueuePosition < this.mSession.Queue.length) {
-            this.mPlayer.setPlayerContent(this.mSession.Queue[this.mUser.State.QueuePosition], this.mUser.State.Time); 
-            this.mUser.State.Waiting = false;
+        if (this.user.State.QueuePosition >= 0 && this.user.State.QueuePosition < this.session.Queue.length) {
+            this.player.setPlayerContent(this.session.Queue[this.user.State.QueuePosition], this.user.State.Time); 
+            this.user.State.Waiting = false;
         }
-        else if (this.mUser.State.QueuePosition < 0 || this.mUser.State.QueuePosition == this.mSession.Queue.length) {
+        else if (this.user.State.QueuePosition < 0 || this.user.State.QueuePosition == this.session.Queue.length) {
             // TODO: set player content to 'waiting on next video'
-            this.mUser.State.Waiting = true;
+            this.user.State.Waiting = true;
         }
-        else if (this.mUser.State.QueuePosition == this.mSession.Queue.length) {
+        else if (this.user.State.QueuePosition == this.session.Queue.length) {
         }
     }
 
     nextMedia() {
-        this.mUser.State.Time = 0;
-        var queue = this.mSession.Queue;
+        this.user.State.Time = 0;
+        var queue = this.session.Queue;
 
-        if(this.mUser.State.QueuePosition + 1 < queue.length) {
-            this.mUser.State.QueuePosition = this.mUser.State.QueuePosition + 1;
+        if(this.user.State.QueuePosition + 1 < queue.length) {
+            this.user.State.QueuePosition = this.user.State.QueuePosition + 1;
         }
-        else if (this.mUser.State.QueuePosition >= 0) {
-            this.mUser.State.QueuePosition = queue.length;
+        else if (this.user.State.QueuePosition >= 0) {
+            this.user.State.QueuePosition = queue.length;
         }
 
         this.userStateChange();
     }
 
     pauseMedia() {
-        this.mPlayer.pause();
+        this.player.pause();
     }
 
     playMedia() {
-        this.mPlayer.play();
+        this.player.play();
     }
 
     previousMedia() {
-        this.mUser.State.Time = 0;
-        var queue = this.mSession.Queue;
-        if(this.mUser.State.QueuePosition > 0) {
-            this.mUser.State.QueuePosition = this.mUser.State.QueuePosition - 1;
+        this.user.State.Time = 0;
+        var queue = this.session.Queue;
+        if(this.user.State.QueuePosition > 0) {
+            this.user.State.QueuePosition = this.user.State.QueuePosition - 1;
             this.userStateChange();
         }
     }
@@ -229,7 +241,7 @@ class RoomManager implements UICallbacks, ClientActions {
         var message = new WsMessage();
         message.Action = 'RequestSyncWithUser';
         message.User = user;
-        this.mSocket.emit(message);
+        this.socket.emit(message);
     }
 
     queueSelectedVideo(elmnt) {
@@ -248,26 +260,26 @@ class RoomManager implements UICallbacks, ClientActions {
         media.ThumbURL = thumbURL;
         media.MP3Source = mp3Source;
         media.OGGSource = oggSource;
-        media.UserId = this.mUser.Id;
-        media.UserName = this.mUser.Name;
+        media.UserId = this.user.Id;
+        media.UserName = this.user.Name;
 
         var message = new WsMessage();
         message.Action = 'AddMediaToSession';
         message.Media = media;
 
         //TODO: local add media
-        this.mSocket.emit(message);
+        this.socket.emit(message);
     }
 
 
     deleteMedia(mediaId: number, position: number) {
 
-        this.mSession.Queue.splice(position, 1);
-        if (this.mUser.State.QueuePosition >= position) {
-            this.mUser.State.QueuePosition -= 1;
+        this.session.Queue.splice(position, 1);
+        if (this.user.State.QueuePosition >= position) {
+            this.user.State.QueuePosition -= 1;
             this.userStateChange();
         }
-        this.mUI.updateQueue(this.mSession.Queue, this.mUser.Id, this.mUser.State.QueuePosition);
+        this.ui.updateQueue(this.session.Queue, this.user.Id, this.user.State.QueuePosition);
 
         var mediaToDelete = new Media();
         mediaToDelete.Id = mediaId;
@@ -276,15 +288,19 @@ class RoomManager implements UICallbacks, ClientActions {
         message.Action = 'DeleteMediaFromSession';
         message.Media = mediaToDelete;
 
-        this.mSocket.emit(message);
+        this.socket.emit(message);
     }
 
 
 }
 
+declare var mobileBrowser: boolean;
+declare var playerType: string;
+
+var mRoomManager = new RoomManager(playerType, mobileBrowser);
 
 $(document).ready(function () {
-
+    mRoomManager.init();
 });
 
 

@@ -1,4 +1,5 @@
-﻿using RadioFutureFinal.DAL;
+﻿using Microsoft.Extensions.Configuration;
+using RadioFutureFinal.DAL;
 using RadioFutureFinal.Messaging;
 using System;
 using System.Collections.Concurrent;
@@ -14,13 +15,15 @@ namespace RadioFutureFinal.Messaging
     {
         IDbRepository _db;
         IMessageSender _wsSender;
+        IConfigurationRoot _config;
 
         // key is session id
         ConcurrentDictionary<int, List<MySocket>> _activeSession;
         ConcurrentDictionary<WebSocket, MySocket> _activeSockets;
 
-        public MyContext(IDbRepository db, MessageSenderFactory senderFactory)
+        public MyContext(IConfigurationRoot configuration, IDbRepository db, MessageSenderFactory senderFactory)
         {
+            _config = configuration;
             _db = db;
             _wsSender = senderFactory.Create(SocketDisconnected);
             _activeSockets = new ConcurrentDictionary<WebSocket, MySocket>();
@@ -66,6 +69,10 @@ namespace RadioFutureFinal.Messaging
         {
             var mySocket = new MySocket(socket);
             _activeSockets.TryAdd(socket, mySocket);
+
+            // TODO: this should probably go somewhere else
+            _wsSender.ClientSetupAudioAPI(mySocket, _config.GetValue<string>("AudioAPIKey"), _config.GetValue<string>("AudioSecret"));
+            _wsSender.ClientSetupYTAPI(mySocket, _config.GetValue<string>("YTAPIKey"));
         }
 
         public void SocketJoinSession(MySocket socket, int sessionId, int userId)
