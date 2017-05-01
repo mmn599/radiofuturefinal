@@ -28,9 +28,10 @@ var YtSearcher = (function () {
                 maxResults: 5
             });
             request.execute(function (results) {
+                var items = results.items;
                 var medias = [];
-                for (var i = 0; i < results.length; i++) {
-                    var result = results[i];
+                for (var i = 0; i < items.length; i++) {
+                    var result = items[i];
                     var media = new Contracts_1.Media();
                     media.YTVideoID = result.id.videoId;
                     media.ThumbURL = result.snippet.thumbnails.medium.url;

@@ -8,6 +8,55 @@ var YtSearcher_1 = require("./YtSearcher");
 var PodcastSearcher_1 = require("./PodcastSearcher");
 var RoomManager = (function () {
     function RoomManager(playerType, mobileBrowser) {
+        var _this = this;
+        //==================================================================
+        // These functions are called directly embedded into the html... kinda weird
+        //==================================================================
+        this.requestSyncWithUser = function (userId) {
+            console.log('request sync with user');
+            var user = new Contracts_1.MyUser();
+            user.Id = userId;
+            var message = new Contracts_1.WsMessage();
+            message.Action = 'RequestSyncWithUser';
+            message.User = user;
+            _this.socket.emit(message);
+        };
+        this.queueSelectedVideo = function (elmnt) {
+            $("#div_search_results").fadeOut();
+            $("#input_search").val("");
+            var videoId = elmnt.getAttribute('data-VideoId');
+            var title = elmnt.innerText || elmnt.textContent;
+            var thumbURL = elmnt.getAttribute('data-ThumbURL');
+            var mp3Source = elmnt.getAttribute('data-MP3Source');
+            var oggSource = elmnt.getAttribute('data-OGGSource');
+            var media = new Contracts_1.Media();
+            media.YTVideoID = videoId;
+            media.Title = title;
+            media.ThumbURL = thumbURL;
+            media.MP3Source = mp3Source;
+            media.OGGSource = oggSource;
+            media.UserId = _this.user.Id;
+            media.UserName = _this.user.Name;
+            var message = new Contracts_1.WsMessage();
+            message.Action = 'AddMediaToSession';
+            message.Media = media;
+            //TODO: local add media
+            _this.socket.emit(message);
+        };
+        this.deleteMedia = function (mediaId, position) {
+            _this.session.Queue.splice(position, 1);
+            if (_this.user.State.QueuePosition >= position) {
+                _this.user.State.QueuePosition -= 1;
+                _this.userStateChange();
+            }
+            _this.ui.updateQueue(_this.session.Queue, _this.user.Id, _this.user.State.QueuePosition);
+            var mediaToDelete = new Contracts_1.Media();
+            mediaToDelete.Id = mediaId;
+            var message = new Contracts_1.WsMessage();
+            message.Action = 'DeleteMediaFromSession';
+            message.Media = mediaToDelete;
+            _this.socket.emit(message);
+        };
         // TODO: find a better way to expose these functions to html?
         window.queueSelectedVideo = this.queueSelectedVideo;
         window.requestSyncWithUser = this.requestSyncWithUser;
@@ -177,54 +226,6 @@ var RoomManager = (function () {
             this.user.State.QueuePosition = this.user.State.QueuePosition - 1;
             this.userStateChange();
         }
-    };
-    //==================================================================
-    // These functions are called directly embedded into the html... kinda weird
-    //==================================================================
-    RoomManager.prototype.requestSyncWithUser = function (userId) {
-        console.log('request sync with user');
-        var user = new Contracts_1.MyUser();
-        user.Id = userId;
-        var message = new Contracts_1.WsMessage();
-        message.Action = 'RequestSyncWithUser';
-        message.User = user;
-        this.socket.emit(message);
-    };
-    RoomManager.prototype.queueSelectedVideo = function (elmnt) {
-        $("#div_search_results").fadeOut();
-        $("#input_search").val("");
-        var videoId = elmnt.getAttribute('data-VideoId');
-        var title = elmnt.innerText || elmnt.textContent;
-        var thumbURL = elmnt.getAttribute('data-ThumbURL');
-        var mp3Source = elmnt.getAttribute('data-MP3Source');
-        var oggSource = elmnt.getAttribute('data-OGGSource');
-        var media = new Contracts_1.Media();
-        media.YTVideoID = videoId;
-        media.Title = title;
-        media.ThumbURL = thumbURL;
-        media.MP3Source = mp3Source;
-        media.OGGSource = oggSource;
-        media.UserId = this.user.Id;
-        media.UserName = this.user.Name;
-        var message = new Contracts_1.WsMessage();
-        message.Action = 'AddMediaToSession';
-        message.Media = media;
-        //TODO: local add media
-        this.socket.emit(message);
-    };
-    RoomManager.prototype.deleteMedia = function (mediaId, position) {
-        this.session.Queue.splice(position, 1);
-        if (this.user.State.QueuePosition >= position) {
-            this.user.State.QueuePosition -= 1;
-            this.userStateChange();
-        }
-        this.ui.updateQueue(this.session.Queue, this.user.Id, this.user.State.QueuePosition);
-        var mediaToDelete = new Contracts_1.Media();
-        mediaToDelete.Id = mediaId;
-        var message = new Contracts_1.WsMessage();
-        message.Action = 'DeleteMediaFromSession';
-        message.Media = mediaToDelete;
-        this.socket.emit(message);
     };
     return RoomManager;
 }());

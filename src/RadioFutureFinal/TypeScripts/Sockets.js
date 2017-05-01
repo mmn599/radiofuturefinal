@@ -10,7 +10,7 @@ var MySocket = (function () {
             var message = JSON.parse(event.data);
             var action = message.Action;
             if (clientActions[action]) {
-                clientActions[action](action);
+                clientActions[action](message);
             }
             else {
             }

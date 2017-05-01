@@ -12,8 +12,8 @@ export class YtPlayer implements IPlayer {
     constructor(mobileBrowser: boolean) {
         this.playerReady = false;
         this.mobileBrowser = mobileBrowser;
-        $("#div_yt_player").hide();
-        $("#div_podcast_player").show();
+        $("#div_yt_player").show();
+        $("#div_podcast_player").hide();
     }
 
     public initPlayer(onPlayerStateChange) {

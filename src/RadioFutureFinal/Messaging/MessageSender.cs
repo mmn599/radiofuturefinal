@@ -50,7 +50,7 @@ namespace RadioFutureFinal.Messaging
             var wsMessage = new WsMessage();
             wsMessage.Action = "clientSetupYTAPI";
             // TODO: dumb
-            wsMessage.Media = new MediaV1() { VideoTitle = secret };
+            wsMessage.Media = new MediaV1() { Title = secret };
             return await _senderBase.SendMessageAsync(socket.WebSocket, wsMessage);
         }
 
@@ -60,7 +60,7 @@ namespace RadioFutureFinal.Messaging
             wsMessage.Action = "clientSetupAudioAPI";
             // TODO: dumb
             wsMessage.User = new MyUserV1() { Name = id };
-            wsMessage.Media = new MediaV1() { VideoTitle = secret };
+            wsMessage.Media = new MediaV1() { Title = secret };
             return await _senderBase.SendMessageAsync(socket.WebSocket, wsMessage);
         }
 

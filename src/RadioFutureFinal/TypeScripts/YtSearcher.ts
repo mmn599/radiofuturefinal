@@ -33,9 +33,10 @@ export class YtSearcher implements ISearcher {
                 maxResults: 5
             });
             request.execute((results) => {
+                var items = results.items;
                 var medias = [];
-                for (var i = 0; i < results.length; i++) {
-                    var result = results[i];
+                for (var i = 0; i < items.length; i++) {
+                    var result = items[i];
                     var media = new Media();
                     media.YTVideoID = result.id.videoId;
                     media.ThumbURL = result.snippet.thumbnails.medium.url;

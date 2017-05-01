@@ -31,7 +31,7 @@ export class MySocket {
             var message = JSON.parse(event.data);
             var action = message.Action;
             if (clientActions[action]) {
-                clientActions[action](action); 
+                clientActions[action](message); 
             }
             else {
                 // TODO: exception

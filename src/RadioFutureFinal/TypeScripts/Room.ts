@@ -233,7 +233,7 @@ class RoomManager implements UICallbacks, ClientActions {
     // These functions are called directly embedded into the html... kinda weird
     //==================================================================
 
-    requestSyncWithUser(userId) {
+    requestSyncWithUser = (userId) => {
         console.log('request sync with user');
 
         var user = new MyUser();
@@ -244,7 +244,7 @@ class RoomManager implements UICallbacks, ClientActions {
         this.socket.emit(message);
     }
 
-    queueSelectedVideo(elmnt) {
+    queueSelectedVideo = (elmnt) => {
 
         $("#div_search_results").fadeOut();
         $("#input_search").val("");
@@ -272,7 +272,7 @@ class RoomManager implements UICallbacks, ClientActions {
     }
 
 
-    deleteMedia(mediaId: number, position: number) {
+    deleteMedia = (mediaId: number, position: number) => {
 
         this.session.Queue.splice(position, 1);
         if (this.user.State.QueuePosition >= position) {

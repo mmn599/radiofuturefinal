@@ -8,19 +8,19 @@ gulp.task("default", function () {
     return browserify({
         basedir: '.',
         debug: true,
-        entires: 
+        entries: 
         [
-            "./TypeScripts/Contracts.ts",
-            "./TypeScripts/Sockets.ts",
-            "./TypeScripts/FrameBuilder.ts",
-            "./TypeScripts/UI.ts",
-            "./TypeScripts/Room.ts",
-            "./TypeScripts/IPlayer.ts",
-            "./TypeScripts/PodcastPlayer.ts",
-            "./TypeScripts/YtPlayer.ts",
-            "./TypeScripts/ISearcher.ts",
-            "./TypeScripts/PodcastSearcher.ts",
-            "./TypeScripts/YtSearcher.ts"
+            './TypeScripts/Contracts.ts',
+            './TypeScripts/Sockets.ts',
+            './TypeScripts/FrameBuilder.ts',
+            './TypeScripts/UI.ts',
+            './TypeScripts/Room.ts',
+            './TypeScripts/IPlayer.ts',
+            './TypeScripts/PodcastPlayer.ts',
+            './TypeScripts/YtPlayer.ts',
+            './TypeScripts/ISearcher.ts',
+            './TypeScripts/PodcastSearcher.ts',
+            './TypeScripts/YtSearcher.ts'
         ],
         cache: {},
         packageCache: {}

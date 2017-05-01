@@ -22,7 +22,7 @@ namespace RadioFutureFinal.Contracts
         public string YTVideoID { get; set; }
 
         [JsonProperty]
-        public string VideoTitle { get; set; }
+        public string Title { get; set; }
 
         [JsonProperty]
         public string ThumbURL { get; set; }

@@ -7,8 +7,8 @@ var YtPlayer = (function () {
         };
         this.playerReady = false;
         this.mobileBrowser = mobileBrowser;
-        $("#div_yt_player").hide();
-        $("#div_podcast_player").show();
+        $("#div_yt_player").show();
+        $("#div_podcast_player").hide();
     }
     YtPlayer.prototype.initPlayer = function (onPlayerStateChange) {
         var _this = this;
