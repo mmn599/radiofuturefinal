@@ -1,7 +1,7 @@
 ﻿html, body {
-	margin: 0;
-	background: #f1f1f1;
-	font-family: 'Josefin Sans';
+    margin: 0;
+    background: #f1f1f1;
+    font-family: 'Josefin Sans';
     overflow-x: hidden;
 }
 
@@ -10,42 +10,42 @@ input:focus {
 }
 
 .everything {
-	width: 100vw;
-	height: 100vh;
-	display: inline-block;
+    width: 100vw;
+    height: 100vh;
+    display: inline-block;
     font-size: 0;
 }
 
 #div_everything {
-	opacity: 0;
+    opacity: 0;
 }
 
 .smallrow {
-	height: 5%;
+    height: 5%;
 }
 
 #div_player {
-	width: 100%;
-	height: 32vh;
+    width: 100%;
+    height: 32vh;
     margin: 0;
     padding: 0;
 }
 
 #div_current_content_info {
-	display: flex;
-	justify-content: center; /* align horizontal */
-	align-items: center; /* align vertical */
-	background: white;
-	height: 5%;
-	width: 100%;
+    display: flex;
+    justify-content: center; /* align horizontal */
+    align-items: center; /* align vertical */
+    background: white;
+    height: 5%;
+    width: 100%;
     font-size: 16px;
     float: right;
 }
 
 #div_current_content {
-	display: inline-block;
-	width: 100%;
-	height: auto;
+    display: inline-block;
+    width: 100%;
+    height: auto;
     font-size: 0;
     border: 0;
 }
@@ -57,8 +57,8 @@ input:focus {
 }
 
 #div_cc_results {
-	right: 66.66%;
-	width: 33.33%;
+    right: 66.66%;
+    width: 33.33%;
     bottom: 5%;
 }
 
@@ -71,9 +71,9 @@ input:focus {
 #div_chat_results {
     right: 0%;
     display: inline-block;
-	width: 20%;
+    width: 20%;
     height: 12%;
-	bottom: 5%;
+    bottom: 5%;
 }
 
 #btn_play {
@@ -85,34 +85,34 @@ input:focus {
 }
 
 #div_user_results {
-	left: 0%;
-	top: 5%;
+    left: 0%;
+    top: 5%;
 }
 
 #div_queue_results {
-	right: 0%;
-	top: 5%;
+    right: 0%;
+    top: 5%;
 }
 
 .results {
-	display: none;
-	background: white;
+    display: none;
+    background: white;
 }
 
 .div_search_result {
-	font-family: 'Josefin Sans';
-	cursor: pointer;
+    font-family: 'Josefin Sans';
+    cursor: pointer;
 }
 
-.div_search_result > * {
-	cursor: pointer;
-}
+    .div_search_result > * {
+        cursor: pointer;
+    }
 
-.div_search_result > p {
-	margin: 0;
-	font-size: 5vw;
-	margin-bottom: 2%;
-}
+    .div_search_result > p {
+        margin: 0;
+        font-size: 5vw;
+        margin-bottom: 2%;
+    }
 
 #div_queue {
     background: blue;
@@ -123,23 +123,23 @@ input:focus {
 }
 
 .myinput {
-	display: inline-block;
-	width: 94vw;
+    display: inline-block;
+    width: 94vw;
     border: 0;
-	border-bottom: 1px solid #CCCCCC;
-	background: #f1f1f1;
-	font-size: 5vw;
-	font-family: "Source Code Pro";
+    border-bottom: 1px solid #CCCCCC;
+    background: #f1f1f1;
+    font-size: 5vw;
+    font-family: "Source Code Pro";
     text-align: center;
 }
 
 .current_content_info {
-	display: block;
+    display: block;
     width: 100%;
     text-align: center;
     margin-left: 5%;
     margin-right: 5%;
-	font-family: 'Josefin Sans';
+    font-family: 'Josefin Sans';
 }
 
 span {
@@ -154,24 +154,44 @@ p {
     display: inline-block;
     height: 100%;
     float: left;
-	font-family: 'Josefin Sans';
+    font-family: 'Josefin Sans';
     font-size: 16px;
     display: flex;
     align-items: center;
 }
 
 .font_source {
-	font-family: "Source Code Pro";
+    font-family: "Source Code Pro";
 }
 
 .div_user {
-    display: inline-block; 
-    width: 33.33%; 
-    height: 20vw; 
+    display: inline-block;
+    width: 33.33%;
+    height: 20vw;
     color: white;
     text-align: center;
     vertical-align: middle;
     line-height: 20vw;
     font-size: 3.5vw;
+}
 
+#div_player_controls {
+    margin-left: 3vw;
+    margin-right: 3vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #f1f1f1;
+}
+
+#p_cc_summary {
+    display: block;
+    text-align: center;
+    font-size: 5vw;
+}
+
+.btn_controls {
+    height: 5vw;
+    width: 5vw;
+    cursor: pointer;
 }
