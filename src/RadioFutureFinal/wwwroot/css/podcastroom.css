@@ -1,0 +1,216 @@
+﻿html, body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    background: #f1f1f1;
+}
+
+input:focus {
+    outline-width: 0;
+}
+
+.everything {
+    width: 100%;
+    height: 100%;
+    display: inline-block;
+    font-size: 0;
+}
+
+#div_everything {
+    opacity: 0;
+}
+
+.smallrow {
+    height: 5%;
+}
+
+.div_player {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+#div_podcast_player {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+}
+
+#div_current_content_info {
+    display: flex;
+    justify-content: center; /* align horizontal */
+    align-items: center; /* align vertical */
+    background: white;
+    height: 5%;
+    width: 100%;
+    font-size: 16px;
+    float: right;
+}
+
+#div_current_content {
+    display: inline-block;
+    width: 100%;
+    height: 90%;
+    font-size: 0;
+    border: 0;
+}
+
+#div_all_info {
+    display: inline-block;
+    width: 100%;
+    height: 5%;
+}
+
+#div_cc_results {
+    right: 66.66%;
+    width: 33.33%;
+    bottom: 5%;
+}
+
+#div_users_overall {
+    padding-left: 1%;
+    justify-content: flex-start;
+    width: 24%;
+}
+
+#input_chat {
+    text-align: right;
+    display: block;
+    background-color: transparent;
+}
+
+#btn_play {
+    display: none;
+}
+
+#div_search_results {
+    right: 25%;
+    width: 50%;
+    top: 5%;
+}
+
+#div_user_results {
+    left: 0;
+    top: 5%;
+}
+
+#div_queue_results {
+    right: 0;
+    top: 5%;
+}
+
+.results {
+    display: none;
+    position: absolute;
+    background: white;
+}
+
+.div_search_result {
+    font-family: 'Josefin Sans';
+    cursor: pointer;
+}
+
+    .div_search_result > * {
+        cursor: pointer;
+    }
+
+    .div_search_result > p {
+        margin: 0;
+        font-size: 24px;
+        margin-bottom: 2%;
+    }
+
+#div_queue {
+    background: blue;
+}
+
+#input_search {
+    display: none;
+}
+
+.myinput {
+    display: inline-block;
+    width: 100%;
+    border: 0;
+    border-bottom: 1px solid #CCCCCC;
+    background: #f1f1f1;
+    font-size: 18px;
+    font-family: "Source Code Pro";
+    text-align: center;
+}
+
+.current_content_info {
+    display: block;
+    width: 100%;
+    text-align: center;
+    margin-left: 5%;
+    margin-right: 5%;
+    font-family: 'Josefin Sans';
+}
+
+.info {
+    height: 100%;
+    float: left;
+    font-family: 'Josefin Sans';
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+}
+
+.img_drop_right {
+    margin-right: 8px;
+}
+
+.img_drop_left {
+    margin-left: 8px;
+}
+
+#div_player_controls {
+    width: 33.33%;
+    justify-content: center;
+}
+
+#div_search {
+    width: 50%;
+    justify-content: center;
+}
+
+#div_queue_overall {
+    width: 24%;
+    padding-right: 1%;
+    justify-content: flex-end;
+}
+
+#div_cc_overall {
+    justify-content: flex-start;
+    padding-left: 1%;
+    width: 32.33%;
+}
+
+.btn_controls {
+    cursor: pointer;
+    margin-left: 2.5%;
+    margin-right: 2.5%;
+}
+
+#div_chat_overall {
+    padding-right: 1%;
+    justify-content: flex-end;
+    width: 45%;
+}
+
+#div_chat_results {
+    right: 0;
+    width: 20%;
+    height: 12%;
+    bottom: 5%;
+    padding: 0;
+    overflow: auto;
+}
+
+#ul_chat {
+    margin: 2%;
+    padding: 0;
+    list-style: none;
+}

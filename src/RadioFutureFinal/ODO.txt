@@ -3,6 +3,7 @@
 -delete working on mobile
 -general mobile ui improvements
 -can i recreate that ytPlayerReady notready bug on IE?
+-update bundle config
 
 big
 -typescript implicit any compilation

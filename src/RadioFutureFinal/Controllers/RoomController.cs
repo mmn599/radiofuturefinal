@@ -21,9 +21,9 @@ namespace RadioFutureFinal.Controllers
             {
                 if(Utils.BroserIsMobile(HttpContext))
                 {
-                    return View("~/Views/Room/EnterRoomMobile.cshtml");
+                    return View("~/Views/Room/YTRoomMobile.cshtml");
                 }
-                return View("~/Views/Room/EnterRoom.cshtml");
+                return View("~/Views/Room/YTRoom.cshtml");
             }
             else
             {
