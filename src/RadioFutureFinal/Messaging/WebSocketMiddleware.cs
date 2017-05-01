@@ -56,7 +56,6 @@ namespace RadioFutureFinal.Messaging
             {
                 var result = await socket.ReceiveAsync(buffer: new ArraySegment<byte>(buffer),
                                                        cancellationToken: CancellationToken.None);
-
                 handleMessage(result, buffer);
             }
         }
