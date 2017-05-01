@@ -1,48 +1,40 @@
 ﻿declare var YT: any;
 
+import { IPlayer } from "./IPlayer";
 import { Media, Session, UserState } from "./Contracts";
 
-export class Player {
+export class YtPlayer implements IPlayer {
 
     private ytPlayer: any;
     private mobileBrowser: boolean;
-    private podcasts: boolean;
     public playerReady: boolean;
 
-
-    constructor(mobileBrowser: boolean, podcasts: boolean) {
+    constructor(mobileBrowser: boolean) {
         this.playerReady = false;
         this.mobileBrowser = mobileBrowser;
-        this.podcasts = podcasts;
+        $("#div_yt_player").hide();
+        $("#div_podcast_player").show();
     }
 
     public initPlayer(onPlayerStateChange) {
 
-        if (!this.podcasts) {
-            $("#div_yt_player").show();
-            $("#div_podcast_player").hide();
-            if (YT && YT.Player) {
-                this.ytPlayer = new YT.Player('div_yt_player', {
-                    height: 'auto',
-                    width: '100%',
-                    playerVars: {
-                        controls: 1,
-                        showinfo: 0,
-                        autoplay: 0
-                    },
-                    events: {
-                        'onReady' : this.onPlayerReady,
-                        'onStateChange': onPlayerStateChange
-                    }
-                });
-            }
-            else {
-                setTimeout(() => { this.initPlayer(onPlayerStateChange) }, 50);
-            }
+        if (YT && YT.Player) {
+            this.ytPlayer = new YT.Player('div_yt_player', {
+                height: 'auto',
+                width: '100%',
+                playerVars: {
+                    controls: 1,
+                    showinfo: 0,
+                    autoplay: 0
+                },
+                events: {
+                    'onReady' : this.onPlayerReady,
+                    'onStateChange': onPlayerStateChange
+                }
+            });
         }
         else {
-            $("#div_yt_player").hide();
-            $("#div_podcast_player").show();
+            setTimeout(() => { this.initPlayer(onPlayerStateChange) }, 50);
         }
 
         if (this.mobileBrowser) {
@@ -85,12 +77,12 @@ export class Player {
 
     private updatePlayerUI(media: Media, time: number) {
         this.ytPlayer.loadVideoById(media.YTVideoID, time, "large");	
-        $("#p_cc_summary").text(media.VideoTitle);
+        $("#p_cc_summary").text(media.Title);
         if (!this.mobileBrowser) {
             var html =
             '<div style="text-align: left; display: flex; align-items: center;">' +
                 '<img style="height: 90px; width: 160px; margin-right: 16px;" src="' + media.ThumbURL + '"/>' +
-                '<span style="margin-right: 16px;">' + media.VideoTitle + '<br>' + 'Recommended by: ' + media.UserName + '</span>' +
+                '<span style="margin-right: 16px;">' + media.Title + '<br>' + 'Recommended by: ' + media.UserName + '</span>' +
             '</div>';
             $("#div_cc_results").html(html);
         }

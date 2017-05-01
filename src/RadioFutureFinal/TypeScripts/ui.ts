@@ -3,7 +3,8 @@ import { Media } from "./Contracts";
 
 declare var Spinner: any;
 
-export class UICallbacks {
+// TODO: make this an interface
+export interface UICallbacks {
     previousMedia: any;
     nextMedia: any;
     playMedia: any;
@@ -19,11 +20,9 @@ export class UI {
     private spinner: any;
     private callbacks: UICallbacks;
     private mobileBrowser: boolean;
-    private podcasts: boolean;
     private frameBuilder: FrameBuilder;
 
-    constructor(mobileBrowser: boolean, podcasts: boolean, callbacks: UICallbacks) {
-        this.podcasts = podcasts;
+    constructor(mobileBrowser: boolean, callbacks: UICallbacks) {
         this.colors = ['red', 'orange', 'yellow', 'green', 'blue', 'violet'];
         this.mobileBrowser = mobileBrowser;
         this.frameBuilder = new FrameBuilder(mobileBrowser);
@@ -39,14 +38,6 @@ export class UI {
     }
 
     public sessionReady = () => {
-        if (this.podcasts) {
-            $("#div_yt_player").hide();
-            $("#div_podcast_player").show();
-        }
-        else {
-            $("#div_yt_player").show();
-            $("#div_podcast_player").hide();
-        }
         $("#div_loading").hide();
         this.spinner.stop();
         $("#div_everything").animate({opacity: 1}, 'fast');
@@ -157,10 +148,11 @@ export class UI {
     private searchEnterPressed(input_search) {
         var divResults = $("#div_search_results");
         divResults.html("");
-        this.callbacks.search(input_search.val(), (results) => {
-            $.each(results.items, (index, item) => {
-                divResults.html(divResults.html() + "<div class='div_search_result' onClick='queueSelectedVideo(this)' data-VideoId='" + item.id.videoId + "' data-ThumbURL='"+item.snippet.thumbnails.medium.url+"'>" + '<p class="text_search_result">' +  item.snippet.title+ '</p></div>' );
-            });
+        this.callbacks.search(input_search.val(), (results: Media[]) => {
+            for (var i = 0; i < results.length; i++) {
+                var media = results[i];
+                divResults.html(divResults.html() + "<div class='div_search_result' onClick='queueSelectedVideo(this)' data-VideoId='" + media.YTVideoID + "' data-ThumbURL='" + media.ThumbURL + "'>" + '<p class="text_search_result">' + media.Title + '</p></div>');
+            }
             input_search.blur();
         });
         if(!divResults.is(':visible')) {

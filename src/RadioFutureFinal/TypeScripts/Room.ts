@@ -1,7 +1,6 @@
 ﻿// This is all pretty bad code. Should be thoroughly reorganized.
 
 // TODO: find a better way to expose these functions to html?
-(<any>window).onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
 (<any>window).ytApiReady = ytApiReady;
 (<any>window).queueSelectedVideo = queueSelectedVideo;
 (<any>window).requestSyncWithUser = requestSyncWithUser;
@@ -9,38 +8,43 @@
 
 import { MyUser, Media, Session, UserState, WsMessage } from "./Contracts";
 import { UICallbacks, UI } from "./UI";
-import { MySocket } from "./Sockets"
-import { Player } from "./Player"
+import { MySocket } from "./Sockets";
+import { IPlayer } from "./IPlayer";
+import { PodcastPlayer } from "./PodcastPlayer";
+import { YtPlayer } from "./YtPlayer";
 
 declare var mobileBrowser: boolean;
 // declare var playerType: string;
-var playerType = "podcasts";
 declare var gapi: any;
 
 var mUser = new MyUser();
 var mSession = new Session();
-var mPlayer: Player; 
+var mPlayer: IPlayer; 
 var mSocket: MySocket;
-var mUI: UI;
+var mUI: UI; 
 
 $(document).ready(function () {
 
     var callbacks = new UICallbacks();
     callbacks.onSendChatMessage = sendChatMessage;
     callbacks.nameChange = saveUserNameChange;
-    callbacks.nextMedia = nextVideoInQueue;
-    callbacks.pauseMedia = pauseVideo;
-    callbacks.playMedia = playVideo;
-    callbacks.previousMedia = previousVideoInQueue;
-    callbacks.search = searchVideos;
+    callbacks.nextMedia = nextMedia;
+    callbacks.pauseMedia = onBtnPause;
+    callbacks.playMedia = onBtnPlay;
+    callbacks.previousMedia = previousMedia;
+    callbacks.search = onSearchVideos;
 
-    var podcasts = false;
+    // TODO: remove
+    var playerType = "podcasts";
+
     if (playerType == "podcasts") {
-        podcasts = true;
+        mPlayer = new PodcastPlayer(mobileBrowser);
+    }
+    else {
+        mPlayer = new YtPlayer(mobileBrowser);
     }
 
-    mPlayer = new Player(mobileBrowser, podcasts);
-    mUI = new UI(mobileBrowser, podcasts, callbacks);
+    mUI = new UI(mobileBrowser, callbacks);
     mSocket = new MySocket(mMessageFunctions);
 
     setupJamSession();
@@ -66,10 +70,6 @@ function setupJamSession() {
 //==================================================================
 // Functions automatically called when youtube api's are ready
 //==================================================================
-function onYouTubeIframeAPIReady() {
-    // mPlayer.initPlayer(onPlayerStateChange);
-}
-
 function ytApiReady() {
 	gapi.client.setApiKey("AIzaSyC4A-dsGk-ha_b-eDpbxaVQt5bR7cOUddc");
 	gapi.client.load("youtube", "v3", function() {});
@@ -77,7 +77,7 @@ function ytApiReady() {
 
 function onPlayerStateChange(event) {
     if(event.data==0) {
-    	nextVideoInQueue();
+    	nextMedia();
     }
 }
 
@@ -138,7 +138,7 @@ function onSessionReady(message: WsMessage) {
 		$("#p_current_recommender_info").text("Use the search bar above.");
 	}
 
-    nextVideoInQueue();
+    nextMedia();
     mUI.updateQueue(mSession.Queue, mUser.Id, mUser.State.QueuePosition);
     mUI.updateUsersList(mSession.Users, mUser.Id);
     mUI.sessionReady();
@@ -153,7 +153,7 @@ function onUpdateUsersList(message: WsMessage) {
 function onUpdateQueue(message: WsMessage) {
     mSession.Queue = message.Session.Queue;
     if (mUser.State.Waiting) {
-        nextVideoInQueue();
+        nextMedia();
     }
     mUI.updateQueue(mSession.Queue, mUser.Id, mUser.State.QueuePosition);
 }
@@ -172,7 +172,8 @@ function sendChatMessage(msg: string) {
     mSocket.emit(message);
 }
 
-function searchVideos(query, callback) {
+function onSearchVideos(query, callback: (media: Media[]) => void) {
+
 	var request = gapi.client.youtube.search.list({
         part: "snippet",
         type: "video",
@@ -180,7 +181,18 @@ function searchVideos(query, callback) {
 	    maxResults: 5
     });
 
-	request.execute(callback);
+    request.execute((results) => {
+        var medias = [];
+        for (var i = 0; i < results.length; i++) {
+            var result = results[i];
+            var media = new Media();
+            media.YTVideoID = result.id.videoId;
+            media.ThumbURL = result.snippet.thumbnails.medium.url;
+            media.Title = result.snippet.title;
+            medias.push(media);
+        } 
+        callback(medias);
+    });
 }
 
 function saveUserNameChange(newName) {
@@ -204,7 +216,7 @@ function userStateChange() {
     }
 }
 
-function nextVideoInQueue() {
+function nextMedia() {
     mUser.State.Time = 0;
     var queue = mSession.Queue;
 
@@ -218,15 +230,15 @@ function nextVideoInQueue() {
     userStateChange();
 }
 
-function pauseVideo() {
+function onBtnPause() {
     mPlayer.pause();
 }
 
-function playVideo() {
+function onBtnPlay() {
     mPlayer.play();
 }
 
-function previousVideoInQueue() {
+function previousMedia() {
     mUser.State.Time = 0;
     var queue = mSession.Queue;
 	if(mUser.State.QueuePosition > 0) {
@@ -255,14 +267,18 @@ function queueSelectedVideo(elmnt) {
 
 	$("#div_search_results").fadeOut();
 	$("#input_search").val("");
-	var VideoId = elmnt.getAttribute('data-VideoId');
-	var Title = elmnt.innerText || elmnt.textContent;
-	var ThumbURL = elmnt.getAttribute('data-ThumbURL');
+	var videoId = elmnt.getAttribute('data-VideoId');
+	var title = elmnt.innerText || elmnt.textContent;
+	var thumbURL = elmnt.getAttribute('data-ThumbURL');
+    var mp3Source = elmnt.getAttribute('data-MP3Source');
+    var oggSource = elmnt.getAttribute('data-OGGSource');
 
     var media = new Media();
-    media.YTVideoID = VideoId;
-    media.VideoTitle = Title;
-    media.ThumbURL = ThumbURL;
+    media.YTVideoID = videoId;
+    media.Title = title;
+    media.ThumbURL = thumbURL;
+    media.MP3Source = mp3Source;
+    media.OGGSource = oggSource;
     media.UserId = mUser.Id;
     media.UserName = mUser.Name;
 

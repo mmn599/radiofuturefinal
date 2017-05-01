@@ -1,10 +1,4 @@
-﻿using RadioFutureFinal.Contracts;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace RadioFutureFinal.Models
+﻿namespace RadioFutureFinal.Models
 {
     public class Media
     {
@@ -14,6 +8,8 @@ namespace RadioFutureFinal.Models
         public string YTVideoID { get; set; }
         public string VideoTitle { get; set; }
         public string ThumbURL { get; set; }
+        public string MP3Source { get; set; }
+        public string OGGSource { get; set; }
 
         public Media()
         {

@@ -17,7 +17,10 @@
     "./TypeScripts/Sockets.ts",
     "./TypeScripts/FrameBuilder.ts",
     "./TypeScripts/UI.ts",
-    "./TypeScripts/Room.ts"
+    "./TypeScripts/Room.ts",
+    "./TypeScripts/IPlayer.ts",
+    "./TypeScripts/PodcastPlayer.ts",
+    "./TypeScripts/YtPlayer.ts"
   ],
   "compileOnSave": true
 }

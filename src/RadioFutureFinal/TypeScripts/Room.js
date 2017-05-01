@@ -1,7 +1,6 @@
 // This is all pretty bad code. Should be thoroughly reorganized.
 "use strict";
 // TODO: find a better way to expose these functions to html?
-window.onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
 window.ytApiReady = ytApiReady;
 window.queueSelectedVideo = queueSelectedVideo;
 window.requestSyncWithUser = requestSyncWithUser;
@@ -9,29 +8,31 @@ window.deleteMedia = deleteMedia;
 var Contracts_1 = require("./Contracts");
 var UI_1 = require("./UI");
 var Sockets_1 = require("./Sockets");
-var Player_1 = require("./Player");
-// declare var playerType: string;
-var playerType = "podcasts";
+var PodcastPlayer_1 = require("./PodcastPlayer");
+var YtPlayer_1 = require("./YtPlayer");
 var mUser = new Contracts_1.MyUser();
 var mSession = new Contracts_1.Session();
 var mPlayer;
 var mSocket;
 var mUI;
 $(document).ready(function () {
-    var callbacks = new UI_1.UICallbacks();
+    var callbacks = new UICallbacks();
     callbacks.onSendChatMessage = sendChatMessage;
     callbacks.nameChange = saveUserNameChange;
-    callbacks.nextMedia = nextVideoInQueue;
-    callbacks.pauseMedia = pauseVideo;
-    callbacks.playMedia = playVideo;
-    callbacks.previousMedia = previousVideoInQueue;
-    callbacks.search = searchVideos;
-    var podcasts = false;
+    callbacks.nextMedia = nextMedia;
+    callbacks.pauseMedia = onBtnPause;
+    callbacks.playMedia = onBtnPlay;
+    callbacks.previousMedia = previousMedia;
+    callbacks.search = onSearchVideos;
+    // TODO: remove
+    var playerType = "podcasts";
     if (playerType == "podcasts") {
-        podcasts = true;
+        mPlayer = new PodcastPlayer_1.PodcastPlayer(mobileBrowser);
     }
-    mPlayer = new Player_1.Player(mobileBrowser, podcasts);
-    mUI = new UI_1.UI(mobileBrowser, podcasts, callbacks);
+    else {
+        mPlayer = new YtPlayer_1.YtPlayer(mobileBrowser);
+    }
+    mUI = new UI_1.UI(mobileBrowser, callbacks);
     mSocket = new Sockets_1.MySocket(mMessageFunctions);
     setupJamSession();
     mPlayer.initPlayer(onPlayerStateChange);
@@ -50,16 +51,13 @@ function setupJamSession() {
 //==================================================================
 // Functions automatically called when youtube api's are ready
 //==================================================================
-function onYouTubeIframeAPIReady() {
-    // mPlayer.initPlayer(onPlayerStateChange);
-}
 function ytApiReady() {
     gapi.client.setApiKey("AIzaSyC4A-dsGk-ha_b-eDpbxaVQt5bR7cOUddc");
     gapi.client.load("youtube", "v3", function () { });
 }
 function onPlayerStateChange(event) {
     if (event.data == 0) {
-        nextVideoInQueue();
+        nextMedia();
     }
 }
 //==================================================================
@@ -106,7 +104,7 @@ function onSessionReady(message) {
         $("#p_current_content_info").text("Queue up a song!");
         $("#p_current_recommender_info").text("Use the search bar above.");
     }
-    nextVideoInQueue();
+    nextMedia();
     mUI.updateQueue(mSession.Queue, mUser.Id, mUser.State.QueuePosition);
     mUI.updateUsersList(mSession.Users, mUser.Id);
     mUI.sessionReady();
@@ -119,7 +117,7 @@ function onUpdateUsersList(message) {
 function onUpdateQueue(message) {
     mSession.Queue = message.Session.Queue;
     if (mUser.State.Waiting) {
-        nextVideoInQueue();
+        nextMedia();
     }
     mUI.updateQueue(mSession.Queue, mUser.Id, mUser.State.QueuePosition);
 }
@@ -135,14 +133,25 @@ function sendChatMessage(msg) {
     message.User = mUser;
     mSocket.emit(message);
 }
-function searchVideos(query, callback) {
+function onSearchVideos(query, callback) {
     var request = gapi.client.youtube.search.list({
         part: "snippet",
         type: "video",
         q: encodeURIComponent(query).replace(/%20/g, "+"),
         maxResults: 5
     });
-    request.execute(callback);
+    request.execute(function (results) {
+        var medias = [];
+        for (var i = 0; i < results.length; i++) {
+            var result = results[i];
+            var media = new Contracts_1.Media();
+            media.YTVideoID = result.id.videoId;
+            media.ThumbURL = result.snippet.thumbnails.medium.url;
+            media.Title = result.snippet.title;
+            medias.push(media);
+        }
+        callback(medias);
+    });
 }
 function saveUserNameChange(newName) {
     mUser.Name = newName;
@@ -163,7 +172,7 @@ function userStateChange() {
     else if (mUser.State.QueuePosition == mSession.Queue.length) {
     }
 }
-function nextVideoInQueue() {
+function nextMedia() {
     mUser.State.Time = 0;
     var queue = mSession.Queue;
     if (mUser.State.QueuePosition + 1 < queue.length) {
@@ -174,13 +183,13 @@ function nextVideoInQueue() {
     }
     userStateChange();
 }
-function pauseVideo() {
+function onBtnPause() {
     mPlayer.pause();
 }
-function playVideo() {
+function onBtnPlay() {
     mPlayer.play();
 }
-function previousVideoInQueue() {
+function previousMedia() {
     mUser.State.Time = 0;
     var queue = mSession.Queue;
     if (mUser.State.QueuePosition > 0) {
@@ -203,13 +212,17 @@ function requestSyncWithUser(userId) {
 function queueSelectedVideo(elmnt) {
     $("#div_search_results").fadeOut();
     $("#input_search").val("");
-    var VideoId = elmnt.getAttribute('data-VideoId');
-    var Title = elmnt.innerText || elmnt.textContent;
-    var ThumbURL = elmnt.getAttribute('data-ThumbURL');
+    var videoId = elmnt.getAttribute('data-VideoId');
+    var title = elmnt.innerText || elmnt.textContent;
+    var thumbURL = elmnt.getAttribute('data-ThumbURL');
+    var mp3Source = elmnt.getAttribute('data-MP3Source');
+    var oggSource = elmnt.getAttribute('data-OGGSource');
     var media = new Contracts_1.Media();
-    media.YTVideoID = VideoId;
-    media.VideoTitle = Title;
-    media.ThumbURL = ThumbURL;
+    media.YTVideoID = videoId;
+    media.Title = title;
+    media.ThumbURL = thumbURL;
+    media.MP3Source = mp3Source;
+    media.OGGSource = oggSource;
     media.UserId = mUser.Id;
     media.UserName = mUser.Name;
     var message = new Contracts_1.WsMessage();

@@ -12,7 +12,6 @@ namespace RadioFutureFinal.Controllers
         public IActionResult EnterRoom(string name = "default_room_name")
         {
             ViewData["roomName"] = name;
-            ViewData["playerType"] = "podcasts";
             if(Utils.BroserIsMobile(HttpContext))
             {
                 return View("~/Views/Room/EnterRoomMobile.cshtml");

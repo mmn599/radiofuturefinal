@@ -34,7 +34,7 @@ var FrameBuilder = (function () {
             currentHTML =
                 '<div ' + deleteThisHTML + 'style="' + canDeleteStyle + onThisStyle + 'text-align: left; display: flex; align-items: center;">' +
                     '<img style="height: 90px; width: 160px; margin-right: 16px;" src="' + media.ThumbURL + '"/>' +
-                    '<span style="margin-right: 16px;">' + media.VideoTitle + '</span>' +
+                    '<span style="margin-right: 16px;">' + media.Title + '</span>' +
                     '</div>';
         }
         return currentHTML;

@@ -26,5 +26,11 @@ namespace RadioFutureFinal.Contracts
 
         [JsonProperty]
         public string ThumbURL { get; set; }
+
+        [JsonProperty]
+        public string MP3Source { get; set; }
+
+        [JsonProperty]
+        public string OGGSource { get; set; }
     }
 }

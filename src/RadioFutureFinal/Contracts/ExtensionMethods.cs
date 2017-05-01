@@ -61,7 +61,9 @@ namespace RadioFutureFinal.Contracts
                 UserName = media.UserName,
                 YTVideoID = media.YTVideoID,
                 VideoTitle = media.VideoTitle,
-                ThumbURL = media.ThumbURL
+                ThumbURL = media.ThumbURL,
+                MP3Source = media.MP3Source,
+                OGGSource = media.OGGSource
             };
             return mediaModel;
         }
@@ -75,7 +77,9 @@ namespace RadioFutureFinal.Contracts
                 UserName = media.UserName,
                 YTVideoID = media.YTVideoID,
                 ThumbURL = media.ThumbURL,
-                VideoTitle = media.VideoTitle
+                VideoTitle = media.VideoTitle,
+                MP3Source = media.MP3Source,
+                OGGSource = media.OGGSource
             };
             return mediaContract;
         }

@@ -3,7 +3,9 @@
     UserId: number;
     UserName: string;
     YTVideoID: number;
-    VideoTitle: string;
+    MP3Source: string;
+    OGGSource: string;
+    Title: string;
     ThumbURL: string;
 }
 

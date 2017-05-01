@@ -66,4 +66,13 @@
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="1.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="TypeScripts\IPlayer.js">
+      <DependentUpon>IPlayer.ts</DependentUpon>
+    </None>
+    <None Update="TypeScripts\IPlayer.js.map">
+      <DependentUpon>IPlayer.js</DependentUpon>
+    </None>
+  </ItemGroup>
+
 </Project>
