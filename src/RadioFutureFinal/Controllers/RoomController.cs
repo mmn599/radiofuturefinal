@@ -9,14 +9,26 @@ namespace RadioFutureFinal.Controllers
             return "Put in a room name dawg!";
         }
 
-        public IActionResult EnterRoom(string name = "default_room_name")
+        public IActionResult EnterRoom(string roomType = "podcasts", string roomName = "default_room_name")
         {
-            ViewData["roomName"] = name;
-            if(Utils.BroserIsMobile(HttpContext))
+            ViewData["roomName"] = roomName;
+            ViewData["roomType"] = roomType;
+            if(roomType == "podcasts")
             {
-                return View("~/Views/Room/EnterRoomMobile.cshtml");
+                return View("~/Views/Room/PodcastRoom.cshtml");
             }
-            return View("~/Views/Room/EnterRoom.cshtml");
+            else if(roomType == "youtube")
+            {
+                if(Utils.BroserIsMobile(HttpContext))
+                {
+                    return View("~/Views/Room/EnterRoomMobile.cshtml");
+                }
+                return View("~/Views/Room/EnterRoom.cshtml");
+            }
+            else
+            {
+                return View("~/Views/Error/Error.cshtml");
+            }
         }
     }
 }

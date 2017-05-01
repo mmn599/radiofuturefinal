@@ -17,22 +17,22 @@ class RoomManager implements UICallbacks, ClientActions {
     socket: MySocket;
     ui: UI;
 
-    playerType: string;
+    roomType: string;
     mobileBrowser: boolean;
 
-    constructor(playerType: string, mobileBrowser: boolean) {
+    constructor(roomType: string, mobileBrowser: boolean) {
         // TODO: find a better way to expose these functions to html?
         (<any>window).queueSelectedVideo = this.queueSelectedVideo;
         (<any>window).requestSyncWithUser = this.requestSyncWithUser;
         (<any>window).deleteMedia = this.deleteMedia;
-        this.playerType = playerType;
+        this.roomType = roomType;
         this.mobileBrowser = mobileBrowser;
     }
 
-    public init() {
+    public init(encodedSessionName: string) {
         this.user = new MyUser();
         this.session = new Session();
-        if (this.playerType == "podcasts") {
+        if (this.roomType == "podcasts") {
             this.player = new PodcastPlayer(this.mobileBrowser);
             this.searcher = new PodcastSearcher();
         }
@@ -43,23 +43,17 @@ class RoomManager implements UICallbacks, ClientActions {
         }
         this.ui = new UI(this.mobileBrowser, this);
         this.socket = new MySocket(this);
-        this.setupJamSession();
+        this.setupJamSession(encodedSessionName);
         this.player.initPlayer(this.onPlayerStateChange);
     }
 
-
-    setupJamSession() {
-        var pathname = window.location.pathname;
-        var encodedSessionName = pathname.replace('\/rooms/', '');
-
+    setupJamSession(encodedSessionName: string) {
         this.session.Name = decodeURI(encodedSessionName);
         this.user.Name = 'Anonymous';
-
         var message = new WsMessage();
         message.Action = 'UserJoinSession';
         message.User = this.user;
         message.Session = this.session;
-
         this.socket.emit(message);
     }
 
@@ -138,7 +132,7 @@ class RoomManager implements UICallbacks, ClientActions {
 
     clientSetupAudioAPI(message: WsMessage) {
         // TODO: better mechanism for different players
-        if (this.playerType == "podcasts") {
+        if (this.roomType == "podcasts") {
             // TODO: better message structure
             // TODO: ensure this isn't awfully insecure
             var id = message.User.Name;
@@ -148,7 +142,7 @@ class RoomManager implements UICallbacks, ClientActions {
     }
 
     clientSetupYTAPI(message: WsMessage) {
-        if (this.playerType != "podcasts") {
+        if (this.roomType != "podcasts") {
             var secret = message.Media.Title;
             this.searcher.init(secret);
         }
@@ -194,6 +188,7 @@ class RoomManager implements UICallbacks, ClientActions {
             this.user.State.Waiting = true;
         }
         else if (this.user.State.QueuePosition == this.session.Queue.length) {
+
         }
     }
 
@@ -291,16 +286,15 @@ class RoomManager implements UICallbacks, ClientActions {
         this.socket.emit(message);
     }
 
-
 }
 
 declare var mobileBrowser: boolean;
-declare var playerType: string;
+declare var roomType: string;
+declare var roomName: string;
 
-var mRoomManager = new RoomManager(playerType, mobileBrowser);
-
+var mRoomManager = new RoomManager(roomType, mobileBrowser);
 $(document).ready(function () {
-    mRoomManager.init();
+    mRoomManager.init(roomName);
 });
 
 

@@ -76,7 +76,7 @@ namespace RadioFutureFinal
 
             routes.MapRoute(
                 name: "room",
-                template: "rooms/{*name}",
+                template: "rooms/{roomType}/{roomName}",
                 defaults: new { controller = "Room", action = "EnterRoom" });
             });
         }

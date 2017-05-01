@@ -7,7 +7,7 @@ var YtPlayer_1 = require("./YtPlayer");
 var YtSearcher_1 = require("./YtSearcher");
 var PodcastSearcher_1 = require("./PodcastSearcher");
 var RoomManager = (function () {
-    function RoomManager(playerType, mobileBrowser) {
+    function RoomManager(roomType, mobileBrowser) {
         var _this = this;
         //==================================================================
         // These functions are called directly embedded into the html... kinda weird
@@ -61,13 +61,13 @@ var RoomManager = (function () {
         window.queueSelectedVideo = this.queueSelectedVideo;
         window.requestSyncWithUser = this.requestSyncWithUser;
         window.deleteMedia = this.deleteMedia;
-        this.playerType = playerType;
+        this.roomType = roomType;
         this.mobileBrowser = mobileBrowser;
     }
-    RoomManager.prototype.init = function () {
+    RoomManager.prototype.init = function (encodedSessionName) {
         this.user = new Contracts_1.MyUser();
         this.session = new Contracts_1.Session();
-        if (this.playerType == "podcasts") {
+        if (this.roomType == "podcasts") {
             this.player = new PodcastPlayer_1.PodcastPlayer(this.mobileBrowser);
             this.searcher = new PodcastSearcher_1.PodcastSearcher();
         }
@@ -78,12 +78,10 @@ var RoomManager = (function () {
         }
         this.ui = new UI_1.UI(this.mobileBrowser, this);
         this.socket = new Sockets_1.MySocket(this);
-        this.setupJamSession();
+        this.setupJamSession(encodedSessionName);
         this.player.initPlayer(this.onPlayerStateChange);
     };
-    RoomManager.prototype.setupJamSession = function () {
-        var pathname = window.location.pathname;
-        var encodedSessionName = pathname.replace('\/rooms/', '');
+    RoomManager.prototype.setupJamSession = function (encodedSessionName) {
         this.session.Name = decodeURI(encodedSessionName);
         this.user.Name = 'Anonymous';
         var message = new Contracts_1.WsMessage();
@@ -151,7 +149,7 @@ var RoomManager = (function () {
     };
     RoomManager.prototype.clientSetupAudioAPI = function (message) {
         // TODO: better mechanism for different players
-        if (this.playerType == "podcasts") {
+        if (this.roomType == "podcasts") {
             // TODO: better message structure
             // TODO: ensure this isn't awfully insecure
             var id = message.User.Name;
@@ -160,7 +158,7 @@ var RoomManager = (function () {
         }
     };
     RoomManager.prototype.clientSetupYTAPI = function (message) {
-        if (this.playerType != "podcasts") {
+        if (this.roomType != "podcasts") {
             var secret = message.Media.Title;
             this.searcher.init(secret);
         }
@@ -229,8 +227,8 @@ var RoomManager = (function () {
     };
     return RoomManager;
 }());
-var mRoomManager = new RoomManager(playerType, mobileBrowser);
+var mRoomManager = new RoomManager(roomType, mobileBrowser);
 $(document).ready(function () {
-    mRoomManager.init();
+    mRoomManager.init(roomName);
 });
 //# sourceMappingURL=Room.js.map
