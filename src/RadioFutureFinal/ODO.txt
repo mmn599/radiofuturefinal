@@ -2,12 +2,12 @@
 -delete working on mobile
 -general mobile ui improvements
 -update bundle config
+-make sure podcast/youtube sessions dont cross over
 
 big
--make sure podcast/youtube sessions dont cross over
+-podcast visualizer
 -typescript implicit any compilation
 -better websocket message structure
--ui for podcasts
 -model support for two types of content: yt videos and podcasts
 -search support for podcasts and yt videos
 
