@@ -74,7 +74,6 @@ export class YtPlayer implements IPlayer {
         return Math.round(this.ytPlayer.getPlayerState());
     }
 
-
     private updatePlayerUI(media: Media, time: number) {
         this.ytPlayer.loadVideoById(media.YTVideoID, time, "large");	
         $("#p_cc_summary").text(media.Title);

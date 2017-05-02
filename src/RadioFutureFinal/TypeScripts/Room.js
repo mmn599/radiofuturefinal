@@ -19,21 +19,8 @@ var RoomManager = (function () {
             message.User = user;
             _this.socket.emit(message);
         };
-        this.queueSelectedMedia = function (elmnt) {
-            console.log('queuing');
-            $("#div_search_results").fadeOut();
-            $("#input_search").val("");
-            var videoId = elmnt.getAttribute('data-VideoId');
-            var title = elmnt.innerText || elmnt.textContent;
-            var thumbURL = elmnt.getAttribute('data-ThumbURL');
-            var mp3Source = elmnt.getAttribute('data-MP3Source');
-            var oggSource = elmnt.getAttribute('data-OGGSource');
-            var media = new Contracts_1.Media();
-            media.YTVideoID = videoId;
-            media.Title = title;
-            media.ThumbURL = thumbURL;
-            media.MP3Source = mp3Source;
-            media.OGGSource = oggSource;
+        this.uiQueueMedia = function (media) {
+            console.log('ui updating queue');
             media.UserId = _this.user.Id;
             media.UserName = _this.user.Name;
             var message = new Contracts_1.WsMessage();
@@ -57,7 +44,6 @@ var RoomManager = (function () {
             _this.socket.emit(message);
         };
         // TODO: find a better way to expose these functions to html?
-        window.queueSelectedMedia = this.queueSelectedMedia;
         window.requestSyncWithUser = this.requestSyncWithUser;
         window.deleteMedia = this.deleteMedia;
         this.roomType = roomType;
@@ -190,6 +176,10 @@ var RoomManager = (function () {
         }
     };
     RoomManager.prototype.uiNextMedia = function () {
+        // TODO: workaround, user state should never be undefined
+        if (!this.user.State) {
+            this.user.State = new Contracts_1.UserState();
+        }
         this.user.State.Time = 0;
         var queue = this.session.Queue;
         if (this.user.State.QueuePosition + 1 < queue.length) {

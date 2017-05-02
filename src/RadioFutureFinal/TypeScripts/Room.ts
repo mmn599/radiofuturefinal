@@ -17,7 +17,6 @@ class RoomManager implements UICallbacks, ClientActions {
 
     constructor(roomType: string, mobileBrowser: boolean) {
         // TODO: find a better way to expose these functions to html?
-        (<any>window).queueSelectedMedia = this.queueSelectedMedia;
         (<any>window).requestSyncWithUser = this.requestSyncWithUser;
         (<any>window).deleteMedia = this.deleteMedia;
         this.roomType = roomType;
@@ -175,6 +174,10 @@ class RoomManager implements UICallbacks, ClientActions {
     }
 
     uiNextMedia() {
+        // TODO: workaround, user state should never be undefined
+        if (!this.user.State) {
+            this.user.State = new UserState();
+        }
         this.user.State.Time = 0;
         var queue = this.session.Queue;
 
@@ -221,23 +224,10 @@ class RoomManager implements UICallbacks, ClientActions {
         this.socket.emit(message);
     }
 
-    queueSelectedMedia = (elmnt) => {
+    uiQueueMedia = (media: Media) => {
 
-        console.log('queuing');
-        $("#div_search_results").fadeOut();
-        $("#input_search").val("");
-        var videoId = elmnt.getAttribute('data-VideoId');
-        var title = elmnt.innerText || elmnt.textContent;
-        var thumbURL = elmnt.getAttribute('data-ThumbURL');
-        var mp3Source = elmnt.getAttribute('data-MP3Source');
-        var oggSource = elmnt.getAttribute('data-OGGSource');
+        console.log('ui updating queue');
 
-        var media = new Media();
-        media.YTVideoID = videoId;
-        media.Title = title;
-        media.ThumbURL = thumbURL;
-        media.MP3Source = mp3Source;
-        media.OGGSource = oggSource;
         media.UserId = this.user.Id;
         media.UserName = this.user.Name;
 
@@ -248,7 +238,6 @@ class RoomManager implements UICallbacks, ClientActions {
         //TODO: local add media
         this.socket.emit(message);
     }
-
 
     deleteMedia = (mediaId: number, position: number) => {
 

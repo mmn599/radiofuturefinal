@@ -12,6 +12,7 @@ export interface UICallbacks {
     uiSendChatMessage: any;
     uiSearch: (query: string) => void;
     uiNameChange: any;
+    uiQueueMedia: (media: Media) => void;
 }
 
 export class UI {
@@ -121,7 +122,8 @@ export class UI {
                 }
             });
         }
-        document.body.addEventListener('click', () => {
+        document.body.addEventListener('click', (event) => {
+            console.log(event.target);
             $("#div_search_results").fadeOut();
             $("#input_search").val("");
         }, true);
@@ -147,13 +149,21 @@ export class UI {
 
     public onSearchResults(results: Media[]) {
         var divResults = $("#div_search_results");
+        divResults.html("");
         var html = [];
         for (var i = 0; i < results.length; i++) {
             var media = results[i];
-            var currentHTML = "<div class='div_search_result' onClick='queueSelectedMedia(this)' data-VideoId='" + media.YTVideoID + "' data-ThumbURL='" + media.ThumbURL + "'>" + '<p class="text_search_result">' + media.Title + '</p></div>';
-            html.push(currentHTML);
+            var divSearchResult = $(document.createElement('div'));
+            divSearchResult.addClass('div_search_result');
+            divSearchResult.appendTo(divResults);
+            divSearchResult.click(() => {
+                this.callbacks.uiQueueMedia(media);
+            });
+            var pResult = document.createElement('p');
+            $(pResult).addClass('text_search_result');
+            $(pResult).appendTo(divSearchResult);
+            $(pResult).text(media.Title);
         }
-        divResults.html(html.join(""));
         $("#input_search").blur();
     }
 

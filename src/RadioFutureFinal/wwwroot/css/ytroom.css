@@ -90,9 +90,11 @@ input:focus {
 }
 
 #div_search_results {
+    position: absolute;
     right: 25%;
     width: 50%;
     top: 5%;
+    z-index: 3;
 }
 
 #div_user_results {
@@ -118,9 +120,6 @@ input:focus {
 
 .text_search_result {
     cursor: pointer;
-}
-
-.div_search_result > p {
     margin: 0;
     font-size: 24px;
     margin-bottom: 2%;
@@ -236,10 +235,12 @@ input:focus {
 }
 
 #canvas_podcast {
+    position: relative;
+    top: 25%;
     display: inline-block;
-    width: 100%;
-    height: 100%;
-    position: relative; 
+    width: 50%;
+    height: 50%;
+    background: white;
 }
 
 .arrow-up {

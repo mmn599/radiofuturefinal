@@ -12,6 +12,7 @@ var PodcastPlayer = (function () {
         };
         this.mobileBrowser = mobileBrowser;
         this.html5audio = document.getElementById('html5audio');
+        this.mp3source = document.getElementById('mp3Source');
         $("#div_yt_player").hide();
         $("#div_podcast_player").show();
     }
@@ -28,8 +29,9 @@ var PodcastPlayer = (function () {
                 '</div>';
             $("#div_cc_results").html(html);
         }
-        this.html5audio.src = media.MP3Source;
-        this.html5audio.currentTime = time;
+        // this.html5audio.currentTime = time;
+        this.mp3source.src = media.MP3Source;
+        this.html5audio.play(); //call this to play the song right away
     };
     PodcastPlayer.prototype.play = function () {
         this.html5audio.play();
