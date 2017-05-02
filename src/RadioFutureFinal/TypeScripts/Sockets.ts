@@ -11,6 +11,7 @@ export interface ClientActions {
     clientProvideUserState: (message: WsMessage) => void;
     clientSetupYTAPI: (message: WsMessage) => void;
     clientSetupAudioAPI: (message: WsMessage) => void;
+
 }
 
 export class MySocket {

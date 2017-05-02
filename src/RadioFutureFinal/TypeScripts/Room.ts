@@ -127,7 +127,7 @@ class RoomManager implements UICallbacks, ClientActions {
     clientChatMessage(message: WsMessage) {
         var chatMessage = message.ChatMessage;
         var userName = message.User.Name;
-        this.ui.onChatMessage(userName, chatMessage);
+        this.ui.onChatMessage(userName, chatMessage, 'blue');
     }
 
     clientSetupAudioAPI(message: WsMessage) {

@@ -208,9 +208,13 @@ export class UI {
         this.callbacks.nameChange(name_input.val());
     }
 
-    public onChatMessage(userName: string, msg: string) {
+    public onChatMessage(userName: string, msg: string, color: string) {
         //TODO: color stuff
-        var html = '<li class="chat"><span style="margin: 0; color: ' + 'blue' + ';">' + userName + ': </span><span>' + msg + '</span></li>';
-        $("#ul_chat").append(html);
+        var ul_chat = $("#ul_chat");
+        var html = '<li class="chat"><span style="margin: 0; color: ' + color + ';">' + userName + ': </span><span>' + msg + '</span></li>';
+        ul_chat.append(html);
+        if (ul_chat.length >= 10) {
+            ul_chat.children()[0].remove(); 
+        }
     }
 }

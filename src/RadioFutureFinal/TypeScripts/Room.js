@@ -145,7 +145,7 @@ var RoomManager = (function () {
     RoomManager.prototype.clientChatMessage = function (message) {
         var chatMessage = message.ChatMessage;
         var userName = message.User.Name;
-        this.ui.onChatMessage(userName, chatMessage);
+        this.ui.onChatMessage(userName, chatMessage, 'blue');
     };
     RoomManager.prototype.clientSetupAudioAPI = function (message) {
         // TODO: better mechanism for different players

@@ -75,7 +75,7 @@ namespace RadioFutureFinal.Messaging
         // TODO: don't use full WsMessage
         public async Task<List<SendResult>> ClientsSendChatMessage(WsMessage message, List<MySocket> socketsInSession)
         {
-            message.ChatMessage = "clientChatMessage";
+            message.Action = "clientChatMessage";
             return await _senderBase.SendMessageToSessionAsync(message, socketsInSession);
         }
 
