@@ -45,6 +45,17 @@ namespace RadioFutureFinal.Messaging
             return await _senderBase.SendMessageAsync(userToSendTo.WebSocket, wsMessage);
         }
 
+        public async Task<SendResult> ClientSearchResults(MySocket userToSendTo, List<MediaV1> searchResults)
+        {
+            var wsMessage = new WsMessage();
+            wsMessage.Action = "clientSearchResults";
+            // TODO: dumb
+            wsMessage.Session = new SessionV1();
+            wsMessage.Session.Queue = searchResults;
+            return await _senderBase.SendMessageAsync(userToSendTo.WebSocket, wsMessage);
+        }
+
+
         public async Task<SendResult> ClientSetupYTAPI(MySocket socket, string secret)
         {
             var wsMessage = new WsMessage();

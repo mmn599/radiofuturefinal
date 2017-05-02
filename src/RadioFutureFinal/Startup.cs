@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using RadioFutureFinal.Messaging;
 using RadioFutureFinal.DAL;
+using RadioFutureFinal.Search;
 
 namespace RadioFutureFinal
 {
@@ -20,9 +21,13 @@ namespace RadioFutureFinal
 
             builder.AddEnvironmentVariables();
             Configuration = builder.Build();
+
+            Searcher = new Searcher(Configuration);
+            Searcher.init();
         }
 
         public IConfigurationRoot Configuration { get; }
+        public Searcher Searcher { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -36,6 +41,8 @@ namespace RadioFutureFinal
             services.AddSingleton<IMyContext, MyContext>();
             services.AddSingleton<IMessageReceiverBase, MessageReceiverBase>();
             services.AddSingleton<IMessageReceiver, MessageReceiver>();
+
+            services.AddSingleton(Searcher);
         }
         
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

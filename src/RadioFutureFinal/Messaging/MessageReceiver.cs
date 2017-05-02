@@ -2,6 +2,7 @@
 using RadioFutureFinal.Contracts;
 using RadioFutureFinal.DAL;
 using RadioFutureFinal.Models;
+using RadioFutureFinal.Search;
 using System;
 using System.Collections.Generic;
 using System.Net.WebSockets;
@@ -15,17 +16,19 @@ namespace RadioFutureFinal.Messaging
         IMyContext _myContext;
         IDbRepository _db;
         IMessageSender _sender;
+        Searcher _searcher;
         Dictionary<string, ResponseFunction> _responses;
 
         public delegate Task ResponseFunction(WsMessage message, MySocket socket);
 
-        public MessageReceiver(IDbRepository db, IMyContext myContext, MessageSenderFactory senderFactory)
+        public MessageReceiver(IDbRepository db, IMyContext myContext, MessageSenderFactory senderFactory, Searcher searcher)
         {
             _myContext = myContext;
             _db = db;
             _sender = senderFactory.Create(_myContext.SocketDisconnected);
+            _searcher = searcher;
 
-            // TODO: probably put this somehwere else?
+            // TODO: there's a better spot for this
             _responses = new Dictionary<string, ResponseFunction>()
             {
                 { "UserJoinSession", JoinSession },
@@ -34,7 +37,8 @@ namespace RadioFutureFinal.Messaging
                 { "SaveUserNameChange", SaveUserNameChange },
                 { "ChatMessage", ChatMessage },
                 { "RequestSyncWithUser", RequestSyncWithUser },
-                { "ProvideSyncToUser", ProvideSyncToUser }
+                { "ProvideSyncToUser", ProvideSyncToUser },
+                { "Search", Search }
             };
         }
 
@@ -120,5 +124,13 @@ namespace RadioFutureFinal.Messaging
             var socketToSendTo = _myContext.GetSocketIdForUser(socket.SessionId, userIdToSendTo);
             await _sender.ClientProvideUserState(message.User, socketToSendTo);
         }
+
+        public async Task Search(WsMessage message, MySocket socket)
+        {
+            var query = message.ChatMessage;
+            var searchResults = await _searcher.searchPodcasts(query);
+            await _sender.ClientSearchResults(socket, searchResults);
+        }
+
     }
 }

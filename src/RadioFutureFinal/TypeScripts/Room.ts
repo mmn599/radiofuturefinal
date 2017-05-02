@@ -4,19 +4,14 @@ import { MySocket, ClientActions } from "./Sockets";
 import { IPlayer } from "./IPlayer";
 import { PodcastPlayer } from "./PodcastPlayer";
 import { YtPlayer } from "./YtPlayer";
-import { ISearcher } from "./ISearcher";
-import { YtSearcher } from "./YtSearcher";
-import { PodcastSearcher } from "./PodcastSearcher";
 
 class RoomManager implements UICallbacks, ClientActions {
 
     user: MyUser;
     session: Session;
-    searcher: ISearcher;
     player: IPlayer; 
     socket: MySocket;
     ui: UI;
-
     roomType: string;
     mobileBrowser: boolean;
 
@@ -34,11 +29,9 @@ class RoomManager implements UICallbacks, ClientActions {
         this.session = new Session();
         if (this.roomType == "podcasts") {
             this.player = new PodcastPlayer(this.mobileBrowser);
-            this.searcher = new PodcastSearcher();
         }
         else {
             // TODO: get rid of this key
-            this.searcher = new YtSearcher('AIzaSyC4A-dsGk-ha_b-eDpbxaVQt5bR7cOUddc');
             this.player = new YtPlayer(this.mobileBrowser);
         }
         this.ui = new UI(this.mobileBrowser, this);
@@ -88,7 +81,6 @@ class RoomManager implements UICallbacks, ClientActions {
         this.socket.emit(outgoingMsg);
     }
 
-
     clientUpdateUser(message: WsMessage) {
         var user = message.User;
         this.user = user;	
@@ -104,7 +96,7 @@ class RoomManager implements UICallbacks, ClientActions {
             $("#p_current_recommender_info").text("Use the search bar above.");
         }
 
-        this.nextMedia();
+        this.uiNextMedia();
         this.ui.updateQueue(this.session.Queue, this.user.Id, this.user.State.QueuePosition);
         this.ui.updateUsersList(this.session.Users, this.user.Id);
         this.ui.sessionReady();
@@ -119,7 +111,7 @@ class RoomManager implements UICallbacks, ClientActions {
     clientUpdateQueue(message: WsMessage) {
         this.session.Queue = message.Session.Queue;
         if (this.user.State.Waiting) {
-            this.nextMedia();
+            this.uiNextMedia();
         }
         this.ui.updateQueue(this.session.Queue, this.user.Id, this.user.State.QueuePosition);
     }
@@ -130,29 +122,15 @@ class RoomManager implements UICallbacks, ClientActions {
         this.ui.onChatMessage(userName, chatMessage, 'blue');
     }
 
-    clientSetupAudioAPI(message: WsMessage) {
-        // TODO: better mechanism for different players
-        if (this.roomType == "podcasts") {
-            // TODO: better message structure
-            // TODO: ensure this isn't awfully insecure
-            var id = message.User.Name;
-            var secret = message.Media.Title;
-            this.searcher.init(secret, id);
-        }
-    }
-
-    clientSetupYTAPI(message: WsMessage) {
-        if (this.roomType != "podcasts") {
-            var secret = message.Media.Title;
-            this.searcher.init(secret);
-        }
+    clientSearchResults(message: WsMessage) {
+        // TODO: dumb
+        var results = message.Session.Queue;
     }
 
     //
     // Mostly UI callback functions
     //
-
-    onSendChatMessage(msg: string) {
+    uiSendChatMessage(msg: string) {
         var message = new WsMessage();
         message.Action = 'ChatMessage';
         message.ChatMessage = msg;
@@ -162,15 +140,18 @@ class RoomManager implements UICallbacks, ClientActions {
 
     onPlayerStateChange(event) {
         if(event.data==0) {
-            this.nextMedia();
+            this.uiNextMedia();
         }
     }
 
-    search(query, callback: (media: Media[]) => void) {
-        this.searcher.search(query, callback);
+    uiSearch(query) {
+        var message = new WsMessage();
+        message.Action = 'Search';
+        message.ChatMessage = query;
+        this.socket.emit(message);
     }
 
-    nameChange(newName) {
+    uiNameChange(newName) {
         this.user.Name = newName;
         var message = new WsMessage();
         message.User = this.user;
@@ -192,7 +173,7 @@ class RoomManager implements UICallbacks, ClientActions {
         }
     }
 
-    nextMedia() {
+    uiNextMedia() {
         this.user.State.Time = 0;
         var queue = this.session.Queue;
 
@@ -206,15 +187,15 @@ class RoomManager implements UICallbacks, ClientActions {
         this.userStateChange();
     }
 
-    pauseMedia() {
+    uiPauseMedia() {
         this.player.pause();
     }
 
-    playMedia() {
+    uiPlayMedia() {
         this.player.play();
     }
 
-    previousMedia() {
+    uiPreviousMedia() {
         this.user.State.Time = 0;
         var queue = this.session.Queue;
         if(this.user.State.QueuePosition > 0) {

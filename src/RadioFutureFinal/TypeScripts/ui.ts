@@ -5,13 +5,13 @@ declare var Spinner: any;
 
 // TODO: make this an interface
 export interface UICallbacks {
-    previousMedia: any;
-    nextMedia: any;
-    playMedia: any;
-    pauseMedia: any;
-    onSendChatMessage: any;
-    search: any;
-    nameChange: any;
+    uiPreviousMedia: any;
+    uiNextMedia: any;
+    uiPlayMedia: any;
+    uiPauseMedia: any;
+    uiSendChatMessage: any;
+    uiSearch: (query: string) => void;
+    uiNameChange: any;
 }
 
 export class UI {
@@ -116,7 +116,7 @@ export class UI {
             var input_chat = $("#input_chat");
             input_chat.keypress((e) => {
                 if (e.which == 13) {
-                    this.callbacks.onSendChatMessage(input_chat.val());
+                    this.callbacks.uiSendChatMessage(input_chat.val());
                     input_chat.val("");
                 }
             });
@@ -131,30 +131,33 @@ export class UI {
     }
 
     private setupPlayerControlButtons() {
-        $("#btn_previous").click(this.callbacks.previousMedia);
+        $("#btn_previous").click(this.callbacks.uiPreviousMedia);
         $("#btn_pause").click(() => {
             $("#btn_pause").hide();
             $("#btn_play").show();
-            this.callbacks.pauseMedia();
+            this.callbacks.uiPauseMedia();
         });
         $("#btn_play").click(() => {
             $("#btn_play").hide();
             $("#btn_pause").show();
-            this.callbacks.playMedia();
+            this.callbacks.uiPlayMedia();
         });
-        $("#btn_next").click(this.callbacks.nextMedia);
+        $("#btn_next").click(this.callbacks.uiNextMedia);
+    }
+
+    public onSearchResults(results: Media[]) {
+        var divResults = $("#div_search_results");
+        for (var i = 0; i < results.length; i++) {
+            var media = results[i];
+            divResults.html(divResults.html() + "<div class='div_search_result' onClick='queueSelectedVideo(this)' data-VideoId='" + media.YTVideoID + "' data-ThumbURL='" + media.ThumbURL + "'>" + '<p class="text_search_result">' + media.Title + '</p></div>');
+        }
+        $("#input_search").blur();
     }
 
     private searchEnterPressed(input_search) {
         var divResults = $("#div_search_results");
         divResults.html("");
-        this.callbacks.search(input_search.val(), (results: Media[]) => {
-            for (var i = 0; i < results.length; i++) {
-                var media = results[i];
-                divResults.html(divResults.html() + "<div class='div_search_result' onClick='queueSelectedVideo(this)' data-VideoId='" + media.YTVideoID + "' data-ThumbURL='" + media.ThumbURL + "'>" + '<p class="text_search_result">' + media.Title + '</p></div>');
-            }
-            input_search.blur();
-        });
+        this.callbacks.uiSearch(input_search.val());
         if(!divResults.is(':visible')) {
             divResults.fadeIn();
         }
@@ -205,7 +208,7 @@ export class UI {
     public userNameChange(name_input) {
         name_input.hide();
         $("#input_search").fadeIn();
-        this.callbacks.nameChange(name_input.val());
+        this.callbacks.uiNameChange(name_input.val());
     }
 
     public onChatMessage(userName: string, msg: string, color: string) {

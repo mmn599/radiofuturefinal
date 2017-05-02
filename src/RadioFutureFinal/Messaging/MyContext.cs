@@ -69,10 +69,6 @@ namespace RadioFutureFinal.Messaging
         {
             var mySocket = new MySocket(socket);
             _activeSockets.TryAdd(socket, mySocket);
-
-            // TODO: this should probably go somewhere else
-            _wsSender.ClientSetupAudioAPI(mySocket, _config.GetValue<string>("AudioAPIKey"), _config.GetValue<string>("AudioSecret"));
-            _wsSender.ClientSetupYTAPI(mySocket, _config.GetValue<string>("YTAPIKey"));
         }
 
         public void SocketJoinSession(MySocket socket, int sessionId, int userId)

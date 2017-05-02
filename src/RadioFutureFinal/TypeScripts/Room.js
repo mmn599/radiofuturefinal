@@ -4,8 +4,6 @@ var UI_1 = require("./UI");
 var Sockets_1 = require("./Sockets");
 var PodcastPlayer_1 = require("./PodcastPlayer");
 var YtPlayer_1 = require("./YtPlayer");
-var YtSearcher_1 = require("./YtSearcher");
-var PodcastSearcher_1 = require("./PodcastSearcher");
 var RoomManager = (function () {
     function RoomManager(roomType, mobileBrowser) {
         var _this = this;
@@ -69,11 +67,9 @@ var RoomManager = (function () {
         this.session = new Contracts_1.Session();
         if (this.roomType == "podcasts") {
             this.player = new PodcastPlayer_1.PodcastPlayer(this.mobileBrowser);
-            this.searcher = new PodcastSearcher_1.PodcastSearcher();
         }
         else {
             // TODO: get rid of this key
-            this.searcher = new YtSearcher_1.YtSearcher('AIzaSyC4A-dsGk-ha_b-eDpbxaVQt5bR7cOUddc');
             this.player = new YtPlayer_1.YtPlayer(this.mobileBrowser);
         }
         this.ui = new UI_1.UI(this.mobileBrowser, this);
@@ -125,7 +121,7 @@ var RoomManager = (function () {
             $("#p_current_content_info").text("Queue up a song!");
             $("#p_current_recommender_info").text("Use the search bar above.");
         }
-        this.nextMedia();
+        this.uiNextMedia();
         this.ui.updateQueue(this.session.Queue, this.user.Id, this.user.State.QueuePosition);
         this.ui.updateUsersList(this.session.Users, this.user.Id);
         this.ui.sessionReady();
@@ -138,7 +134,7 @@ var RoomManager = (function () {
     RoomManager.prototype.clientUpdateQueue = function (message) {
         this.session.Queue = message.Session.Queue;
         if (this.user.State.Waiting) {
-            this.nextMedia();
+            this.uiNextMedia();
         }
         this.ui.updateQueue(this.session.Queue, this.user.Id, this.user.State.QueuePosition);
     };
@@ -147,26 +143,14 @@ var RoomManager = (function () {
         var userName = message.User.Name;
         this.ui.onChatMessage(userName, chatMessage, 'blue');
     };
-    RoomManager.prototype.clientSetupAudioAPI = function (message) {
-        // TODO: better mechanism for different players
-        if (this.roomType == "podcasts") {
-            // TODO: better message structure
-            // TODO: ensure this isn't awfully insecure
-            var id = message.User.Name;
-            var secret = message.Media.Title;
-            this.searcher.init(secret, id);
-        }
-    };
-    RoomManager.prototype.clientSetupYTAPI = function (message) {
-        if (this.roomType != "podcasts") {
-            var secret = message.Media.Title;
-            this.searcher.init(secret);
-        }
+    RoomManager.prototype.clientSearchResults = function (message) {
+        // TODO: dumb
+        var results = message.Session.Queue;
     };
     //
     // Mostly UI callback functions
     //
-    RoomManager.prototype.onSendChatMessage = function (msg) {
+    RoomManager.prototype.uiSendChatMessage = function (msg) {
         var message = new Contracts_1.WsMessage();
         message.Action = 'ChatMessage';
         message.ChatMessage = msg;
@@ -175,13 +159,16 @@ var RoomManager = (function () {
     };
     RoomManager.prototype.onPlayerStateChange = function (event) {
         if (event.data == 0) {
-            this.nextMedia();
+            this.uiNextMedia();
         }
     };
-    RoomManager.prototype.search = function (query, callback) {
-        this.searcher.search(query, callback);
+    RoomManager.prototype.uiSearch = function (query) {
+        var message = new Contracts_1.WsMessage();
+        message.Action = 'Search';
+        message.ChatMessage = query;
+        this.socket.emit(message);
     };
-    RoomManager.prototype.nameChange = function (newName) {
+    RoomManager.prototype.uiNameChange = function (newName) {
         this.user.Name = newName;
         var message = new Contracts_1.WsMessage();
         message.User = this.user;
@@ -200,7 +187,7 @@ var RoomManager = (function () {
         else if (this.user.State.QueuePosition == this.session.Queue.length) {
         }
     };
-    RoomManager.prototype.nextMedia = function () {
+    RoomManager.prototype.uiNextMedia = function () {
         this.user.State.Time = 0;
         var queue = this.session.Queue;
         if (this.user.State.QueuePosition + 1 < queue.length) {
@@ -211,13 +198,13 @@ var RoomManager = (function () {
         }
         this.userStateChange();
     };
-    RoomManager.prototype.pauseMedia = function () {
+    RoomManager.prototype.uiPauseMedia = function () {
         this.player.pause();
     };
-    RoomManager.prototype.playMedia = function () {
+    RoomManager.prototype.uiPlayMedia = function () {
         this.player.play();
     };
-    RoomManager.prototype.previousMedia = function () {
+    RoomManager.prototype.uiPreviousMedia = function () {
         this.user.State.Time = 0;
         var queue = this.session.Queue;
         if (this.user.State.QueuePosition > 0) {
