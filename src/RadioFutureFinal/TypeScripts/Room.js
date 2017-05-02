@@ -19,7 +19,8 @@ var RoomManager = (function () {
             message.User = user;
             _this.socket.emit(message);
         };
-        this.queueSelectedVideo = function (elmnt) {
+        this.queueSelectedMedia = function (elmnt) {
+            console.log('queuing');
             $("#div_search_results").fadeOut();
             $("#input_search").val("");
             var videoId = elmnt.getAttribute('data-VideoId');
@@ -56,7 +57,7 @@ var RoomManager = (function () {
             _this.socket.emit(message);
         };
         // TODO: find a better way to expose these functions to html?
-        window.queueSelectedVideo = this.queueSelectedVideo;
+        window.queueSelectedMedia = this.queueSelectedMedia;
         window.requestSyncWithUser = this.requestSyncWithUser;
         window.deleteMedia = this.deleteMedia;
         this.roomType = roomType;
@@ -146,6 +147,7 @@ var RoomManager = (function () {
     RoomManager.prototype.clientSearchResults = function (message) {
         // TODO: dumb
         var results = message.Session.Queue;
+        this.ui.onSearchResults(results);
     };
     //
     // Mostly UI callback functions

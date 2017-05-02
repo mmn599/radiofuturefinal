@@ -17,10 +17,7 @@ gulp.task("default", function () {
             './TypeScripts/Room.ts',
             './TypeScripts/IPlayer.ts',
             './TypeScripts/PodcastPlayer.ts',
-            './TypeScripts/YtPlayer.ts',
-            './TypeScripts/ISearcher.ts',
-            './TypeScripts/PodcastSearcher.ts',
-            './TypeScripts/YtSearcher.ts'
+            './TypeScripts/YtPlayer.ts'
         ],
         cache: {},
         packageCache: {}

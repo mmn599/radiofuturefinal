@@ -52,7 +52,6 @@ namespace RadioFutureFinal.Search
             dynamic json = Newtonsoft.Json.JsonConvert.DeserializeObject(responseBody);
             _audioToken = json.access_token;
             _ready = true;
-            await searchPodcasts("radiolab");
         }
 
         public async Task<List<MediaV1>> searchPodcasts(string query)

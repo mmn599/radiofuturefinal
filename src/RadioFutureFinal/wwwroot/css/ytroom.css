@@ -116,7 +116,7 @@ input:focus {
     cursor: pointer;
 }
 
-.div_search_result > * {
+.text_search_result {
     cursor: pointer;
 }
 

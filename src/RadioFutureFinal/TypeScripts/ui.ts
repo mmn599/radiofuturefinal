@@ -147,10 +147,13 @@ export class UI {
 
     public onSearchResults(results: Media[]) {
         var divResults = $("#div_search_results");
+        var html = [];
         for (var i = 0; i < results.length; i++) {
             var media = results[i];
-            divResults.html(divResults.html() + "<div class='div_search_result' onClick='queueSelectedVideo(this)' data-VideoId='" + media.YTVideoID + "' data-ThumbURL='" + media.ThumbURL + "'>" + '<p class="text_search_result">' + media.Title + '</p></div>');
+            var currentHTML = "<div class='div_search_result' onClick='queueSelectedMedia(this)' data-VideoId='" + media.YTVideoID + "' data-ThumbURL='" + media.ThumbURL + "'>" + '<p class="text_search_result">' + media.Title + '</p></div>';
+            html.push(currentHTML);
         }
+        divResults.html(html.join(""));
         $("#input_search").blur();
     }
 

@@ -20,6 +20,16 @@ export class PodcastPlayer implements IPlayer {
     }
 
     setPlayerContent(media: Media, time: number) {
+        // TODO: this should be in super class
+        $("#p_cc_summary").text(media.Title);
+        if (!this.mobileBrowser) {
+            var html =
+                '<div style="text-align: left; display: flex; align-items: center;">' +
+                '<img style="height: 90px; width: 160px; margin-right: 16px;" src="' + media.ThumbURL + '"/>' +
+                '<span style="margin-right: 16px;">' + media.Title + '<br>' + 'Recommended by: ' + media.UserName + '</span>' +
+                '</div>';
+            $("#div_cc_results").html(html);
+        }
         this.html5audio.src = media.MP3Source;
         this.html5audio.currentTime = time;
     }

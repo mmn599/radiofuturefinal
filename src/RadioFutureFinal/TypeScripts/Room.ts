@@ -17,7 +17,7 @@ class RoomManager implements UICallbacks, ClientActions {
 
     constructor(roomType: string, mobileBrowser: boolean) {
         // TODO: find a better way to expose these functions to html?
-        (<any>window).queueSelectedVideo = this.queueSelectedVideo;
+        (<any>window).queueSelectedMedia = this.queueSelectedMedia;
         (<any>window).requestSyncWithUser = this.requestSyncWithUser;
         (<any>window).deleteMedia = this.deleteMedia;
         this.roomType = roomType;
@@ -125,6 +125,7 @@ class RoomManager implements UICallbacks, ClientActions {
     clientSearchResults(message: WsMessage) {
         // TODO: dumb
         var results = message.Session.Queue;
+        this.ui.onSearchResults(results);
     }
 
     //
@@ -220,8 +221,9 @@ class RoomManager implements UICallbacks, ClientActions {
         this.socket.emit(message);
     }
 
-    queueSelectedVideo = (elmnt) => {
+    queueSelectedMedia = (elmnt) => {
 
+        console.log('queuing');
         $("#div_search_results").fadeOut();
         $("#input_search").val("");
         var videoId = elmnt.getAttribute('data-VideoId');

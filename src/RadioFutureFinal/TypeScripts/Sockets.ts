@@ -34,7 +34,7 @@ export class MySocket {
                 clientActions[action](message); 
             }
             else {
-                // TODO: exception
+                console.log('bad client action');
             }
         };
 
