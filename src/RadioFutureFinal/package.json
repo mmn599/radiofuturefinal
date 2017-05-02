@@ -16,8 +16,8 @@
     "@types/jquery": "^2.0.41"
   },
   "dependencies": {
-    "events": "^1.0.2",
-    "promise": "^7.0.4",
-    "request": "^2.61.0"
+    "events": "1.0.2",
+    "promise": "7.0.4",
+    "request": "2.61.0"
   }
 }

@@ -4,7 +4,7 @@ var PodcastSearcher = (function () {
     }
     PodcastSearcher.prototype.init = function (secret, appId) {
         if (appId === void 0) { appId = null; }
-        var Audiosearch = require('../wwwroot/js/searchaudio.js');
+        var Audiosearch = require('audiosearch-client-node');
         this.audiosearch = new Audiosearch(appId, secret);
     };
     PodcastSearcher.prototype.search = function (query, callback) {
