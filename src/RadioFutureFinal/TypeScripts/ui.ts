@@ -6,10 +6,6 @@ declare var Spinner: any;
 // Oh god this code is scary
 
 export interface UICallbacks {
-    uiPreviousMedia: any;
-    uiNextMedia: any;
-    uiPlayMedia: any;
-    uiPauseMedia: any;
     uiSendChatMessage: any;
     uiSearch: (query: string, page: number) => void;
     uiNameChange: any;
@@ -38,7 +34,6 @@ export class UI {
         this.setupSpinnerUI();
         this.setupInfoRolloverUI();
         this.setupInputUI();
-        this.setupPlayerControlButtons();
     }
 
     public sessionReady = () => {
@@ -74,15 +69,30 @@ export class UI {
         this.spinner = new Spinner(opts).spin(target);
     }
 
-    private setupFadeUI(overall, results) {
+    private dropperSwitch(dropper: JQuery) {
+        if (dropper.hasClass('arrow-down')) {
+            dropper.removeClass('arrow-down');
+            dropper.addClass('arrow-up');
+        }
+        else {
+            dropper.removeClass('arrow-up');
+            dropper.addClass('arrow-down');
+        }
+    }
+
+    private setupFadeUI(overall: JQuery, results) {
         overall.mouseenter((e) => {
             if (!results.is(':visible')) {
                 results.fadeIn();
+                let dropper = overall.find('.dropper');
+                this.dropperSwitch(dropper);
             }
         });
         overall.mouseleave((e) => {
             if (results.is(':visible')) {
                 results.fadeOut();
+                let dropper = overall.find('.dropper');
+                this.dropperSwitch(dropper);
             }
         });
     }
@@ -132,21 +142,6 @@ export class UI {
         $("#input_search").bind("propertychange input paste", (event) => {
             this.searchTextChanged($("#input_search").val());
         });
-    }
-
-    private setupPlayerControlButtons() {
-        $("#btn_previous").click(this.callbacks.uiPreviousMedia);
-        $("#btn_pause").click(() => {
-            $("#btn_pause").hide();
-            $("#btn_play").show();
-            this.callbacks.uiPauseMedia();
-        });
-        $("#btn_play").click(() => {
-            $("#btn_play").hide();
-            $("#btn_pause").show();
-            this.callbacks.uiPlayMedia();
-        });
-        $("#btn_next").click(this.callbacks.uiNextMedia);
     }
 
     public onSearchResults(results: Media[]) {

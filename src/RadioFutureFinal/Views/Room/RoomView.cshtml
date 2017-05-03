@@ -23,7 +23,7 @@
 
         <div id="div_all_info">
             <div id="div_users_overall" class="info">
-                <div class="arrow-down img_drop_right"></div>
+                <div class="dropper arrow-down img_drop_right"></div>
                 <p id="p_users_summary"></p>
                 <div id="div_user_results" class="results"></div>
             </div>
@@ -34,7 +34,7 @@
             </div>
             <div id="div_queue_overall" class="info">
                 <p id="p_queue_summary">Nothing in the playlist. Queue something!</p>
-                <div class="arrow-down img_drop_left"></div>
+                <div class="dropper arrow-down img_drop_left"></div>
                 <div id="div_queue_results" class="results"></div>
             </div>
         </div>
@@ -42,7 +42,9 @@
         <div id="div_current_content">
             <div class="div_player" id="div_yt_player"></div>
             <div class="div_player" id="div_podcast_player">
-                <canvas id="canvas_podcast"></canvas>
+                <div class="div_inner_podcast_player">
+                    <div id="btn_play_pause" class="play_btn"></div>
+                </div>
                 <audio id="html5audio">
                     <source id="mp3Source" type="audio/mp3" />
                 </audio>
@@ -50,24 +52,13 @@
         </div>
 
         <div id="div_current_content_info">
-            <div id="div_cc_overall" class="info">
-                <div id="div_cc_results" class="results"></div>
-                <div class="arrow-up img_drop_right"></div>
-                <p id="p_cc_summary">Queue something up!</p>
-            </div>
-            <div id="div_player_controls" class="info">
-                <img id="btn_previous" class="btn_controls" src="~/images/arrows-1.png" />
-                <img id="btn_pause" class="btn_controls" src="~/images/pause-button.png" />
-                <img id="btn_play" class="btn_controls" />
-                <img id="btn_next" class="btn_controls" src="~/images/arrows.png" />
-            </div>
             <div id="div_chat_overall" class="info">
                 <div id="div_chat_results" class="results">
                     <ul id="ul_chat"></ul>
                     <input class="myinput" id="input_chat" placeholder="Enter your chat message" />
                 </div>
                 <p>Chat</p>
-                <div class="arrow-up img_drop_left"></div>
+                <div class="dropper arrow-up img_drop_left"></div>
             </div>
         </div>
 
