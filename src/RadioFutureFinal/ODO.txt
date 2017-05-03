@@ -1,5 +1,5 @@
 ﻿little
--add Show to media
+-button 
 -delete button on queue
 -highlight current on queue
 -click to go to on queue

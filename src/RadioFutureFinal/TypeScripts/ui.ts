@@ -236,6 +236,23 @@ export class UI {
     }
 
     public updateQueue(queue: Media[], userIdMe: number, queuePosition: number) {
+
+        // TODO: this should get out of here
+        var hasNext = (queuePosition + 1) < queue.length;
+        var hasPrevious = queuePosition > 0;
+        if (hasNext) {
+            $("#btn_next").show();
+        }
+        else {
+            $("#btn_next").hide();
+        }
+        if (hasPrevious) {
+            $("#btn_previous").show();
+        }
+        else {
+            $("#btn_previous").hide();
+        }
+
         var length = queue.length;
         var summary = length + " things in the playlist";
         if (length == 1) {

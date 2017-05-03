@@ -165,9 +165,6 @@ class RoomManager implements UICallbacks, ClientActions {
             this.user.State.QueuePosition += 1;
             this.onUserStateChange();
         }
-        else {
-            this.player.nothingPlaying();
-        }
     }
 
     uiPauseMedia = () => {

@@ -23,9 +23,6 @@ var RoomManager = (function () {
                 _this.user.State.QueuePosition += 1;
                 _this.onUserStateChange();
             }
-            else {
-                _this.player.nothingPlaying();
-            }
         };
         this.uiPauseMedia = function () {
             _this.player.pause();
