@@ -12,6 +12,33 @@ var RoomManager = (function () {
             var length = _this.session.Queue.length;
             return pos < 0 || ((pos == (length - 1)) && _this.player.isStopped());
         };
+        this.onPlayerStateChange = function (event) {
+            if (event.data == 0) {
+                _this.uiNextMedia();
+            }
+        };
+        this.uiNextMedia = function () {
+            var queue = _this.session.Queue;
+            if (_this.user.State.QueuePosition + 1 < queue.length) {
+                _this.user.State.Time = 0;
+                _this.user.State.QueuePosition += 1;
+                _this.onUserStateChange();
+            }
+        };
+        this.uiPauseMedia = function () {
+            _this.player.pause();
+        };
+        this.uiPlayMedia = function () {
+            _this.player.play();
+        };
+        this.uiPreviousMedia = function () {
+            _this.user.State.Time = 0;
+            var queue = _this.session.Queue;
+            if (_this.user.State.QueuePosition > 0) {
+                _this.user.State.QueuePosition = _this.user.State.QueuePosition - 1;
+                _this.onUserStateChange();
+            }
+        };
         //==================================================================
         // These functions are called directly embedded into the html... kinda weird
         //==================================================================
@@ -139,11 +166,6 @@ var RoomManager = (function () {
         message.User = this.user;
         this.socket.emit(message);
     };
-    RoomManager.prototype.onPlayerStateChange = function (event) {
-        if (event.data == 0) {
-            this.uiNextMedia();
-        }
-    };
     RoomManager.prototype.uiSearch = function (query) {
         var message = new Contracts_1.WsMessage();
         message.Action = 'Search';
@@ -160,28 +182,7 @@ var RoomManager = (function () {
     RoomManager.prototype.onUserStateChange = function () {
         if (this.user.State.QueuePosition >= 0 && this.user.State.QueuePosition < this.session.Queue.length) {
             this.player.setPlayerContent(this.session.Queue[this.user.State.QueuePosition], this.user.State.Time);
-        }
-    };
-    RoomManager.prototype.uiNextMedia = function () {
-        var queue = this.session.Queue;
-        if (this.user.State.QueuePosition + 1 < queue.length) {
-            this.user.State.Time = 0;
-            this.user.State.QueuePosition += 1;
-        }
-        this.onUserStateChange();
-    };
-    RoomManager.prototype.uiPauseMedia = function () {
-        this.player.pause();
-    };
-    RoomManager.prototype.uiPlayMedia = function () {
-        this.player.play();
-    };
-    RoomManager.prototype.uiPreviousMedia = function () {
-        this.user.State.Time = 0;
-        var queue = this.session.Queue;
-        if (this.user.State.QueuePosition > 0) {
-            this.user.State.QueuePosition = this.user.State.QueuePosition - 1;
-            this.onUserStateChange();
+            this.ui.updateQueue(this.session.Queue, this.user.Id, this.user.State.QueuePosition);
         }
     };
     return RoomManager;

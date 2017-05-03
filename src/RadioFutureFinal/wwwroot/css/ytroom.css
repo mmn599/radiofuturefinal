@@ -60,6 +60,7 @@ input:focus {
     display: inline-block;
     width: 100%;
     height: 5%;
+    z-index: 1;
 }
 
 #div_cc_results {
@@ -101,11 +102,13 @@ input:focus {
 #div_user_results {
     left: 0;
     top: 5%;
+    z-index: 1;
 }
 
 #div_queue_results {
     right: 0;
     top: 5%;
+    z-index: 1;
 }
 
 .results {

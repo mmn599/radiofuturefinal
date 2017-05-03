@@ -127,7 +127,7 @@ class RoomManager implements UICallbacks, ClientActions {
         this.socket.emit(message);
     }
 
-    onPlayerStateChange(event) {
+    onPlayerStateChange = (event) => {
         if(event.data==0) {
             this.uiNextMedia();
         }
@@ -150,28 +150,29 @@ class RoomManager implements UICallbacks, ClientActions {
 
     onUserStateChange() {
         if (this.user.State.QueuePosition >= 0 && this.user.State.QueuePosition < this.session.Queue.length) {
-            this.player.setPlayerContent(this.session.Queue[this.user.State.QueuePosition], this.user.State.Time); 
+            this.player.setPlayerContent(this.session.Queue[this.user.State.QueuePosition], this.user.State.Time);
+            this.ui.updateQueue(this.session.Queue, this.user.Id, this.user.State.QueuePosition);
         }
     }
 
-    uiNextMedia() {
+    uiNextMedia = () => {
         var queue = this.session.Queue;
         if(this.user.State.QueuePosition + 1 < queue.length) {
             this.user.State.Time = 0;
             this.user.State.QueuePosition += 1;
+            this.onUserStateChange();
         }
-        this.onUserStateChange();
     }
 
-    uiPauseMedia() {
+    uiPauseMedia = () => {
         this.player.pause();
     }
 
-    uiPlayMedia() {
+    uiPlayMedia = () => {
         this.player.play();
     }
 
-    uiPreviousMedia() {
+    uiPreviousMedia = () => {
         this.user.State.Time = 0;
         var queue = this.session.Queue;
         if(this.user.State.QueuePosition > 0) {
