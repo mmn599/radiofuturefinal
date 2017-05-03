@@ -92,9 +92,8 @@ input:focus {
 }
 
 #div_search_results {
-    position: absolute;
-    right: 12.5%;
-    width: 75%;
+    width: 50%;
+    left: 25%;
     top: 5%;
     z-index: 1;
 }
@@ -106,6 +105,7 @@ input:focus {
 }
 
 #div_queue_results {
+    width: 50%;
     right: 0;
     top: 5%;
     z-index: 1;
@@ -117,7 +117,7 @@ input:focus {
     background: white;
 }
 
-.div_search_result {
+.div_result {
     font-family: 'Josefin Sans';
     cursor: pointer;
     display: flex;
@@ -137,27 +137,29 @@ input:focus {
     background: grey;
 }
 
-.div_search_result:hover {
+.div_result:hover {
     background: grey;
 }
 
-.search_result_title {
-    cursor: pointer;
+.result_title {
     font-size: 18px;
 }
 
 .div_inner_results {
     padding-left: 1%;
     display: inline-block;
-    width: 90%;
+    width: 89%;
 }
 
-.search_result_description {
-    cursor: pointer;
+.result_description {
     font-size: 14px;
 }
 
-.img_search_result {
+.search_stuff {
+    cursor: pointer;
+}
+
+.img_result {
     width: 10%;
     height: auto;
 }

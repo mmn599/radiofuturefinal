@@ -153,28 +153,28 @@ export class UI {
         divResults.show();
         divResults.html("");
         for (var i = 0; i < results.length; i++) {
-            var media = results[i];
+            let media = results[i];
             var divSearchResult = $(document.createElement('div'));
-            divSearchResult.addClass('div_search_result');
+            divSearchResult.addClass('div_result search_stuff');
             divSearchResult.appendTo(divResults);
-            divSearchResult.click(() => {
-                this.callbacks.uiQueueMedia(media);
-            });
             var imgThumb = document.createElement('img');
-            $(imgThumb).addClass('img_search_result');
+            $(imgThumb).addClass('img_result search_stuff');
             imgThumb.src = media.ThumbURL;
             $(imgThumb).appendTo(divSearchResult);
             var innerDiv = document.createElement('div');
-            $(innerDiv).addClass('div_inner_results');
+            $(innerDiv).addClass('div_inner_results search_stuff');
             $(innerDiv).appendTo(divSearchResult);
             var spanTitle = document.createElement('p');
-            $(spanTitle).addClass('search_result_title');
+            $(spanTitle).addClass('result_title search_stuff');
             $(spanTitle).appendTo(innerDiv);
             $(spanTitle).text(media.Title);
             var spanDescription = document.createElement('p');
-            $(spanDescription).addClass('search_result_description');
+            $(spanDescription).addClass('result_description search_stuff');
             $(spanDescription).appendTo(innerDiv);
             $(spanDescription).text(media.Description);
+            divSearchResult.click(() => {
+                this.callbacks.uiQueueMedia(media);
+            });
         }
         // TODO: this doesnt have to be added every time
         var pagingDiv = $(document.createElement('div'));
@@ -251,16 +251,30 @@ export class UI {
         $("#p_queue_summary").text(summary);
 
         var queueResults = $("#div_queue_results");
-        var html = [];
+        queueResults.html("");
+        // TODO: need to make this seperate from search results probably
         for (var i = 0; i < length; i++) {
             var media = queue[i];
-            var onThis = i === queuePosition;
-            var currentHTML = this.frameBuilder.media(media, i, media.UserId === userIdMe, onThis);
-            html.push(currentHTML);
+            var divQueueResult = $(document.createElement('div'));
+            divQueueResult.addClass('div_result');
+            divQueueResult.appendTo(queueResults);
+            var imgThumb = document.createElement('img');
+            $(imgThumb).addClass('img_result');
+            imgThumb.src = media.ThumbURL;
+            $(imgThumb).appendTo(divQueueResult);
+            var innerDiv = document.createElement('div');
+            $(innerDiv).addClass('div_inner_results');
+            $(innerDiv).appendTo(divQueueResult);
+            var spanTitle = document.createElement('p');
+            $(spanTitle).addClass('result_title');
+            $(spanTitle).appendTo(innerDiv);
+            $(spanTitle).text(media.Title);
+            var spanDescription = document.createElement('p');
+            $(spanDescription).addClass('result_description');
+            $(spanDescription).appendTo(innerDiv);
+            $(spanDescription).text(media.Description);
         }
-
-        queueResults.html(html.join(""));
-    }
+   }
 
 
     public updateUsersList(users, userIdMe: number) {
