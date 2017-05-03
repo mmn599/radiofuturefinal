@@ -1,4 +1,6 @@
 ﻿little
+-scroll on queue
+-scroll on search results
 -more descriptive queue
 -make sure it's okay if podcast/youtube sessions dont cross over
 -delete working on mobile

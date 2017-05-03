@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using RadioFutureFinal.Contracts;
+using RadioFutureFinal.Errors;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,6 +30,7 @@ namespace RadioFutureFinal.Search
             _audiosearchId = config.GetValue<string>("AudioAPIKey");
             _audiosearchSecret = config.GetValue<string>("AudioSecret");
             _client = new HttpClient();
+            _client.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "request");
         }
 
         public async Task init()
@@ -58,36 +60,46 @@ namespace RadioFutureFinal.Search
         {
             if(_ready)
             {
-                _client.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "request");
-                var encodedQuery = System.Net.WebUtility.UrlEncode(query);
-                var request = new HttpRequestMessage()
+                HttpResponseMessage response;
+                string responseBody;
+                dynamic json;
+                try
                 {
-                    RequestUri = new Uri(BASE_AUDIO_PATH + API_PATH + EPISODE_QUERY_PATH + encodedQuery + "?size=5&from=" + (5*page).ToString()),
-                    Method = HttpMethod.Get
-                };
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _audioToken);
+                    var encodedQuery = System.Net.WebUtility.UrlEncode(query);
+                    var request = new HttpRequestMessage()
+                    {
+                        RequestUri = new Uri(BASE_AUDIO_PATH + API_PATH + EPISODE_QUERY_PATH + encodedQuery + "?size=5&from=" + (5*page).ToString()),
+                        Method = HttpMethod.Get
+                    };
+                    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _audioToken);
 
-                var response = await _client.SendAsync(request);
-                var responseBody = await response.Content.ReadAsStringAsync();
-                dynamic json = Newtonsoft.Json.JsonConvert.DeserializeObject(responseBody);
+                    response = await _client.SendAsync(request);
+                    responseBody = await response.Content.ReadAsStringAsync();
+                    json = Newtonsoft.Json.JsonConvert.DeserializeObject(responseBody);
 
-                var mediaResults = new List<MediaV1>();
-                var results = json.results;
-                foreach(var result in results)
-                {
-                    var media = new MediaV1();
-                    media.Title = result.title;
-                    media.MP3Source = result.audio_files[0].mp3;
-                    media.ThumbURL = result.show_image_urls.thumb;
-                    media.Description = result.description;
-                    mediaResults.Add(media); 
+                    var mediaResults = new List<MediaV1>();
+                    var results = json.results;
+                    foreach(var result in results)
+                    {
+                        var media = new MediaV1();
+                        media.Title = result.title;
+                        media.MP3Source = result.audio_files[0].mp3;
+                        media.ThumbURL = result.show_image_urls.thumb;
+                        media.Description = result.description;
+                        mediaResults.Add(media); 
+                    }
+
+                    return mediaResults;
                 }
-
-                return mediaResults;
+                catch(Exception e)
+                {
+                    // TODO: error search response on client
+                    return new List<MediaV1>();
+                }
             }
             else
             {
-                throw new Exception();
+                throw new RadioException("Tried searching when http client wasn't ready");
             }
         }
 

@@ -96,6 +96,8 @@ input:focus {
     left: 25%;
     top: 5%;
     z-index: 1;
+    max-height: 80vh;
+    overflow-y: auto;
 }
 
 #div_user_results {
@@ -109,6 +111,8 @@ input:focus {
     right: 0;
     top: 5%;
     z-index: 1;
+    max-height: 80vh;
+    overflow-y: auto;
 }
 
 .results {
@@ -122,6 +126,11 @@ input:focus {
     cursor: pointer;
     display: flex;
     align-items: center;
+    justify-content: center;
+}
+
+.div_outer_paging {
+    display: flex;
     justify-content: center;
 }
 
@@ -297,4 +306,10 @@ input:focus {
 
 #div_error {
     display: none;
+}
+
+#p_searching {
+    text-align: center; 
+    margin: 3%;
+    color: cornflowerblue;
 }

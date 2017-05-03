@@ -7,5 +7,8 @@ namespace RadioFutureFinal.Errors
 {
     public class RadioException : Exception
     {
+        public RadioException(string message) : base(message)
+        {
+        }
     }
 }

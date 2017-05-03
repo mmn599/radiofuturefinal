@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using RadioFutureFinal.Contracts;
+using RadioFutureFinal.Errors;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,10 +27,9 @@ namespace RadioFutureFinal.Messaging
                 WsMessage wsMessage = JsonConvert.DeserializeObject<WsMessage>(strMessage);
                 await _messageReceiver.HandleMessage(wsMessage, socket);
             }
-            catch
+            catch(JsonSerializationException e)
             {
-                // TODO: real exception
-                throw new Exception();
+                throw new RadioException(strMessage);
             }
         }
     }

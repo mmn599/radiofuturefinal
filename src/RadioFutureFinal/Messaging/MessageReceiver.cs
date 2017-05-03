@@ -54,8 +54,7 @@ namespace RadioFutureFinal.Messaging
             }
             else
             {
-                // TODO: real exception
-                throw new RadioException();
+                throw new RadioException("Action not found: " + wsMessage.Action);
             }
         }
 

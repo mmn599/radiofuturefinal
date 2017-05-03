@@ -3,7 +3,8 @@ import { Media } from "./Contracts";
 
 declare var Spinner: any;
 
-// TODO: make this an interface
+// Oh god this code is scary
+
 export interface UICallbacks {
     uiPreviousMedia: any;
     uiNextMedia: any;
@@ -171,35 +172,47 @@ export class UI {
             var spanDescription = document.createElement('p');
             $(spanDescription).addClass('result_description search_stuff');
             $(spanDescription).appendTo(innerDiv);
-            $(spanDescription).text(media.Description);
+            $(spanDescription).html(media.Description);
             divSearchResult.click(() => {
                 this.callbacks.uiQueueMedia(media);
             });
         }
+        if (results.length == 0) {
+            var divResults = $("#div_search_results");
+            divResults.html("");
+            divResults.html("<p id='p_searching'>no results found</p>");
+            divResults.fadeIn();
+        }
         // TODO: this doesnt have to be added every time
-        var pagingDiv = $(document.createElement('div'));
-        pagingDiv.appendTo(divResults);
-        var previousDiv = $(document.createElement('div'));
-        previousDiv.appendTo(pagingDiv);
-        previousDiv.addClass('div_paging');
-        previousDiv.click(() => {
-            this.previousPage();
-        });
-        previousDiv.text('previous page');
-        var nextDiv = $(document.createElement('div'));
-        nextDiv.appendTo(pagingDiv);
-        nextDiv.addClass('div_paging');
-        nextDiv.click(() => {
-            this.nextPage();
-        });
-        nextDiv.text('next page');
+        if (results.length == 5) {
+            var pagingDiv = $(document.createElement('div'));
+            pagingDiv.addClass("div_outer_paging");
+            pagingDiv.appendTo(divResults);
+            var previousDiv = $(document.createElement('div'));
+            previousDiv.appendTo(pagingDiv);
+            previousDiv.addClass('div_paging');
+            previousDiv.click(() => {
+                this.previousPage();
+            });
+            previousDiv.text('previous page');
+            if (this.currentPage == 0) {
+                previousDiv.hide();
+            }
+            var nextDiv = $(document.createElement('div'));
+            nextDiv.appendTo(pagingDiv);
+            nextDiv.addClass('div_paging');
+            nextDiv.click(() => {
+                this.nextPage();
+            });
+            nextDiv.text('next page');
+        }
 
         $("#input_search").blur();
     }
 
     previousPage = () => {
-        this.displaySearching();
         if (this.currentPage > 0) {
+            this.displaySearching();
             this.currentPage -= 1;
             this.callbacks.uiSearch(this.currentQuery, this.currentPage);
         }
@@ -226,7 +239,7 @@ export class UI {
     displaySearching() {
         var divResults = $("#div_search_results");
         divResults.html("");
-        divResults.html("<p>searching</p>");
+        divResults.html("<p id='p_searching'>searching</p>");
         divResults.fadeIn();
     }
 
@@ -272,7 +285,7 @@ export class UI {
             var spanDescription = document.createElement('p');
             $(spanDescription).addClass('result_description');
             $(spanDescription).appendTo(innerDiv);
-            $(spanDescription).text(media.Description);
+            $(spanDescription).html(media.Description);
         }
    }
 
