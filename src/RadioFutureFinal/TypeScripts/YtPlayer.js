@@ -1,12 +1,13 @@
 "use strict";
 var YtPlayer = (function () {
-    function YtPlayer(mobileBrowser) {
+    function YtPlayer(ui, mobileBrowser) {
         var _this = this;
         this.onPlayerReady = function () {
             _this.playerReady = true;
         };
         this.playerReady = false;
         this.mobileBrowser = mobileBrowser;
+        this.ui = ui;
         $("#div_yt_player").show();
         $("#div_podcast_player").hide();
     }
@@ -42,7 +43,8 @@ var YtPlayer = (function () {
             setTimeout(function () { _this.setPlayerContent(media, time); }, 50);
         }
         else {
-            this.updatePlayerUI(media, time);
+            this.ytPlayer.loadVideoById(media.YTVideoID, time, "large");
+            this.ui.updateCurrentContent(media);
             this.play();
         }
     };
@@ -57,17 +59,6 @@ var YtPlayer = (function () {
     };
     YtPlayer.prototype.getCurrentState = function () {
         return Math.round(this.ytPlayer.getPlayerState());
-    };
-    YtPlayer.prototype.updatePlayerUI = function (media, time) {
-        this.ytPlayer.loadVideoById(media.YTVideoID, time, "large");
-        $("#p_cc_summary").text(media.Title);
-        if (!this.mobileBrowser) {
-            var html = '<div style="text-align: left; display: flex; align-items: center;">' +
-                '<img style="height: 90px; width: 160px; margin-right: 16px;" src="' + media.ThumbURL + '"/>' +
-                '<span style="margin-right: 16px;">' + media.Title + '<br>' + 'Recommended by: ' + media.UserName + '</span>' +
-                '</div>';
-            $("#div_cc_results").html(html);
-        }
     };
     return YtPlayer;
 }());

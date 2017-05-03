@@ -1,17 +1,19 @@
 ﻿little
+-better 'searching' ui
+-much more descriptive podcast search results UI
+-multi page search results
+-more descriptive queue
+-make sure it's okay if podcast/youtube sessions dont cross over
 -delete working on mobile
 -general mobile ui improvements
 -update bundle config
--make sure podcast/youtube sessions dont cross over
 
 big
 -podcast visualizer
--typescript implicit any compilation
--better websocket message structure
--model support for two types of content: yt videos and podcasts
--search support for podcasts and yt videos
 
 Performance and Code stuff
+-typescript implicit any compilation
+-better websocket message structure
 -basic testing framework
 -add very basic exceptions
 -get css out of html

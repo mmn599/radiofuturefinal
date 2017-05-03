@@ -167,6 +167,18 @@ export class UI {
         $("#input_search").blur();
     }
 
+    public updateCurrentContent(media: Media) {
+        $("#p_cc_summary").text(media.Title);
+        if (!this.mobileBrowser) {
+            var html =
+                '<div style="text-align: left; display: flex; align-items: center;">' +
+                '<img style="height: 90px; width: 160px; margin-right: 16px;" src="' + media.ThumbURL + '"/>' +
+                '<span style="margin-right: 16px;">' + media.Title + '<br>' + 'Recommended by: ' + media.UserName + '</span>' +
+                '</div>';
+            $("#div_cc_results").html(html);
+        }
+    }
+
     private searchEnterPressed(input_search) {
         var divResults = $("#div_search_results");
         divResults.html("");

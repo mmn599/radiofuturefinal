@@ -26,14 +26,13 @@ class RoomManager implements UICallbacks, ClientActions {
     public init(encodedSessionName: string) {
         this.user = new MyUser();
         this.session = new Session();
+        this.ui = new UI(this.mobileBrowser, this);
         if (this.roomType == "podcasts") {
-            this.player = new PodcastPlayer(this.mobileBrowser);
+            this.player = new PodcastPlayer(this.ui, this.mobileBrowser);
         }
         else {
-            // TODO: get rid of this key
-            this.player = new YtPlayer(this.mobileBrowser);
+            this.player = new YtPlayer(this.ui, this.mobileBrowser);
         }
-        this.ui = new UI(this.mobileBrowser, this);
         this.socket = new MySocket(this);
         this.setupJamSession(encodedSessionName);
         this.player.initPlayer(this.onPlayerStateChange);

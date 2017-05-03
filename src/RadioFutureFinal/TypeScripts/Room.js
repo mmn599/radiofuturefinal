@@ -52,14 +52,13 @@ var RoomManager = (function () {
     RoomManager.prototype.init = function (encodedSessionName) {
         this.user = new Contracts_1.MyUser();
         this.session = new Contracts_1.Session();
+        this.ui = new UI_1.UI(this.mobileBrowser, this);
         if (this.roomType == "podcasts") {
-            this.player = new PodcastPlayer_1.PodcastPlayer(this.mobileBrowser);
+            this.player = new PodcastPlayer_1.PodcastPlayer(this.ui, this.mobileBrowser);
         }
         else {
-            // TODO: get rid of this key
-            this.player = new YtPlayer_1.YtPlayer(this.mobileBrowser);
+            this.player = new YtPlayer_1.YtPlayer(this.ui, this.mobileBrowser);
         }
-        this.ui = new UI_1.UI(this.mobileBrowser, this);
         this.socket = new Sockets_1.MySocket(this);
         this.setupJamSession(encodedSessionName);
         this.player.initPlayer(this.onPlayerStateChange);
