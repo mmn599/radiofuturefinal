@@ -332,29 +332,53 @@ input:focus {
     background-color: #ff4f39;
     top: 30%;
     align-items: center;
+    justify-content: center;
 }
 
 #cc_title {
-    font-size: 24px;
+    font-size: 2.5vw;
     color: white;
-    margin-left: 2%;
+    margin-top: 1vh;
+    margin-bottom: 1vh;
 }
 
 #cc_show {
-    font-size: 18px;
+    font-size: 1.5vw;
     color: white;
-    margin-left: 2%;
+    margin: 0;
 }
 
 #cc_time {
-    font-size: 18px;
+    margin-left: 1%;
+}
+
+.time {
+    display: inline-block;
+    font-size: 1.5vw;
     color: white;
+    width: 7vw;
+    text-align: center;
+}
+
+.time_slash {
+    font-size: 1.5vw;
+    color: white;
+    width: 1vw;
+    text-align: center;
+}
+
+#cc_info {
+    margin: 0;
+    padding: 0;
+    font-size: 0;
     margin-left: 2%;
 }
 
 #canvas_progress {
-    margin-left: 2%;
-    background: white;  
+    background: #ffa79c;
+    width: 30vw;
+    height: 1vw;
+    margin-left: .5%;
 }
 
 #btn_play_pause {
@@ -363,7 +387,8 @@ input:focus {
 }
 
 #btn_next {
-    margin-left: 2%;
+    position: absolute;
+    right: 2%;
     width: 0;
     height: 0;
     border-top: 20px solid transparent;
@@ -377,7 +402,8 @@ input:focus {
 }
 
 #btn_previous {
-    margin-left: 2%;
+    position: absolute;
+    left: 2%;
     width: 0;
     height: 0;
     border-top: 20px solid transparent;

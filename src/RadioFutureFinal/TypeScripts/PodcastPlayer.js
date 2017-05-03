@@ -3,8 +3,6 @@ var PodcastPlayer = (function () {
     function PodcastPlayer(ui, mobileBrowser, nextMedia, previousMedia) {
         var _this = this;
         this.initPlayer = function (onPlayerStateChange) {
-            _this.canvas.style.width = '30%';
-            _this.canvas.style.height = '5%';
             _this.canvas.width = _this.canvas.offsetWidth;
             _this.canvas.height = _this.canvas.offsetHeight;
             _this.setupControls();
@@ -36,10 +34,14 @@ var PodcastPlayer = (function () {
         this.updateProgressUI = function (time, duration) {
             var ctx = _this.canvas.getContext('2d');
             ctx.moveTo(0, 0);
-            ctx.fillStyle = 'grey';
+            ctx.fillStyle = 'white';
+            if (duration == 0) {
+                duration = 1;
+            }
             ctx.rect(0, 0, time / duration * _this.canvas.width, _this.canvas.height);
             ctx.fill();
-            $("#cc_time").text(Math.round(time));
+            $("#cc_time").text(_this.format(time));
+            $("#cc_duration").text(_this.format(duration));
         };
         this.setPlayerContent = function (media, time) {
             _this.mp3source.setAttribute('src', media.MP3Source);
@@ -83,6 +85,22 @@ var PodcastPlayer = (function () {
     PodcastPlayer.prototype.audioTimeUpdate = function () {
         var percentage = this.audio.currentTime / this.audio.duration;
         this.updateProgressUI(this.audio.currentTime, this.audio.duration);
+    };
+    PodcastPlayer.prototype.format = function (seconds) {
+        if (!seconds || seconds == NaN) {
+            seconds = 0;
+        }
+        seconds = Math.round(seconds);
+        var hours = Math.floor(seconds / 3600);
+        var minutes = Math.floor(seconds / 60);
+        var secs = seconds % 60;
+        return this.format2Digit(hours) + ":" + this.format2Digit(minutes) + ":" + this.format2Digit(secs);
+    };
+    PodcastPlayer.prototype.format2Digit = function (num) {
+        if (num < 10) {
+            return "0" + num.toString();
+        }
+        return num.toString();
     };
     PodcastPlayer.prototype.updateInfoUI = function (media) {
         $("#cc_show").text('Radiolab');

@@ -25,8 +25,6 @@ export class PodcastPlayer implements IPlayer {
     };
 
     initPlayer = (onPlayerStateChange) => {
-        this.canvas.style.width = '30%';
-        this.canvas.style.height = '5%';
         this.canvas.width = this.canvas.offsetWidth;
         this.canvas.height = this.canvas.offsetHeight;
         this.setupControls();
@@ -63,13 +61,33 @@ export class PodcastPlayer implements IPlayer {
         });
     }
 
+    format(seconds) {
+        if (!seconds || seconds == NaN) {
+            seconds = 0;
+        }
+        seconds = Math.round(seconds);
+        var hours = Math.floor(seconds / 3600);
+        var minutes = Math.floor(seconds / 60);
+        var secs = seconds % 60;
+        return this.format2Digit(hours) + ":" + this.format2Digit(minutes) + ":" + this.format2Digit(secs);
+    }
+
+    format2Digit(num: number) {
+        if (num < 10) {
+            return "0" + num.toString();
+        }
+        return num.toString();
+    }
+
     updateProgressUI = (time: number, duration: number) => {
         var ctx = this.canvas.getContext('2d');
         ctx.moveTo(0, 0);
-        ctx.fillStyle = 'grey';
+        ctx.fillStyle = 'white';
+        if (duration == 0) { duration = 1; }
         ctx.rect(0, 0, time / duration * this.canvas.width, this.canvas.height);
         ctx.fill();
-        $("#cc_time").text(Math.round(time));
+        $("#cc_time").text(this.format(time));
+        $("#cc_duration").text(this.format(duration));
     }
 
     setPlayerContent = (media: Media, time: number) => {
