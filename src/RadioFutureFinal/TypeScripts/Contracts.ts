@@ -8,6 +8,7 @@
     Title: string;
     ThumbURL: string;
     Description: string;
+    Show: string;
 }
 
 export class MyUser {

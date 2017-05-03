@@ -86,6 +86,7 @@ namespace RadioFutureFinal.Search
                         media.MP3Source = result.audio_files[0].mp3;
                         media.ThumbURL = result.show_image_urls.thumb;
                         media.Description = result.description;
+                        media.Show = result.show_title;
                         mediaResults.Add(media); 
                     }
 

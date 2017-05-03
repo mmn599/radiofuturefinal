@@ -11,6 +11,7 @@
         public string MP3Source { get; set; }
         public string OGGSource { get; set; }
         public string Description { get; set; }
+        public string Show { get; set; }
 
         public Media()
         {

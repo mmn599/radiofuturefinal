@@ -119,7 +119,7 @@ var PodcastPlayer = (function () {
         return num.toString();
     };
     PodcastPlayer.prototype.updateInfoUI = function (media) {
-        $("#cc_show").text('Radiolab');
+        $("#cc_show").text(media.Show);
         $("#cc_title").text(media.Title);
     };
     return PodcastPlayer;

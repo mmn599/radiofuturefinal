@@ -120,7 +120,7 @@ export class PodcastPlayer implements IPlayer {
     }
 
     updateInfoUI(media: Media) {
-        $("#cc_show").text('Radiolab');
+        $("#cc_show").text(media.Show);
         $("#cc_title").text(media.Title);
     }
 

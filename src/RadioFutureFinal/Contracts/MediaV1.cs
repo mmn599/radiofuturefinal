@@ -35,5 +35,8 @@ namespace RadioFutureFinal.Contracts
 
         [JsonProperty]
         public string Description { get; set; }
+
+        [JsonProperty]
+        public string Show { get; set; }
     }
 }
