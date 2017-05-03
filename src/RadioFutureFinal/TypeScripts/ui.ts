@@ -175,7 +175,7 @@ export class UI {
         if (results.length == 0) {
             var divResults = $("#div_search_results");
             divResults.html("");
-            divResults.html("<p id='p_searching'>no results found</p>");
+            divResults.html("<p id='p_searching'>no results found, or something screwed up</p>");
             divResults.fadeIn();
         }
         // TODO: this doesnt have to be added every time

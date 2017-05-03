@@ -1,5 +1,4 @@
 ﻿little
--scroll bar sets progress
 -add Show to media
 -delete button on queue
 -highlight current on queue

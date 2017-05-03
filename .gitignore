@@ -246,4 +246,5 @@ src/RadioFutureFinal/TypeScripts/*.js.map
 src/RadioFutureFinal/wwwroot/js/bundle.min.js
 src/RadioFutureFinal/wwwroot/js/bundle.min.js.map
 src/RadioFutureFinal/TypeScripts/ui.js
+src/RadioFutureFinal/wwwroot/js/roombundle.js
 src/RadioFutureFinal/appsettings.json
