@@ -128,8 +128,10 @@ namespace RadioFutureFinal.Messaging
 
         public async Task Search(WsMessage message, MySocket socket)
         {
+            // TODO: dumb
             var query = message.ChatMessage;
-            var searchResults = await _searcher.searchPodcasts(query);
+            var page = message.Media.Id;
+            var searchResults = await _searcher.searchPodcasts(query, page);
             await _sender.ClientSearchResults(socket, searchResults);
         }
 

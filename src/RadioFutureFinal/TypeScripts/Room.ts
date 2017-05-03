@@ -125,7 +125,7 @@ class RoomManager implements UICallbacks, ClientActions {
         message.ChatMessage = msg;
         message.User = this.user;
         this.socket.emit(message);
-    }
+   }
 
     onPlayerStateChange = (event) => {
         if(event.data==0) {
@@ -133,10 +133,13 @@ class RoomManager implements UICallbacks, ClientActions {
         }
     }
 
-    uiSearch(query) {
+    uiSearch(query: string, page: number) {
         var message = new WsMessage();
         message.Action = 'Search';
+        // TODO: dumb
         message.ChatMessage = query;
+        message.Media = new Media();
+        message.Media.Id = page;
         this.socket.emit(message);
     }
 
@@ -185,6 +188,11 @@ class RoomManager implements UICallbacks, ClientActions {
     //==================================================================
     // These functions are called directly embedded into the html... kinda weird
     //==================================================================
+
+    onFatalError = () => {
+        $("#div_everything").hide();
+        $("#div_error").show();
+    }
 
     requestSyncWithUser = (userId) => {
         console.log('request sync with user');

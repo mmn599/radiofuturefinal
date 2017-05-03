@@ -54,7 +54,7 @@ namespace RadioFutureFinal.Search
             _ready = true;
         }
 
-        public async Task<List<MediaV1>> searchPodcasts(string query)
+        public async Task<List<MediaV1>> searchPodcasts(string query, int page)
         {
             if(_ready)
             {
@@ -62,7 +62,7 @@ namespace RadioFutureFinal.Search
                 var encodedQuery = System.Net.WebUtility.UrlEncode(query);
                 var request = new HttpRequestMessage()
                 {
-                    RequestUri = new Uri(BASE_AUDIO_PATH + API_PATH + EPISODE_QUERY_PATH + encodedQuery),
+                    RequestUri = new Uri(BASE_AUDIO_PATH + API_PATH + EPISODE_QUERY_PATH + encodedQuery + "?size=5&from=" + (5*page).ToString()),
                     Method = HttpMethod.Get
                 };
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _audioToken);

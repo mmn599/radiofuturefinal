@@ -42,6 +42,10 @@ var RoomManager = (function () {
         //==================================================================
         // These functions are called directly embedded into the html... kinda weird
         //==================================================================
+        this.onFatalError = function () {
+            $("#div_everything").hide();
+            $("#div_error").show();
+        };
         this.requestSyncWithUser = function (userId) {
             console.log('request sync with user');
             var user = new Contracts_1.MyUser();
@@ -166,10 +170,13 @@ var RoomManager = (function () {
         message.User = this.user;
         this.socket.emit(message);
     };
-    RoomManager.prototype.uiSearch = function (query) {
+    RoomManager.prototype.uiSearch = function (query, page) {
         var message = new Contracts_1.WsMessage();
         message.Action = 'Search';
+        // TODO: dumb
         message.ChatMessage = query;
+        message.Media = new Contracts_1.Media();
+        message.Media.Id = page;
         this.socket.emit(message);
     };
     RoomManager.prototype.uiNameChange = function (newName) {

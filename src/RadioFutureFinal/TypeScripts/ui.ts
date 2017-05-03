@@ -10,7 +10,7 @@ export interface UICallbacks {
     uiPlayMedia: any;
     uiPauseMedia: any;
     uiSendChatMessage: any;
-    uiSearch: (query: string) => void;
+    uiSearch: (query: string, page: number) => void;
     uiNameChange: any;
     uiQueueMedia: (media: Media) => void;
 }
@@ -22,6 +22,8 @@ export class UI {
     private callbacks: UICallbacks;
     private mobileBrowser: boolean;
     private frameBuilder: FrameBuilder;
+    private currentPage: number;
+    private currentQuery: string;
 
     constructor(mobileBrowser: boolean, callbacks: UICallbacks) {
         this.colors = ['red', 'orange', 'yellow', 'green', 'blue', 'violet'];
@@ -122,11 +124,10 @@ export class UI {
                 }
             });
         }
-        document.body.addEventListener('click', (event) => {
-            console.log(event.target);
+        jQuery(document.body).on("click", ":not(#div_search_results, #div_search_results *)", (event) => {
             $("#div_search_results").fadeOut();
             $("#input_search").val("");
-        }, true);
+        });​​​​​​​
         $("#input_search").bind("propertychange input paste", (event) => {
             this.searchTextChanged($("#input_search").val());
         });
@@ -149,8 +150,8 @@ export class UI {
 
     public onSearchResults(results: Media[]) {
         var divResults = $("#div_search_results");
+        divResults.show();
         divResults.html("");
-        var html = [];
         for (var i = 0; i < results.length; i++) {
             var media = results[i];
             var divSearchResult = $(document.createElement('div'));
@@ -159,12 +160,55 @@ export class UI {
             divSearchResult.click(() => {
                 this.callbacks.uiQueueMedia(media);
             });
-            var pResult = document.createElement('p');
-            $(pResult).addClass('text_search_result');
-            $(pResult).appendTo(divSearchResult);
-            $(pResult).text(media.Title);
+            var imgThumb = document.createElement('img');
+            $(imgThumb).addClass('img_search_result');
+            imgThumb.src = media.ThumbURL;
+            $(imgThumb).appendTo(divSearchResult);
+            var innerDiv = document.createElement('div');
+            $(innerDiv).addClass('div_inner_results');
+            $(innerDiv).appendTo(divSearchResult);
+            var spanTitle = document.createElement('p');
+            $(spanTitle).addClass('search_result_title');
+            $(spanTitle).appendTo(innerDiv);
+            $(spanTitle).text(media.Title);
+            var spanDescription = document.createElement('p');
+            $(spanDescription).addClass('search_result_description');
+            $(spanDescription).appendTo(innerDiv);
+            $(spanDescription).text(media.Description);
         }
+        // TODO: this doesnt have to be added every time
+        var pagingDiv = $(document.createElement('div'));
+        pagingDiv.appendTo(divResults);
+        var previousDiv = $(document.createElement('div'));
+        previousDiv.appendTo(pagingDiv);
+        previousDiv.addClass('div_paging');
+        previousDiv.click(() => {
+            this.previousPage();
+        });
+        previousDiv.text('previous page');
+        var nextDiv = $(document.createElement('div'));
+        nextDiv.appendTo(pagingDiv);
+        nextDiv.addClass('div_paging');
+        nextDiv.click(() => {
+            this.nextPage();
+        });
+        nextDiv.text('next page');
+
         $("#input_search").blur();
+    }
+
+    previousPage = () => {
+        this.displaySearching();
+        if (this.currentPage > 0) {
+            this.currentPage -= 1;
+            this.callbacks.uiSearch(this.currentQuery, this.currentPage);
+        }
+    }
+
+    nextPage = () => {
+        this.displaySearching();
+        this.currentPage += 1;
+        this.callbacks.uiSearch(this.currentQuery, this.currentPage);
     }
 
     public updateCurrentContent(media: Media) {
@@ -179,11 +223,20 @@ export class UI {
         }
     }
 
-    private searchEnterPressed(input_search) {
-        this.callbacks.uiSearch(input_search.val());
+    displaySearching() {
         var divResults = $("#div_search_results");
+        divResults.html("");
         divResults.html("<p>searching</p>");
         divResults.fadeIn();
+    }
+
+    private searchEnterPressed(input_search) {
+        this.currentPage = 0;
+        this.currentQuery = input_search.val();
+        if (this.currentQuery && this.currentQuery != "") {
+            this.callbacks.uiSearch(this.currentQuery, this.currentPage);
+            this.displaySearching();
+        }
     }
 
     public updateQueue(queue: Media[], userIdMe: number, queuePosition: number) {
@@ -212,9 +265,9 @@ export class UI {
 
     public updateUsersList(users, userIdMe: number) {
         var num = users.length;
-        var summary = users.length + " users in the room";
+        var summary = users.length + " users listening";
         if (num == 1) {
-            summary = users.length + " user in the room";
+            summary = users.length + " user listening";
         }
         $("#p_users_summary").text(summary);
         var userResults = $("#div_user_results");
