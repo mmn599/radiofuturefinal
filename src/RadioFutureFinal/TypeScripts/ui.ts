@@ -286,6 +286,14 @@ export class UI {
             $(spanDescription).addClass('result_description');
             $(spanDescription).appendTo(innerDiv);
             $(spanDescription).html(media.Description);
+
+            if (queuePosition == i) {
+                $(divQueueResult).css({
+                    "border-color": "#ffa79c",
+                    "border-width": "2px",
+                    "border-style": "solid"
+                });
+            }
         }
    }
 

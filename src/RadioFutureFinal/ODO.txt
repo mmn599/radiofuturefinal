@@ -1,8 +1,8 @@
 ﻿little
--button 
 -delete button on queue
 -highlight current on queue
 -click to go to on queue
+-fix triangles
 
 big
 -mobile
