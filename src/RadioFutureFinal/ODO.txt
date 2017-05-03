@@ -1,18 +1,15 @@
 ﻿little
--scroll on queue
--scroll on search results
--more descriptive queue
--make sure it's okay if podcast/youtube sessions dont cross over
--delete working on mobile
--general mobile ui improvements
--update bundle config
+-delete button on queue
+-highlight current on queue
+-click to go to on queue
 
 big
--how are we going to do both? should we?
 -podcast visualizer
 -mobile
 
 Performance and Code stuff
+-how are we going to do both? should we?
+-update bundle config
 -better flow for getting into a room
 -typescript implicit any compilation
 -better websocket message structure
