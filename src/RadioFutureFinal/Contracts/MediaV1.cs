@@ -32,5 +32,8 @@ namespace RadioFutureFinal.Contracts
 
         [JsonProperty]
         public string OGGSource { get; set; }
+
+        [JsonProperty]
+        public string Description { get; set; }
     }
 }

@@ -63,7 +63,8 @@ namespace RadioFutureFinal.Contracts
                 Title = media.Title,
                 ThumbURL = media.ThumbURL,
                 MP3Source = media.MP3Source,
-                OGGSource = media.OGGSource
+                OGGSource = media.OGGSource,
+                Description = media.Description
             };
             return mediaModel;
         }
@@ -79,7 +80,8 @@ namespace RadioFutureFinal.Contracts
                 ThumbURL = media.ThumbURL,
                 Title = media.Title,
                 MP3Source = media.MP3Source,
-                OGGSource = media.OGGSource
+                OGGSource = media.OGGSource,
+                Description = media.Description
             };
             return mediaContract;
         }

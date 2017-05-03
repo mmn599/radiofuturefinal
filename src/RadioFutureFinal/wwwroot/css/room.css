@@ -93,9 +93,9 @@ input:focus {
 
 #div_search_results {
     position: absolute;
-    right: 25%;
-    width: 50%;
-    top: 5%;
+    right: 12.5%;
+    width: 75%;
+    top: 3.5%;
     z-index: 1;
 }
 

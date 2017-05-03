@@ -9,7 +9,9 @@
 -update bundle config
 
 big
+-how are we going to do both? should we?
 -podcast visualizer
+-mobile
 
 Performance and Code stuff
 -better flow for getting into a room

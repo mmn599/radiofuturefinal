@@ -7,6 +7,7 @@
     OGGSource: string;
     Title: string;
     ThumbURL: string;
+    Description: string;
 }
 
 export class MyUser {
