@@ -60,6 +60,9 @@ var YtPlayer = (function () {
     YtPlayer.prototype.getCurrentState = function () {
         return Math.round(this.ytPlayer.getPlayerState());
     };
+    YtPlayer.prototype.isStopped = function () {
+        return this.getCurrentState() == 0;
+    };
     return YtPlayer;
 }());
 exports.YtPlayer = YtPlayer;

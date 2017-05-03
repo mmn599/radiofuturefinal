@@ -76,4 +76,8 @@ export class YtPlayer implements IPlayer {
         return Math.round(this.ytPlayer.getPlayerState());
     }
 
+    public isStopped(): boolean {
+        return this.getCurrentState() == 0;
+    }
+
 }

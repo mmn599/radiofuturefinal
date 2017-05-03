@@ -13,6 +13,7 @@ export class PodcastPlayer implements IPlayer {
     private ui: UI;
 
     constructor(ui: UI, mobileBrowser: boolean) {
+        this.ui = ui;
         this.mobileBrowser = mobileBrowser;
         this.audio = <HTMLAudioElement>document.getElementById('html5audio');
         this.mp3source = document.getElementById('mp3Source');
@@ -23,7 +24,7 @@ export class PodcastPlayer implements IPlayer {
 
     audioTimeUpdate() {
         var percentage = this.audio.currentTime / this.audio.duration;
-        this.drawSine(percentage);
+        this.updatePlayerUI(percentage);
     }
 
     initPlayer = (onPlayerStateChange) => {
@@ -31,7 +32,7 @@ export class PodcastPlayer implements IPlayer {
         this.canvas.style.height = "100%";
         this.canvas.width = this.canvas.offsetWidth;
         this.canvas.height = this.canvas.offsetHeight;
-        this.drawSine(0);
+        this.updatePlayerUI(0);
         this.audio.onended = () => {
             onPlayerStateChange({ data: 0 });
         }
@@ -44,7 +45,7 @@ export class PodcastPlayer implements IPlayer {
         return A * Math.sin((i / (this.canvas.width / num)) * 2 * Math.PI);
     }
 
-    drawSine = (percentage: number) => {
+    updatePlayerUI = (percentage: number) => {
         var ctx = this.canvas.getContext("2d");
         ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         ctx.lineWidth = 2;

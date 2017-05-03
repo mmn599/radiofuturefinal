@@ -7,7 +7,7 @@ var PodcastPlayer = (function () {
             _this.canvas.style.height = "100%";
             _this.canvas.width = _this.canvas.offsetWidth;
             _this.canvas.height = _this.canvas.offsetHeight;
-            _this.drawSine(0);
+            _this.updatePlayerUI(0);
             _this.audio.onended = function () {
                 onPlayerStateChange({ data: 0 });
             };
@@ -18,7 +18,7 @@ var PodcastPlayer = (function () {
         this.sine = function (A, i, num) {
             return A * Math.sin((i / (_this.canvas.width / num)) * 2 * Math.PI);
         };
-        this.drawSine = function (percentage) {
+        this.updatePlayerUI = function (percentage) {
             var ctx = _this.canvas.getContext("2d");
             ctx.clearRect(0, 0, _this.canvas.width, _this.canvas.height);
             ctx.lineWidth = 2;
@@ -69,6 +69,7 @@ var PodcastPlayer = (function () {
         this.isStopped = function () {
             return _this.audio.currentTime >= _this.audio.duration;
         };
+        this.ui = ui;
         this.mobileBrowser = mobileBrowser;
         this.audio = document.getElementById('html5audio');
         this.mp3source = document.getElementById('mp3Source');
@@ -79,7 +80,7 @@ var PodcastPlayer = (function () {
     ;
     PodcastPlayer.prototype.audioTimeUpdate = function () {
         var percentage = this.audio.currentTime / this.audio.duration;
-        this.drawSine(percentage);
+        this.updatePlayerUI(percentage);
     };
     return PodcastPlayer;
 }());
