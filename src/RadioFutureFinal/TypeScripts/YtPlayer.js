@@ -1,25 +1,18 @@
-﻿declare var YT: any;
-
-import { IPlayer } from "./IPlayer";
-import { Media, Session, UserState } from "./Contracts";
-import { UI } from "./UI";
-
-export class YtPlayer implements IPlayer {
-
-    private ytPlayer: any;
-    private mobileBrowser: boolean;
-    private ui: UI;
-    public playerReady: boolean;
-
-    constructor(ui: UI, mobileBrowser: boolean) {
+"use strict";
+var YtPlayer = (function () {
+    function YtPlayer(ui, mobileBrowser) {
+        var _this = this;
+        this.onPlayerReady = function () {
+            _this.playerReady = true;
+        };
         this.playerReady = false;
         this.mobileBrowser = mobileBrowser;
         this.ui = ui;
         $("#div_yt_player").show();
         $("#div_podcast_player").hide();
     }
-
-    public initPlayer(onPlayerStateChange) {
+    YtPlayer.prototype.initPlayer = function (onPlayerStateChange) {
+        var _this = this;
         if (YT && YT.Player) {
             this.ytPlayer = new YT.Player('div_yt_player', {
                 height: 'auto',
@@ -30,53 +23,46 @@ export class YtPlayer implements IPlayer {
                     autoplay: 0
                 },
                 events: {
-                    'onReady' : this.onPlayerReady,
+                    'onReady': this.onPlayerReady,
                     'onStateChange': onPlayerStateChange
                 }
             });
         }
         else {
-            setTimeout(() => { this.initPlayer(onPlayerStateChange) }, 50);
+            setTimeout(function () { _this.initPlayer(onPlayerStateChange); }, 50);
         }
         if (this.mobileBrowser) {
             var div_player = $("#div_yt_player");
             div_player.height(div_player.width() * 9.0 / 16.0);
         }
-    }
-
-    public onPlayerReady = () => {
-        this.playerReady = true;
-    }
-
-    public setPlayerContent(media: Media, time: number) {
+    };
+    YtPlayer.prototype.setPlayerContent = function (media, time) {
+        var _this = this;
         if (!this.playerReady) {
             console.log('player not ready!');
-            setTimeout(() => { this.setPlayerContent(media, time) }, 50);
+            setTimeout(function () { _this.setPlayerContent(media, time); }, 50);
         }
         else {
             this.ytPlayer.loadVideoById(media.YTVideoID, time, "large");
             this.play();
         }
-    }
-
-    public play() {
+    };
+    YtPlayer.prototype.play = function () {
         this.ytPlayer.playVideo();
-    }
-
-    public pause() {
+    };
+    YtPlayer.prototype.pause = function () {
         this.ytPlayer.pauseVideo();
-    }
-
-    public getCurrentTime(): number {
+    };
+    YtPlayer.prototype.getCurrentTime = function () {
         return Math.round(this.ytPlayer.getCurrentTime());
-    }
-
-    public getCurrentState(): number {
+    };
+    YtPlayer.prototype.getCurrentState = function () {
         return Math.round(this.ytPlayer.getPlayerState());
-    }
-
-    public isStopped(): boolean {
+    };
+    YtPlayer.prototype.isStopped = function () {
         return this.getCurrentState() == 0;
-    }
-
-}
+    };
+    return YtPlayer;
+}());
+exports.YtPlayer = YtPlayer;
+//# sourceMappingURL=YtPlayer.js.map

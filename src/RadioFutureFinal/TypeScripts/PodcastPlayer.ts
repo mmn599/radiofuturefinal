@@ -12,7 +12,7 @@ export class PodcastPlayer implements IPlayer {
     private ui: UI;
     private canvas: HTMLCanvasElement;
 
-    constructor(ui: UI, mobileBrowser: boolean) {
+    constructor(ui: UI, mobileBrowser: boolean, nextMedia, previousMedia) {
         this.ui = ui;
         this.mobileBrowser = mobileBrowser;
         this.audio = <HTMLAudioElement>document.getElementById('html5audio');
@@ -20,6 +20,8 @@ export class PodcastPlayer implements IPlayer {
         this.canvas = <HTMLCanvasElement>document.getElementById('canvas_progress');
         $("#div_yt_player").hide();
         $("#div_podcast_player").show();
+        $("#btn_next").click(nextMedia);
+        $("#btn_previous").click(previousMedia);
     };
 
     initPlayer = (onPlayerStateChange) => {
@@ -28,7 +30,7 @@ export class PodcastPlayer implements IPlayer {
         this.canvas.width = this.canvas.offsetWidth;
         this.canvas.height = this.canvas.offsetHeight;
         this.setupControls();
-        this.updateProgressUI(0);
+        this.nothingPlaying();
         this.audio.onended = () => {
             onPlayerStateChange({ data: 0 });
         }
@@ -37,16 +39,22 @@ export class PodcastPlayer implements IPlayer {
         }
     }
 
+    public nothingPlaying = () => {
+        $("#cc_title").text('Nothing currently playing.');
+        $("#cc_show").text('Queue something up!');
+        this.updateProgressUI(0, 1);
+    }
+
     audioTimeUpdate() {
         var percentage = this.audio.currentTime / this.audio.duration;
-        this.updateProgressUI(percentage);
+        this.updateProgressUI(this.audio.currentTime, this.audio.duration);
     }
 
     setupControls = () => {
         var btnPlayPause = $("#btn_play_pause");
         btnPlayPause.attr('class', 'play_btn');
         btnPlayPause.click(() => {
-            if (btnPlayPause.hasClass('play_btn')) {
+            if (this.audio.paused) {
                 this.play();
             }
             else {
@@ -55,34 +63,35 @@ export class PodcastPlayer implements IPlayer {
         });
     }
 
-    updateProgressUI = (percentage: number) => {
+    updateProgressUI = (time: number, duration: number) => {
         var ctx = this.canvas.getContext('2d');
         ctx.moveTo(0, 0);
         ctx.fillStyle = 'grey';
-        ctx.rect(0, 0, percentage * this.canvas.width, this.canvas.height);
+        ctx.rect(0, 0, time / duration * this.canvas.width, this.canvas.height);
         ctx.fill();
+        $("#cc_time").text(Math.round(time));
     }
 
     setPlayerContent = (media: Media, time: number) => {
         this.mp3source.setAttribute('src', media.MP3Source);
         this.audio.load();
-        this.audio.play();
         this.updateInfoUI(media);
+        this.play();
     }
 
     updateInfoUI(media: Media) {
-        $("#p_cc_show").text('Radiolab');
-        $("#p_cc_title").text(media.Title);
+        $("#cc_show").text('Radiolab');
+        $("#cc_title").text(media.Title);
     }
 
     play = () => {
-        this.audio.play();
         $("#btn_play_pause").removeClass('play_btn').addClass('pause_btn');
+        this.audio.play();
     }
 
     pause = () => {
+        $("#btn_play_pause").removeClass('pause_btn').addClass('play_btn');
         this.audio.pause();
-        $("btn_play_pause").removeClass('pause_btn').addClass('play_btn');
     }
 
     getCurrentTime = () => {

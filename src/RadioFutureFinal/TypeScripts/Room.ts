@@ -9,7 +9,7 @@ class RoomManager implements UICallbacks, ClientActions {
 
     user: MyUser;
     session: Session;
-    player: IPlayer; 
+    player: PodcastPlayer; 
     socket: MySocket;
     ui: UI;
     roomType: string;
@@ -27,12 +27,12 @@ class RoomManager implements UICallbacks, ClientActions {
         this.user = new MyUser();
         this.session = new Session();
         this.ui = new UI(this.mobileBrowser, this);
-        if (this.roomType == "podcasts") {
-            this.player = new PodcastPlayer(this.ui, this.mobileBrowser);
-        }
-        else {
-            this.player = new YtPlayer(this.ui, this.mobileBrowser);
-        }
+        //if (this.roomType == "podcasts") {
+        this.player = new PodcastPlayer(this.ui, this.mobileBrowser, this.uiNextMedia, this.uiPreviousMedia);
+        //}
+        //else {
+        //    this.player = new YtPlayer(this.ui, this.mobileBrowser);
+        //}
         this.socket = new MySocket(this);
         this.setupJamSession(encodedSessionName);
         this.player.initPlayer(this.onPlayerStateChange);
@@ -164,6 +164,9 @@ class RoomManager implements UICallbacks, ClientActions {
             this.user.State.Time = 0;
             this.user.State.QueuePosition += 1;
             this.onUserStateChange();
+        }
+        else {
+            this.player.nothingPlaying();
         }
     }
 
