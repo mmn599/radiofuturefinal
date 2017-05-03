@@ -386,6 +386,7 @@ input:focus {
 #btn_play_pause {
     display: inline-block;
     margin-left: 2%;
+    cursor: pointer;
 }
 
 #btn_next {
