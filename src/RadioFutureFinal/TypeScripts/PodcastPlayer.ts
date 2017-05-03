@@ -27,6 +27,17 @@ export class PodcastPlayer implements IPlayer {
     initPlayer = (onPlayerStateChange) => {
         this.canvas.width = this.canvas.offsetWidth;
         this.canvas.height = this.canvas.offsetHeight;
+
+        $(this.canvas).click((e) => {
+            var xPos = e.clientX - this.canvas.getBoundingClientRect().left;
+            if (xPos < 0) {
+                xPos = 0;
+            }
+            var percentage = xPos / this.canvas.width;
+            console.log(percentage);
+            this.updatePlayerTime(percentage * this.audio.duration);
+        });
+
         this.setupControls();
         this.nothingPlaying();
         this.audio.onended = () => {
@@ -35,6 +46,10 @@ export class PodcastPlayer implements IPlayer {
         this.audio.ontimeupdate = () => {
             this.audioTimeUpdate();
         }
+    }
+
+    public updatePlayerTime = (time: number) => {
+        this.audio.currentTime = time;
     }
 
     public nothingPlaying = () => {
@@ -81,11 +96,18 @@ export class PodcastPlayer implements IPlayer {
 
     updateProgressUI = (time: number, duration: number) => {
         var ctx = this.canvas.getContext('2d');
-        ctx.moveTo(0, 0);
+
+        var percent = time / duration;
+        if (!percent || percent == NaN) { percent = 0;}
+        console.log(percent);
+
+        ctx.beginPath();
+        ctx.fillStyle = "#ffa79c";
+        ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+        ctx.beginPath();
         ctx.fillStyle = 'white';
-        if (duration == 0) { duration = 1; }
-        ctx.rect(0, 0, time / duration * this.canvas.width, this.canvas.height);
-        ctx.fill();
+        ctx.fillRect(0, 0, percent * this.canvas.width, this.canvas.height);
         $("#cc_time").text(this.format(time));
         $("#cc_duration").text(this.format(duration));
     }

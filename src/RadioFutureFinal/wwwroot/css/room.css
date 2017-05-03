@@ -346,6 +346,7 @@ input:focus {
     font-size: 1.5vw;
     color: white;
     margin: 0;
+    padding-left: .1vw;
 }
 
 #cc_time {
@@ -379,6 +380,7 @@ input:focus {
     width: 30vw;
     height: 1vw;
     margin-left: .5%;
+    cursor: pointer;
 }
 
 #btn_play_pause {

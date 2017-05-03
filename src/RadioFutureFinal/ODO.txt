@@ -1,10 +1,11 @@
 ﻿little
+-scroll bar sets progress
+-add Show to media
 -delete button on queue
 -highlight current on queue
 -click to go to on queue
 
 big
--podcast visualizer
 -mobile
 
 Performance and Code stuff

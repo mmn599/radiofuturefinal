@@ -5,6 +5,15 @@ var PodcastPlayer = (function () {
         this.initPlayer = function (onPlayerStateChange) {
             _this.canvas.width = _this.canvas.offsetWidth;
             _this.canvas.height = _this.canvas.offsetHeight;
+            $(_this.canvas).click(function (e) {
+                var xPos = e.clientX - _this.canvas.getBoundingClientRect().left;
+                if (xPos < 0) {
+                    xPos = 0;
+                }
+                var percentage = xPos / _this.canvas.width;
+                console.log(percentage);
+                _this.updatePlayerTime(percentage * _this.audio.duration);
+            });
             _this.setupControls();
             _this.nothingPlaying();
             _this.audio.onended = function () {
@@ -13,6 +22,9 @@ var PodcastPlayer = (function () {
             _this.audio.ontimeupdate = function () {
                 _this.audioTimeUpdate();
             };
+        };
+        this.updatePlayerTime = function (time) {
+            _this.audio.currentTime = time;
         };
         this.nothingPlaying = function () {
             $("#cc_title").text('Nothing currently playing.');
@@ -33,13 +45,17 @@ var PodcastPlayer = (function () {
         };
         this.updateProgressUI = function (time, duration) {
             var ctx = _this.canvas.getContext('2d');
-            ctx.moveTo(0, 0);
-            ctx.fillStyle = 'white';
-            if (duration == 0) {
-                duration = 1;
+            var percent = time / duration;
+            if (!percent || percent == NaN) {
+                percent = 0;
             }
-            ctx.rect(0, 0, time / duration * _this.canvas.width, _this.canvas.height);
-            ctx.fill();
+            console.log(percent);
+            ctx.beginPath();
+            ctx.fillStyle = "#ffa79c";
+            ctx.fillRect(0, 0, _this.canvas.width, _this.canvas.height);
+            ctx.beginPath();
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, percent * _this.canvas.width, _this.canvas.height);
             $("#cc_time").text(_this.format(time));
             $("#cc_duration").text(_this.format(duration));
         };

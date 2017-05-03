@@ -13,10 +13,6 @@ namespace RadioFutureFinal.Controllers
         {
             ViewData["roomName"] = roomName;
             ViewData["roomType"] = "podcasts";
-            if(Utils.BroserIsMobile(HttpContext))
-            {
-                return View("~/Views/Room/RoomViewMobile.cshtml");
-            }
             return View("~/Views/Room/RoomView.cshtml");
         }
     }
