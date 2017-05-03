@@ -54,16 +54,11 @@ class RoomManager implements UICallbacks, ClientActions {
 
     clientProvideUserState(message: WsMessage) {
         var userToSyncWith = message.User;
-
         this.user.State.QueuePosition = userToSyncWith.State.QueuePosition;
         this.user.State.Time = userToSyncWith.State.Time;
-        this.user.State.YTPlayerState = userToSyncWith.State.YTPlayerState;
-
+        this.user.State.PlayerState = userToSyncWith.State.PlayerState;
         this.ui.updateQueue(this.session.Queue, this.user.Id, this.user.State.QueuePosition);
-
-        var currentMedia = this.session.Queue[this.user.State.QueuePosition];
-
-        this.userStateChange();
+        this.onUserStateChange();
     }
 
     clientRequestUserState(message: WsMessage) {
@@ -71,7 +66,7 @@ class RoomManager implements UICallbacks, ClientActions {
         userData.Id = message.User.Id; // TODO: bad bad bad
         userData.State.QueuePosition = this.user.State.QueuePosition;
         userData.State.Time = Math.round(this.player.getCurrentTime());
-        userData.State.YTPlayerState = this.player.getCurrentState();
+        userData.State.PlayerState = this.player.getCurrentState();
 
         var outgoingMsg = new WsMessage();
         outgoingMsg.Action = 'ProvideSyncToUser';
@@ -79,21 +74,9 @@ class RoomManager implements UICallbacks, ClientActions {
         this.socket.emit(outgoingMsg);
     }
 
-    clientUpdateUser(message: WsMessage) {
-        var user = message.User;
-        this.user = user;	
-    }
-
     clientSessionReady(message: WsMessage) {
         this.session = message.Session;
         this.user = message.User;
-
-        // TODO: get rid of this bullshit
-        if (this.session.Queue.length == 0) {
-            $("#p_current_content_info").text("Queue up a song!");
-            $("#p_current_recommender_info").text("Use the search bar above.");
-        }
-
         this.uiNextMedia();
         this.ui.updateQueue(this.session.Queue, this.user.Id, this.user.State.QueuePosition);
         this.ui.updateUsersList(this.session.Users, this.user.Id);
@@ -107,8 +90,9 @@ class RoomManager implements UICallbacks, ClientActions {
     }
 
     clientUpdateQueue(message: WsMessage) {
+        var wasWaiting = this.isUserWaiting();
         this.session.Queue = message.Session.Queue;
-        if (this.user.State.Waiting) {
+        if (wasWaiting) {
             this.uiNextMedia();
         }
         this.ui.updateQueue(this.session.Queue, this.user.Id, this.user.State.QueuePosition);
@@ -124,6 +108,12 @@ class RoomManager implements UICallbacks, ClientActions {
         // TODO: dumb
         var results = message.Session.Queue;
         this.ui.onSearchResults(results);
+    }
+
+    isUserWaiting = (): boolean => {
+        var pos = this.user.State.QueuePosition;
+        var length = this.session.Queue.length;
+        return pos < 0 || ((pos == (length - 1)) && this.player.isStopped());
     }
 
     //
@@ -158,36 +148,19 @@ class RoomManager implements UICallbacks, ClientActions {
         this.socket.emit(message);
     }
 
-    userStateChange() {
+    onUserStateChange() {
         if (this.user.State.QueuePosition >= 0 && this.user.State.QueuePosition < this.session.Queue.length) {
             this.player.setPlayerContent(this.session.Queue[this.user.State.QueuePosition], this.user.State.Time); 
-            this.user.State.Waiting = false;
-        }
-        else if (this.user.State.QueuePosition < 0 || this.user.State.QueuePosition == this.session.Queue.length) {
-            // TODO: set player content to 'waiting on next video'
-            this.user.State.Waiting = true;
-        }
-        else if (this.user.State.QueuePosition == this.session.Queue.length) {
-
         }
     }
 
     uiNextMedia() {
-        // TODO: workaround, user state should never be undefined
-        if (!this.user.State) {
-            this.user.State = new UserState();
-        }
-        this.user.State.Time = 0;
         var queue = this.session.Queue;
-
         if(this.user.State.QueuePosition + 1 < queue.length) {
-            this.user.State.QueuePosition = this.user.State.QueuePosition + 1;
+            this.user.State.Time = 0;
+            this.user.State.QueuePosition += 1;
         }
-        else if (this.user.State.QueuePosition >= 0) {
-            this.user.State.QueuePosition = queue.length;
-        }
-
-        this.userStateChange();
+        this.onUserStateChange();
     }
 
     uiPauseMedia() {
@@ -203,7 +176,7 @@ class RoomManager implements UICallbacks, ClientActions {
         var queue = this.session.Queue;
         if(this.user.State.QueuePosition > 0) {
             this.user.State.QueuePosition = this.user.State.QueuePosition - 1;
-            this.userStateChange();
+            this.onUserStateChange();
         }
     }
 
@@ -224,16 +197,11 @@ class RoomManager implements UICallbacks, ClientActions {
     }
 
     uiQueueMedia = (media: Media) => {
-
-        console.log('ui updating queue');
-
         media.UserId = this.user.Id;
         media.UserName = this.user.Name;
-
         var message = new WsMessage();
         message.Action = 'AddMediaToSession';
         message.Media = media;
-
         //TODO: local add media
         this.socket.emit(message);
     }
@@ -243,7 +211,7 @@ class RoomManager implements UICallbacks, ClientActions {
         this.session.Queue.splice(position, 1);
         if (this.user.State.QueuePosition >= position) {
             this.user.State.QueuePosition -= 1;
-            this.userStateChange();
+            this.onUserStateChange();
         }
         this.ui.updateQueue(this.session.Queue, this.user.Id, this.user.State.QueuePosition);
 

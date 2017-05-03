@@ -8,5 +8,6 @@ export interface IPlayer {
     pause(): void;
     getCurrentTime(): number;
     getCurrentState(): number;
+    isStopped(): boolean;
 
 }

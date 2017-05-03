@@ -180,12 +180,10 @@ export class UI {
     }
 
     private searchEnterPressed(input_search) {
-        var divResults = $("#div_search_results");
-        divResults.html("");
         this.callbacks.uiSearch(input_search.val());
-        if(!divResults.is(':visible')) {
-            divResults.fadeIn();
-        }
+        var divResults = $("#div_search_results");
+        divResults.html("<p>searching</p>");
+        divResults.fadeIn();
     }
 
     public updateQueue(queue: Media[], userIdMe: number, queuePosition: number) {

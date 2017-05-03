@@ -25,8 +25,8 @@ namespace RadioFutureFinal.Contracts
                 {
                     Time = 0,
                     QueuePosition = -1,
-                    YTPlayerState = 0,
-                    Waiting = false
+                    PlayerState = 0,
+                    Waiting = true
                 }
             };
             return userContract;

@@ -16,8 +16,7 @@ var UserState = (function () {
     function UserState() {
         this.Time = 0;
         this.QueuePosition = -1;
-        this.YTPlayerState = 0;
-        this.Waiting = false;
+        this.PlayerState = 0;
     }
     return UserState;
 }());

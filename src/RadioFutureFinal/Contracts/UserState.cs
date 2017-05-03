@@ -11,8 +11,7 @@ namespace RadioFutureFinal.Contracts
         public UserState()
         {
             Time = 0;
-            YTPlayerState = 0;
-            Waiting = true;
+            PlayerState = 0;
             QueuePosition = -1;
         }
 
@@ -23,7 +22,7 @@ namespace RadioFutureFinal.Contracts
         public int QueuePosition { get; set; }
 
         [JsonProperty]
-        public int YTPlayerState { get; set; }
+        public int PlayerState { get; set; }
 
         [JsonProperty]
         public bool Waiting { get; set; }

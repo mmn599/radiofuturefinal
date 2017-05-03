@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using RadioFutureFinal.Contracts;
 using RadioFutureFinal.DAL;
+using RadioFutureFinal.Errors;
 using RadioFutureFinal.Models;
 using RadioFutureFinal.Search;
 using System;
@@ -54,7 +55,7 @@ namespace RadioFutureFinal.Messaging
             else
             {
                 // TODO: real exception
-                throw new Exception();
+                throw new RadioException();
             }
         }
 

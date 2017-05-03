@@ -1,8 +1,12 @@
-﻿/// <binding BeforeBuild='default' />
+﻿/// <binding BeforeBuild='default' ProjectOpened='watch' />
 var gulp = require("gulp");
 var browserify = require("browserify");
 var source = require('vinyl-source-stream');
 var tsify = require("tsify");
+
+gulp.task('watch', function () {
+    gulp.watch('./TypeScripts/*.ts', ['default']);
+});
 
 gulp.task("default", function () {
     return browserify({

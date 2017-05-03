@@ -13,7 +13,7 @@ var MySocket = (function () {
                 clientActions[action](message);
             }
             else {
-                console.log('bad client action');
+                throw new Error("bad client action");
             }
         };
         socket.onerror = function (event) {

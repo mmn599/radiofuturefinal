@@ -25,14 +25,12 @@ export class UserState {
     constructor() {
         this.Time = 0;
         this.QueuePosition = -1;
-        this.YTPlayerState = 0;
-        this.Waiting = false;
+        this.PlayerState = 0;
     }
 
     Time: number;
     QueuePosition: number;
-    YTPlayerState: number;
-    Waiting: boolean;
+    PlayerState: number;
 }
 
 export class Session {

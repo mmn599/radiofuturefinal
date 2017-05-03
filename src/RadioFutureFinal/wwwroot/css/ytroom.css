@@ -95,7 +95,7 @@ input:focus {
     right: 25%;
     width: 50%;
     top: 5%;
-    z-index: 3;
+    z-index: 1;
 }
 
 #div_user_results {
@@ -174,7 +174,7 @@ input:focus {
 #div_player_controls {
     width: 33.33%;
     justify-content: center;
-    padding-right: 1.75%;
+    padding-right: 1.8%;
 }
 
 #div_search {
@@ -237,11 +237,8 @@ input:focus {
 
 #canvas_podcast {
     position: relative;
-    top: 25%;
     display: inline-block;
-    width: 50%;
-    height: 50%;
-    background: white;
+    z-index: 0;
 }
 
 .arrow-up {

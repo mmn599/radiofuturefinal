@@ -2,7 +2,6 @@
 
 export interface ClientActions {
 
-    clientUpdateUser: (message: WsMessage) => void;
     clientSessionReady: (message: WsMessage) => void;
     clientUpdateUsersList: (message: WsMessage) => void;
     clientUpdateQueue: (message: WsMessage) => void;
@@ -34,7 +33,7 @@ export class MySocket {
                 clientActions[action](message); 
             }
             else {
-                console.log('bad client action');
+                throw new Error("bad client action");
             }
         };
 

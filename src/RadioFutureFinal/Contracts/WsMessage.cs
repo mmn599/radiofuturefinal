@@ -14,5 +14,14 @@ namespace RadioFutureFinal.Contracts
         public MyUserV1 User { get; set; }
 
         public string ChatMessage { get; set; }
+
+        public WsMessage()
+        {
+            // TODO: dumb
+            Session = new SessionV1();
+            Media = new MediaV1();
+            User = new MyUserV1();
+            ChatMessage = "";
+        }
     }
 }

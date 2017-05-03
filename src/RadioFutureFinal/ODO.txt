@@ -12,6 +12,7 @@ big
 -podcast visualizer
 
 Performance and Code stuff
+-better flow for getting into a room
 -typescript implicit any compilation
 -better websocket message structure
 -basic testing framework
