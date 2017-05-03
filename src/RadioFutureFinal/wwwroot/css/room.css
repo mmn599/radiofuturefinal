@@ -282,12 +282,6 @@ input:focus {
     list-style: none;
 }
 
-#canvas_podcast {
-    position: relative;
-    display: inline-block;
-    z-index: 0;
-}
-
 .arrow-up {
     width: 0;
     height: 0;
@@ -335,4 +329,16 @@ input:focus {
     height: 30%; 
     background-color: #ff4f39;
     top: 30%;
+}
+
+#p_cc_title {
+    font-size: 24px;
+}
+
+#p_cc_show {
+    font-size: 18px;
+}
+
+#canvas_progress {
+    background: white;  
 }
