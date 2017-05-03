@@ -10,6 +10,7 @@ export interface UICallbacks {
     uiSearch: (query: string, page: number) => void;
     uiNameChange: any;
     uiQueueMedia: (media: Media) => void;
+    uiGoToMedia: (newQueuePosition: number) => void;
 }
 
 export class UI {
@@ -148,7 +149,7 @@ export class UI {
         var divResults = $("#div_search_results");
         divResults.show();
         divResults.html("");
-        for (var i = 0; i < results.length; i++) {
+        for (let i = 0; i < results.length; i++) {
             let media = results[i];
             var divSearchResult = $(document.createElement('div'));
             divSearchResult.addClass('div_result search_stuff');
@@ -266,11 +267,15 @@ export class UI {
         var queueResults = $("#div_queue_results");
         queueResults.html("");
         // TODO: need to make this seperate from search results probably
-        for (var i = 0; i < length; i++) {
-            var media = queue[i];
+        for (let i = 0; i < length; i++) {
+            let media = queue[i];
             var divQueueResult = $(document.createElement('div'));
             divQueueResult.addClass('div_result');
             divQueueResult.appendTo(queueResults);
+            divQueueResult.click(() => {
+                console.log('yeet');
+                this.callbacks.uiGoToMedia(i);
+            });
             var imgThumb = document.createElement('img');
             $(imgThumb).addClass('img_result');
             imgThumb.src = media.ThumbURL;
@@ -286,7 +291,6 @@ export class UI {
             $(spanDescription).addClass('result_description');
             $(spanDescription).appendTo(innerDiv);
             $(spanDescription).html(media.Description);
-
             if (queuePosition == i) {
                 $(divQueueResult).css({
                     "border-color": "#ffa79c",

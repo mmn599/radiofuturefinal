@@ -11,7 +11,6 @@ var PodcastPlayer = (function () {
                     xPos = 0;
                 }
                 var percentage = xPos / _this.canvas.width;
-                console.log(percentage);
                 _this.updatePlayerTime(percentage * _this.audio.duration);
             });
             _this.setupControls();
@@ -49,7 +48,6 @@ var PodcastPlayer = (function () {
             if (!percent || percent == NaN) {
                 percent = 0;
             }
-            console.log(percent);
             ctx.beginPath();
             ctx.fillStyle = "#ffa79c";
             ctx.fillRect(0, 0, _this.canvas.width, _this.canvas.height);

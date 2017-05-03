@@ -185,10 +185,19 @@ var RoomManager = (function () {
         message.Action = 'SaveUserNameChange';
         this.socket.emit(message);
     };
+    RoomManager.prototype.uiGoToMedia = function (newQueuePosition) {
+        console.log('poop: ' + newQueuePosition);
+        this.user.State.QueuePosition = newQueuePosition;
+        this.user.State.Time = 0;
+        this.onUserStateChange();
+    };
     RoomManager.prototype.onUserStateChange = function () {
         if (this.user.State.QueuePosition >= 0 && this.user.State.QueuePosition < this.session.Queue.length) {
             this.player.setPlayerContent(this.session.Queue[this.user.State.QueuePosition], this.user.State.Time);
             this.ui.updateQueue(this.session.Queue, this.user.Id, this.user.State.QueuePosition);
+        }
+        else if (this.user.State.QueuePosition < 0) {
+            this.player.nothingPlaying();
         }
     };
     return RoomManager;

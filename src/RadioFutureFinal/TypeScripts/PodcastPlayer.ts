@@ -34,7 +34,6 @@ export class PodcastPlayer implements IPlayer {
                 xPos = 0;
             }
             var percentage = xPos / this.canvas.width;
-            console.log(percentage);
             this.updatePlayerTime(percentage * this.audio.duration);
         });
 
@@ -99,7 +98,6 @@ export class PodcastPlayer implements IPlayer {
 
         var percent = time / duration;
         if (!percent || percent == NaN) { percent = 0;}
-        console.log(percent);
 
         ctx.beginPath();
         ctx.fillStyle = "#ffa79c";
