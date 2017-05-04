@@ -1,8 +1,12 @@
 ﻿little
 -player loading ui
+-polish up user name change ui
+-figure out queueing bug
 
 big
--mobile
+-serious manual testing and debugging
+-improve testing functionality
+-cleaning
 
 Performance and Code stuff
 -how are we going to do both? should we?
