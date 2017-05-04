@@ -175,6 +175,13 @@ input:focus {
 }
 
 #input_search {
+    width: 90%;
+}
+
+#btn_search {
+    width: 10%;
+    height: auto;
+    float: right;
 }
 
 .myinput {
@@ -465,4 +472,9 @@ li:focus {
 #input_name {
     border-bottom: 2px solid black;
     margin-bottom: 3vh;
+}
+
+#div_search_in {
+    display: flex;
+    align-items: center;
 }
