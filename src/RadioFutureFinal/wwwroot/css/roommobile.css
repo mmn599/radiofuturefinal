@@ -21,10 +21,6 @@ input:focus {
     opacity: 0;
 }
 
-.smallrow {
-    height: 5%;
-}
-
 .div_player {
     display: none;
     width: 100%;
@@ -44,15 +40,16 @@ input:focus {
 #div_current_content {
     display: inline-block;
     width: 100%;
-    height: 60%;
     font-size: 0;
     border: 0;
+    position: absolute;
+    top: 30%;
 }
 
 #div_all_info {
     display: inline-block;
     width: 100%;
-    height: 5%;
+    height: 5vh;
     z-index: 1;
 }
 
@@ -62,10 +59,17 @@ input:focus {
     bottom: 5%;
 }
 
+#div_damn {
+    display: flex;
+    padding: 1vh;
+    background-color: #ff4f39;
+    justify-content: center;
+}
+
 #div_users_overall {
     padding-left: 1%;
     justify-content: flex-start;
-    width: 24%;
+    width: 49%;
 }
 
 #input_chat {
@@ -82,12 +86,15 @@ input:focus {
 
 
 #div_search_results {
-    width: 50%;
-    left: 25%;
-    top: 5%;
+    width: 100%;
+    top: 10%;
     z-index: 1;
-    max-height: 80vh;
+    max-height: 70vh;
     overflow-y: auto;
+}
+
+#div_search_results > p {
+    font-size: 18px;
 }
 
 #div_user_results {
@@ -97,8 +104,7 @@ input:focus {
 }
 
 #div_queue_results {
-    width: 50%;
-    right: 0;
+    width: 100vw;
     top: 5%;
     z-index: 1;
     max-height: 80vh;
@@ -117,6 +123,7 @@ input:focus {
     display: flex;
     align-items: center;
     justify-content: center;
+    padding-bottom: 1vw;
 }
 
 .div_outer_paging {
@@ -130,11 +137,12 @@ input:focus {
     width: 46%;
     text-align: center;
     cursor: pointer;
+    font-size: 7vw;
 }
 
-    .div_paging:hover {
-        background: grey;
-    }
+.div_paging:hover {
+    background: grey;
+}
 
 .div_result:hover {
     background: grey;
@@ -148,22 +156,27 @@ input:focus {
 }
 
 .result_title {
-    font-size: 18px;
+    font-size: 10vw;
+    margin-top: 1vw;
+    margin-left: 1vw;
+    margin-bottom: 1vw;
+    margin-right: 1vw;
 }
 
 .div_inner_results {
     padding-left: 1%;
     display: inline-block;
     cursor: pointer;
-    width: 89%;
+    width: 84%;
 }
 
-    .div_inner_results:hover {
-        background: grey;
-    }
+.div_inner_results:hover {
+    background: grey;
+}
 
 .result_description {
-    font-size: 14px;
+    font-size: 7vw;
+    margin: 1vw;
 }
 
 .search_stuff {
@@ -171,7 +184,7 @@ input:focus {
 }
 
 .img_result {
-    width: 10%;
+    width: 15%;
     height: auto;
 }
 
@@ -227,12 +240,14 @@ input:focus {
 }
 
 #div_search {
-    width: 50%;
+    width: 100%;
+    height: 5vh;
+    margin-top: 2.5%;
     justify-content: center;
 }
 
 #div_queue_overall {
-    width: 24%;
+    width: 49%;
     padding-right: 1%;
     justify-content: flex-end;
 }
@@ -251,24 +266,17 @@ input:focus {
     height: 20px;
 }
 
-#btn_play {
-}
-
-
-
 #div_chat_overall {
     justify-content: center;
-    width: 33.33%;
+    width: 100%;
+    padding: 1%;
 }
 
 #div_chat_results {
     display: inline-block;
-    position: absolute;
-    width: 40%;
-    left: 30%;
-    bottom: 0;
-    height: 35%;
-    padding: 0;
+    width: 90%;
+    bottom: 5%;
+    height: 50vh;
     overflow: auto;
 }
 
@@ -309,75 +317,80 @@ input:focus {
 .play_btn {
     width: 0;
     height: 0;
-    border-top: 48px solid transparent;
-    border-left: 72px solid white;
-    border-bottom: 48px solid transparent;
+    border-top: 24px solid transparent;
+    border-left: 36px solid white;
+    border-bottom: 24px solid transparent;
 }
 
 .pause_btn {
-    width: 24px;
-    height: 96px;
-    border-right: 24px solid white;
-    border-left: 24px solid white;
+    width: 12px;
+    height: 48px;
+    border-right: 12px solid white;
+    border-left: 12px solid white;
 }
 
 .div_inner_podcast_player {
     display: flex;
-    position: absolute;
     width: 100%;
-    height: 30%;
+    height: 100%;
     background-color: #ff4f39;
-    top: 30%;
-    align-items: center;
     justify-content: center;
 }
 
 #cc_title {
-    font-size: 2.5vw;
+    font-size: 2.5vh;
     color: white;
     margin-top: 1vh;
+    text-align: center;
     margin-bottom: 1vh;
 }
 
 #cc_show {
-    font-size: 1.5vw;
+    font-size: 2vh;
     color: white;
     margin: 0;
     padding-left: .1vw;
+    text-align: center;
 }
 
 #cc_time {
-    margin-left: 1%;
+    text-align: center;
 }
 
 .time {
-    display: inline-block;
-    font-size: 1.5vw;
+    font-size: 3.5vw;
     color: white;
-    width: 7vw;
+    width: 90vw;
     text-align: center;
+    padding-bottom: 1vw;
+    margin-top: 1vh;
 }
 
 .time_slash {
-    font-size: 1.5vw;
+    display: none;
+    font-size: 3.5vw;
     color: white;
-    width: 1vw;
+    width: 5vw;
+    margin-top: 1vh;
     text-align: center;
+}
+
+#cc_duration {
+    display: none;
 }
 
 #cc_info {
     margin: 0;
     padding: 0;
     font-size: 0;
-    margin-left: 2%;
 }
 
 #canvas_progress {
     background: #ffa79c;
-    width: 30vw;
-    height: 1vw;
-    margin-left: .5%;
+    width: 90vw;
+    height: 2vh;
     cursor: pointer;
+    margin-top: 1vh;
     -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */
     -moz-user-select: none; /* Firefox */
@@ -393,34 +406,32 @@ input:focus {
 }
 
 #btn_next {
-    position: absolute;
-    right: 2%;
     width: 0;
     height: 0;
-    border-top: 20px solid transparent;
-    border-bottom: 20px solid transparent;
-    border-left: 20px solid white;
-    cursor: pointer;
+    border-top: 24px solid transparent;
+    border-left: 36px solid white;
+    border-bottom: 24px solid transparent;
+    position: absolute;
+    right: 1vw;
 }
 
-    #btn_next:hover {
-        border-left: 20px solid blue;
-    }
+#btn_next:hover {
+    border-left: 20px solid blue;
+}
 
 #btn_previous {
-    position: absolute;
-    left: 2%;
     width: 0;
     height: 0;
-    border-top: 20px solid transparent;
-    border-bottom: 20px solid transparent;
-    border-right: 20px solid white;
-    cursor: pointer;
+    position: absolute;
+    left: 1vw;
+    border-top: 24px solid transparent;
+    border-right: 36px solid white;
+    border-bottom: 24px solid transparent;
 }
 
-    #btn_previous:hover {
-        border-right: 20px solid blue;
-    }
+#btn_previous:hover {
+    border-right: 20px solid blue;
+}
 
 .span_delete {
     color: red;
@@ -442,4 +453,8 @@ input:focus {
 
 li:focus {
     outline: none;
+}
+
+#p_queue_summary {
+    padding: 0;
 }

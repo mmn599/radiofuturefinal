@@ -27,7 +27,7 @@ export class UI {
     constructor(mobileBrowser: boolean, callbacks: UICallbacks) {
         this.colors = ['red', 'orange', 'yellow', 'green', 'blue', 'violet'];
         this.mobileBrowser = mobileBrowser;
-        this.frameBuilder = new FrameBuilder(mobileBrowser);
+        this.frameBuilder = new FrameBuilder();
         this.callbacks = callbacks;
         this.initialize();
     }
@@ -71,31 +71,56 @@ export class UI {
         this.spinner = new Spinner(opts).spin(target);
     }
 
+    private fadeOut = (overall, results) => {
+        results.fadeOut();
+        let dropper = overall.find('.dropper');
+        dropper.removeClass('arrow-up');
+        dropper.addClass('arrow-down');
+    }
+
+    private fadeIn = (overall, results) => {
+        results.fadeIn();
+        let dropper = overall.find('.dropper');
+        dropper.removeClass('arrow-down');
+        dropper.addClass('arrow-up');
+    }
+
     private setupFadeUI(overall: JQuery, results) {
         overall.mouseenter((e) => {
             if (!results.is(':visible')) {
-                results.fadeIn();
-                let dropper = overall.find('.dropper');
-                dropper.removeClass('arrow-down');
-                dropper.addClass('arrow-up');
+                this.fadeIn(overall, results);
             }
         });
         overall.mouseleave((e) => {
             if (results.is(':visible')) {
-                results.fadeOut();
-                let dropper = overall.find('.dropper');
-                dropper.removeClass('arrow-up');
-                dropper.addClass('arrow-down');
+                this.fadeOut(overall, results);
+            }
+        });
+    }
+
+    private setupMobileClickUI(dropper, overall, results) {
+        dropper.click(() => {
+            if (!results.is(':visible')) {
+                this.fadeIn(overall, results);
+            }
+            else {
+                this.fadeOut(overall, results);
             }
         });
     }
 
     private setupInfoRolloverUI() {
+        var divUsersOverall = $("#div_users_overall");
+        var divQueueOverall = $("#div_queue_overall");
+        var divUserResults = $("#div_user_results");
+        var divQueueResults = $("#div_queue_results");
         if (!this.mobileBrowser) {
-            this.setupFadeUI($("#div_users_overall"), $("#div_user_results"));
-            this.setupFadeUI($("#div_queue_overall"), $("#div_queue_results"));
-            this.setupFadeUI($("#div_chat_overall"), $("#div_chat_results"));
-            this.setupFadeUI($("#div_cc_overall"), $("#div_cc_results"));
+            this.setupFadeUI(divUsersOverall, divUserResults); 
+            this.setupFadeUI(divQueueOverall, divQueueResults);
+        }
+        else {
+            this.setupMobileClickUI(divUsersOverall.children(".dropper"), divUsersOverall, divUserResults);
+            this.setupMobileClickUI(divQueueOverall.children(".dropper"), divQueueOverall, divQueueResults);
         }
     }
 
@@ -252,7 +277,7 @@ export class UI {
             summary = length + " thing in the playlist";
         }
         else if (length <= 0) {
-            summary = "Nothing in the playlist. Queue something!";
+            summary = "Nothing in the playlist.";
         }
         $("#p_queue_summary").text(summary);
 

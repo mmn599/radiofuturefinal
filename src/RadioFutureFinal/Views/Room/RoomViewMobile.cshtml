@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css?family=Cousine" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:300" rel="stylesheet" type="text/css">
     <script src="~/js/spin.js"></script>
-    <script>var mobileBrowser = false;</script>
+    <script>var mobileBrowser = true;</script>
     <script>var roomType = "@ViewData["roomType"]"; var roomName = "@ViewData["roomName"]"</script>
     <script src="~/js/roombundle.js"></script>
     <script src="https://apis.google.com/js/client.js"></script>
@@ -27,35 +27,36 @@
                 <p id="p_users_summary"></p>
                 <div id="div_user_results" class="results"></div>
             </div>
-            <div class="info md-col-4" id="div_search">
-                <input class="myinput" id="input_name" placeholder="type in your name and press enter">
-                <input class="myinput" id="input_search" placeholder="search for podcasts">
-                <div id="div_search_results" class="results"></div>
-            </div>
             <div id="div_queue_overall" class="info">
-                <p id="p_queue_summary">Nothing in the playlist. Queue something!</p>
+                <p id="p_queue_summary"></p>
                 <div class="dropper arrow-down img_drop_left"></div>
                 <div id="div_queue_results" class="results"></div>
             </div>
+        </div>
+
+        <div id="div_search">
+            <input class="myinput" id="input_name" placeholder="type in your name and press enter">
+            <input class="myinput" id="input_search" placeholder="search for podcasts">
+            <div id="div_search_results" class="results"></div>
         </div>
 
         <div id="div_current_content">
             <div class="div_player" id="div_yt_player"></div>
             <div class="div_player" id="div_podcast_player">
                 <div class="div_inner_podcast_player">
-                    <div id="btn_previous"></div>
-                    <div id="btn_play_pause" class="play_btn"></div>
                     <div id="cc_info">
-                        <canvas id="canvas_progress"></canvas>
                         <p id="cc_title"></p>
                         <p id="cc_show"></p>
+                        <canvas id="canvas_progress"></canvas>
+                        <p class="time" id="cc_time"></p>
                     </div>
-                    <span class="time" id="cc_time"></span>
-                    <span class="time_slash"> / </span>
-                    <span class="time" id="cc_duration"></span>
-                    <div id="btn_next"></div>
                 </div>
                 <audio id="html5audio"></audio>
+            </div>
+            <div id="div_damn">
+                <div id="btn_previous"></div>
+                <div id="btn_play_pause" class="play_btn"></div>
+                <div id="btn_next"></div>
             </div>
         </div>
 
