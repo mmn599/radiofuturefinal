@@ -41,11 +41,3 @@ export class Session {
     Users: MyUser[];
     Queue: Media[];
 }
-
-export class WsMessage {
-    Action: string;
-    Session: Session;
-    Media: Media;
-    User: MyUser;
-    ChatMessage: string;
-}

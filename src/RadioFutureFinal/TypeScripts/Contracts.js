@@ -27,10 +27,4 @@ var Session = (function () {
     return Session;
 }());
 exports.Session = Session;
-var WsMessage = (function () {
-    function WsMessage() {
-    }
-    return WsMessage;
-}());
-exports.WsMessage = WsMessage;
 //# sourceMappingURL=Contracts.js.map

@@ -11,11 +11,6 @@ var RoomManager = (function () {
             var length = _this.session.Queue.length;
             return pos < 0 || ((pos == (length - 1)) && _this.player.isStopped());
         };
-        this.onPlayerStateChange = function (event) {
-            if (event.data == 0) {
-                _this.uiNextMedia();
-            }
-        };
         this.uiNextMedia = function () {
             var queue = _this.session.Queue;
             if (_this.user.State.QueuePosition + 1 < queue.length) {
@@ -38,44 +33,30 @@ var RoomManager = (function () {
                 _this.onUserStateChange();
             }
         };
-        //==================================================================
-        // These functions are called directly embedded into the html... kinda weird
-        //==================================================================
-        this.onFatalError = function () {
-            $("#div_everything").hide();
-            $("#div_error").show();
-        };
-        this.requestSyncWithUser = function (userId) {
-            console.log('request sync with user');
-            var user = new Contracts_1.MyUser();
-            user.Id = userId;
-            var message = new Contracts_1.WsMessage();
-            message.Action = 'RequestSyncWithUser';
-            message.User = user;
-            _this.socket.emit(message);
-        };
         this.uiQueueMedia = function (media) {
-            media.UserId = _this.user.Id;
-            media.UserName = _this.user.Name;
-            var message = new Contracts_1.WsMessage();
-            message.Action = 'AddMediaToSession';
-            message.Media = media;
-            //TODO: local add media
-            _this.socket.emit(message);
+            _this.socket.AddMediaToSession(media);
         };
         this.uiDeleteMedia = function (mediaId, position) {
+            // TODO: this should be done once the update is sent from server
             _this.session.Queue.splice(position, 1);
             if (_this.user.State.QueuePosition >= position) {
                 _this.user.State.QueuePosition -= 1;
                 _this.onUserStateChange();
             }
             _this.ui.updateQueue(_this.session.Queue, _this.user.Id, _this.user.State.QueuePosition);
-            var mediaToDelete = new Contracts_1.Media();
-            mediaToDelete.Id = mediaId;
-            var message = new Contracts_1.WsMessage();
-            message.Action = 'DeleteMediaFromSession';
-            message.Media = mediaToDelete;
-            _this.socket.emit(message);
+            _this.socket.DeleteMediaFromSession(mediaId);
+        };
+        this.requestSyncWithUser = function (userId) {
+            _this.socket.RequestSyncWithUser(userId);
+        };
+        this.onPlayerStateChange = function (event) {
+            if (event.data == 0) {
+                _this.uiNextMedia();
+            }
+        };
+        this.onFatalError = function () {
+            $("#div_everything").hide();
+            $("#div_error").show();
         };
         // TODO: find a better way to expose these functions to html?
         window.requestSyncWithUser = this.requestSyncWithUser;
@@ -99,97 +80,71 @@ var RoomManager = (function () {
     RoomManager.prototype.setupJamSession = function (encodedSessionName) {
         this.session.Name = decodeURI(encodedSessionName);
         this.user.Name = 'Anonymous';
-        var message = new Contracts_1.WsMessage();
-        message.Action = 'UserJoinSession';
-        message.User = this.user;
-        message.Session = this.session;
-        this.socket.emit(message);
+        this.socket.JoinSession(this.session.Name);
     };
     //==================================================================
     // WebSocket message response functions
     //==================================================================
-    RoomManager.prototype.clientProvideUserState = function (message) {
-        var userToSyncWith = message.User;
-        this.user.State.QueuePosition = userToSyncWith.State.QueuePosition;
-        this.user.State.Time = userToSyncWith.State.Time;
-        this.user.State.PlayerState = userToSyncWith.State.PlayerState;
+    RoomManager.prototype.clientProvideUserState = function (userState) {
+        this.user.State.QueuePosition = userState.QueuePosition;
+        this.user.State.Time = userState.Time;
+        this.user.State.PlayerState = userState.PlayerState;
         this.ui.updateQueue(this.session.Queue, this.user.Id, this.user.State.QueuePosition);
         this.onUserStateChange();
     };
-    RoomManager.prototype.clientRequestUserState = function (message) {
-        var userData = new Contracts_1.MyUser();
-        userData.Id = message.User.Id; // TODO: bad bad bad
-        userData.State.QueuePosition = this.user.State.QueuePosition;
-        userData.State.Time = Math.round(this.player.getCurrentTime());
-        userData.State.PlayerState = this.player.getCurrentState();
-        var outgoingMsg = new Contracts_1.WsMessage();
-        outgoingMsg.Action = 'ProvideSyncToUser';
-        outgoingMsg.User = userData;
-        this.socket.emit(outgoingMsg);
+    RoomManager.prototype.clientRequestUserState = function (userIdRequestor) {
+        var myUserState = new Contracts_1.UserState();
+        myUserState.QueuePosition = this.user.State.QueuePosition;
+        myUserState.Time = Math.round(this.player.getCurrentTime());
+        myUserState.PlayerState = this.player.getCurrentState();
+        this.socket.ProvideSyncToUser(myUserState, userIdRequestor);
     };
-    RoomManager.prototype.clientSessionReady = function (message) {
-        this.session = message.Session;
-        this.user = message.User;
+    RoomManager.prototype.clientSessionReady = function (session, user) {
+        this.session = session;
+        this.user = user;
         this.uiNextMedia();
         this.ui.updateQueue(this.session.Queue, this.user.Id, this.user.State.QueuePosition);
         this.ui.updateUsersList(this.session.Users, this.user.Id);
         this.ui.sessionReady();
     };
-    RoomManager.prototype.clientUpdateUsersList = function (message) {
-        var users = message.Session.Users;
+    RoomManager.prototype.clientUpdateUsersList = function (users) {
         this.session.Users = users;
         this.ui.updateUsersList(this.session.Users, this.user.Id);
     };
-    RoomManager.prototype.clientUpdateQueue = function (message) {
+    RoomManager.prototype.clientUpdateQueue = function (queue) {
         var wasWaiting = this.isUserWaiting();
-        this.session.Queue = message.Session.Queue;
+        this.session.Queue = queue;
         if (wasWaiting) {
             this.uiNextMedia();
         }
         this.ui.updateQueue(this.session.Queue, this.user.Id, this.user.State.QueuePosition);
     };
-    RoomManager.prototype.clientChatMessage = function (message) {
-        var chatMessage = message.ChatMessage;
-        var userName = message.User.Name;
-        this.ui.onChatMessage(userName, chatMessage, 'blue');
+    RoomManager.prototype.clientChatMessage = function (message, userName) {
+        this.ui.onChatMessage(userName, message, 'blue');
     };
-    RoomManager.prototype.clientSearchResults = function (message) {
-        // TODO: dumb
-        var results = message.Session.Queue;
-        this.ui.onSearchResults(results);
+    RoomManager.prototype.clientSearchResults = function (searchResults) {
+        this.ui.onSearchResults(searchResults);
     };
     //
     // Mostly UI callback functions
     //
     RoomManager.prototype.uiSendChatMessage = function (msg) {
-        var message = new Contracts_1.WsMessage();
-        message.Action = 'ChatMessage';
-        message.ChatMessage = msg;
-        message.User = this.user;
-        this.socket.emit(message);
+        this.socket.ChatMessage(msg, this.user.Name);
     };
     RoomManager.prototype.uiSearch = function (query, page) {
-        var message = new Contracts_1.WsMessage();
-        message.Action = 'Search';
-        // TODO: dumb
-        message.ChatMessage = query;
-        message.Media = new Contracts_1.Media();
-        message.Media.Id = page;
-        this.socket.emit(message);
+        this.socket.Search(query, page);
     };
     RoomManager.prototype.uiNameChange = function (newName) {
-        this.user.Name = newName;
-        var message = new Contracts_1.WsMessage();
-        message.User = this.user;
-        message.Action = 'SaveUserNameChange';
-        this.socket.emit(message);
+        this.socket.SaveUserNameChange(this.user.Id, this.user.Name);
     };
     RoomManager.prototype.uiGoToMedia = function (newQueuePosition) {
-        console.log('poop: ' + newQueuePosition);
         this.user.State.QueuePosition = newQueuePosition;
         this.user.State.Time = 0;
         this.onUserStateChange();
     };
+    //
+    // Misc
+    //
     RoomManager.prototype.onUserStateChange = function () {
         if (this.user.State.QueuePosition >= 0 && this.user.State.QueuePosition < this.session.Queue.length) {
             this.player.setPlayerContent(this.session.Queue[this.user.State.QueuePosition], this.user.State.Time);
