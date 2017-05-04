@@ -94,7 +94,7 @@ input:focus {
 }
 
 #div_search_results > p {
-    font-size: 18px;
+    font-size: 5vw;
 }
 
 #div_user_results {
@@ -202,7 +202,7 @@ input:focus {
     border: 0;
     border-bottom: 1px solid #CCCCCC;
     background: #f1f1f1;
-    font-size: 18px;
+    font-size: 5vw;
     font-family: "Source Code Pro";
     text-align: center;
 }
@@ -220,7 +220,7 @@ input:focus {
     height: 100%;
     float: left;
     font-family: 'Josefin Sans';
-    font-size: 16px;
+    font-size: 5vw;
     display: flex;
     align-items: center;
 }
@@ -444,7 +444,7 @@ input:focus {
     }
 
 .chat > span {
-    font-size: 18px;
+    font-size: 5vw;
 }
 
 .class:focus {
