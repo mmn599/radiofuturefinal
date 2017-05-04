@@ -156,13 +156,13 @@ export class UI {
 
     private setupInputUI() {
         var inputSearch = $("#input_search");
-        inputSearch.click(() => {
-            this.searchEnterPressed(inputSearch);
-        });
         inputSearch.keypress((e) => {
             if (e.which == 13) {
                 this.searchEnterPressed(inputSearch);
             }
+        });
+        $("#btn_search").click(() => {
+            this.searchEnterPressed(inputSearch);
         });
         var input_name = $("#input_name");
         input_name.keypress((e) => {
@@ -179,7 +179,7 @@ export class UI {
                 }
             });
         }
-        jQuery(document.body).on("click", ":not(#div_search_results, #div_search_results *)", (event) => {
+        jQuery(document.body).on("click", ":not(#btn_search, #div_search_results, #div_search_results *)", (event) => {
             $("#div_search_results").fadeOut();
             $("#input_search").val("");
         });​​​​​​​
@@ -378,6 +378,7 @@ export class UI {
 
     public userNameChange(name_input) {
         name_input.hide();
+        $("#div_inner_user_results").show();
         this.callbacks.uiNameChange(name_input.val());
     }
 

@@ -175,10 +175,6 @@ input:focus {
 }
 
 #input_search {
-    background-image: url('../images/search.jpg');
-    background-repeat: no-repeat;
-    background-position: right center;
-    outline: 0;
 }
 
 .myinput {

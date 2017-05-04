@@ -94,6 +94,7 @@ input:focus {
     left: 0;
     top: 5%;
     z-index: 1;
+    width: 33.33%;
 }
 
 #div_queue_results {
@@ -180,17 +181,14 @@ input:focus {
 }
 
 #input_search {
-    display: none;
     font-size: 2vw;
-    background-image: url('../images/search.jpg');
-    background-repeat: no-repeat;
-    background-position: right center;
-    outline: 0;
-    cursor: pointer;
 }
 
 #input_name {
-    font-size: 2vw;
+    font-size: 1vw;
+    margin-top: 3%;
+    margin-bottom: 3%;
+    background: white;
 }
 
 .myinput {
@@ -458,4 +456,12 @@ li:focus {
     border-color: #ffa79c;
     border-width: 2px;
     border-style: solid;
+}
+
+#div_inner_user_results {
+    display: none;
+}
+
+#btn_search {
+    cursor: pointer;
 }
