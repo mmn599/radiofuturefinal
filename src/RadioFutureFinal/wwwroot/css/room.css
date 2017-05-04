@@ -153,6 +153,13 @@ input:focus {
     background: grey;
 }
 
+.div_queue_result {
+    font-family: 'Josefin Sans';
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .result_title {
     font-size: 18px;
 }
@@ -160,7 +167,12 @@ input:focus {
 .div_inner_results {
     padding-left: 1%;
     display: inline-block;
+    cursor: pointer;
     width: 89%;
+}
+
+.div_inner_results:hover {
+    background: grey;
 }
 
 .result_description {
@@ -417,4 +429,14 @@ input:focus {
 
 #btn_previous:hover {
     border-right: 20px solid blue;
+}
+
+.span_delete {
+    color: red;
+    padding: 1%;
+    cursor: pointer;
+}
+
+.span_delete:hover {
+    background: grey;
 }

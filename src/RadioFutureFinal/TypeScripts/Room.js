@@ -63,7 +63,7 @@ var RoomManager = (function () {
             //TODO: local add media
             _this.socket.emit(message);
         };
-        this.deleteMedia = function (mediaId, position) {
+        this.uiDeleteMedia = function (mediaId, position) {
             _this.session.Queue.splice(position, 1);
             if (_this.user.State.QueuePosition >= position) {
                 _this.user.State.QueuePosition -= 1;
@@ -79,7 +79,6 @@ var RoomManager = (function () {
         };
         // TODO: find a better way to expose these functions to html?
         window.requestSyncWithUser = this.requestSyncWithUser;
-        window.deleteMedia = this.deleteMedia;
         this.roomType = roomType;
         this.mobileBrowser = mobileBrowser;
     }

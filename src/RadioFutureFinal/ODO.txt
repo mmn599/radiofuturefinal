@@ -1,6 +1,5 @@
 ﻿little
 -delete button on queue
--click to go to on queue
 -fix triangles
 
 big

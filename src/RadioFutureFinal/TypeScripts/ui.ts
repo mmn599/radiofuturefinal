@@ -11,6 +11,7 @@ export interface UICallbacks {
     uiNameChange: any;
     uiQueueMedia: (media: Media) => void;
     uiGoToMedia: (newQueuePosition: number) => void;
+    uiDeleteMedia: (mediaId: number, position: number) => void;
 }
 
 export class UI {
@@ -269,13 +270,9 @@ export class UI {
         // TODO: need to make this seperate from search results probably
         for (let i = 0; i < length; i++) {
             let media = queue[i];
-            var divQueueResult = $(document.createElement('div'));
-            divQueueResult.addClass('div_result');
+            let divQueueResult = $(document.createElement('div'));
+            divQueueResult.addClass('div_queue_result');
             divQueueResult.appendTo(queueResults);
-            divQueueResult.click(() => {
-                console.log('yeet');
-                this.callbacks.uiGoToMedia(i);
-            });
             var imgThumb = document.createElement('img');
             $(imgThumb).addClass('img_result');
             imgThumb.src = media.ThumbURL;
@@ -283,6 +280,9 @@ export class UI {
             var innerDiv = document.createElement('div');
             $(innerDiv).addClass('div_inner_results');
             $(innerDiv).appendTo(divQueueResult);
+            $(innerDiv).click(() => {
+                this.callbacks.uiGoToMedia(i);
+            });
             var spanTitle = document.createElement('p');
             $(spanTitle).addClass('result_title');
             $(spanTitle).appendTo(innerDiv);
@@ -291,6 +291,13 @@ export class UI {
             $(spanDescription).addClass('result_description');
             $(spanDescription).appendTo(innerDiv);
             $(spanDescription).html(media.Description);
+            var deleteX = document.createElement('span');
+            $(deleteX).text('X');
+            $(deleteX).addClass('span_delete');
+            $(deleteX).click(() => {
+                this.callbacks.uiDeleteMedia(media.Id, i);
+            });
+            $(deleteX).appendTo(divQueueResult);
             if (queuePosition == i) {
                 $(divQueueResult).css({
                     "border-color": "#ffa79c",

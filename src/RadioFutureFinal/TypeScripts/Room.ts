@@ -18,7 +18,6 @@ class RoomManager implements UICallbacks, ClientActions {
     constructor(roomType: string, mobileBrowser: boolean) {
         // TODO: find a better way to expose these functions to html?
         (<any>window).requestSyncWithUser = this.requestSyncWithUser;
-        (<any>window).deleteMedia = this.deleteMedia;
         this.roomType = roomType;
         this.mobileBrowser = mobileBrowser;
     }
@@ -225,7 +224,7 @@ class RoomManager implements UICallbacks, ClientActions {
         this.socket.emit(message);
     }
 
-    deleteMedia = (mediaId: number, position: number) => {
+    uiDeleteMedia = (mediaId: number, position: number) => {
 
         this.session.Queue.splice(position, 1);
         if (this.user.State.QueuePosition >= position) {
