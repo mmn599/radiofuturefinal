@@ -1,5 +1,5 @@
 ﻿little
--loading ui
+-player loading ui
 
 big
 -mobile

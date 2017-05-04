@@ -443,3 +443,9 @@ input:focus {
 li:focus {
     outline: none;
 }
+
+.queue_result_selected {
+    border-color: #ffa79c;
+    border-width: 2px;
+    border-style: solid;
+}

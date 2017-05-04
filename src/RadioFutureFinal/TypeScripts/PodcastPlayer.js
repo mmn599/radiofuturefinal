@@ -38,7 +38,7 @@ var PodcastPlayer = (function () {
             _this.audio.currentTime = 0;
             _this.removeSource();
             _this.audio.load;
-            $("#btn_play_pause").css('visibility', 'hidden');
+            // $("#btn_play_pause").css('visibility', 'hidden');
             setTimeout(function () {
                 _this.updateProgressUI(0, 0);
             }, 100);
@@ -79,8 +79,9 @@ var PodcastPlayer = (function () {
             newmp3.attr('src', media.MP3Source);
             _this.updateInfoUI(media);
             _this.audio.load();
-            _this.play();
-            $("#btn_play_pause").css('visibility', 'visible');
+            _this.pause();
+            _this.updateProgressUI(0, 0);
+            // $("#btn_play_pause").css('visibility', 'visible');
         };
         this.play = function () {
             $("#btn_play_pause").removeClass('play_btn').addClass('pause_btn');

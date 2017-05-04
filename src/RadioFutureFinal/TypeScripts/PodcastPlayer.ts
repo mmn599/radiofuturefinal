@@ -62,7 +62,7 @@ export class PodcastPlayer implements IPlayer {
         this.audio.currentTime = 0;
         this.removeSource();
         this.audio.load;
-        $("#btn_play_pause").css('visibility', 'hidden');
+        // $("#btn_play_pause").css('visibility', 'hidden');
         setTimeout(() => {
             this.updateProgressUI(0, 0);
         }, 100);
@@ -136,8 +136,9 @@ export class PodcastPlayer implements IPlayer {
         newmp3.attr('src', media.MP3Source);
         this.updateInfoUI(media);
         this.audio.load();
-        this.play();
-        $("#btn_play_pause").css('visibility', 'visible');
+        this.pause();
+        this.updateProgressUI(0, 0);
+        // $("#btn_play_pause").css('visibility', 'visible');
     }
 
     updateInfoUI(media: Media) {

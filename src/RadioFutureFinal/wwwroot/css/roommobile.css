@@ -34,16 +34,7 @@ input:focus {
     justify-content: center;
     align-content: center;
     width: 100%;
-    height: 100%;
-}
-
-#div_current_content {
-    display: inline-block;
-    width: 100%;
-    font-size: 0;
-    border: 0;
-    position: absolute;
-    top: 30%;
+    height: 90%;
 }
 
 #div_all_info {
@@ -70,18 +61,18 @@ input:focus {
     padding-left: 1%;
     justify-content: flex-start;
     width: 49%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 #input_chat {
     text-align: center;
     display: block;
     background-color: transparent;
-    margin-bottom: 1.5%;
     margin-left: 2.5%;
     margin-right: 2.5%;
     width: 95%;
-    position: absolute;
-    bottom: 0;
 }
 
 
@@ -99,21 +90,22 @@ input:focus {
 
 #div_user_results {
     left: 0;
-    top: 5%;
+    top: 40%;
     z-index: 1;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 #div_queue_results {
     width: 100vw;
-    top: 5%;
+    top: 40%;
     z-index: 1;
-    max-height: 80vh;
+    max-height: 90vh;
     overflow-y: auto;
 }
 
 .results {
-    display: none;
-    position: absolute;
     background: white;
 }
 
@@ -140,23 +132,16 @@ input:focus {
     font-size: 7vw;
 }
 
-.div_paging:hover {
-    background: grey;
-}
-
-.div_result:hover {
-    background: grey;
-}
-
 .div_queue_result {
     font-family: 'Josefin Sans';
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 1vw;
 }
 
 .result_title {
-    font-size: 10vw;
+    font-size: 6vw;
     margin-top: 1vw;
     margin-left: 1vw;
     margin-bottom: 1vw;
@@ -170,12 +155,8 @@ input:focus {
     width: 84%;
 }
 
-.div_inner_results:hover {
-    background: grey;
-}
-
 .result_description {
-    font-size: 7vw;
+    font-size: 5vw;
     margin: 1vw;
 }
 
@@ -184,12 +165,11 @@ input:focus {
 }
 
 .img_result {
-    width: 15%;
-    height: auto;
+    width: 15vw;
+    height: 15vw;
 }
 
 #div_queue {
-    background: blue;
 }
 
 #input_search {
@@ -242,7 +222,6 @@ input:focus {
 #div_search {
     width: 100%;
     height: 5vh;
-    margin-top: 2.5%;
     justify-content: center;
 }
 
@@ -276,7 +255,7 @@ input:focus {
     display: inline-block;
     width: 90%;
     bottom: 5%;
-    height: 50vh;
+    height: 80vh;
     overflow: auto;
 }
 
@@ -291,17 +270,17 @@ input:focus {
 .arrow-up {
     width: 0;
     height: 0;
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-bottom: 10px solid #ff4f39;
+    border-left: 40px solid transparent;
+    border-right: 40px solid transparent;
+    border-bottom: 40px solid #ff4f39;
 }
 
 .arrow-down {
     width: 0;
     height: 0;
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-top: 10px solid #ff4f39;
+    border-left: 40px solid transparent;
+    border-right: 40px solid transparent;
+    border-top: 40px solid #ff4f39;
 }
 
 #div_error {
@@ -317,32 +296,31 @@ input:focus {
 .play_btn {
     width: 0;
     height: 0;
-    border-top: 24px solid transparent;
-    border-left: 36px solid white;
-    border-bottom: 24px solid transparent;
+    border-top: 96px solid transparent;
+    border-left: 144px solid white;
+    border-bottom: 96px solid transparent;
 }
 
 .pause_btn {
-    width: 12px;
-    height: 48px;
-    border-right: 12px solid white;
-    border-left: 12px solid white;
+    width: 48px;
+    height: 192px;
+    border-right: 48px solid white;
+    border-left: 48px solid white;
 }
 
 .div_inner_podcast_player {
     display: flex;
     width: 100%;
-    height: 100%;
     background-color: #ff4f39;
-    justify-content: center;
+    padding: 2vw;
 }
 
 #cc_title {
-    font-size: 2.5vh;
+    display: flex;
+    margin-left: 2vw;
+    font-size: 6vw;
     color: white;
-    margin-top: 1vh;
-    text-align: center;
-    margin-bottom: 1vh;
+    align-items: center;
 }
 
 #cc_show {
@@ -351,29 +329,20 @@ input:focus {
     margin: 0;
     padding-left: .1vw;
     text-align: center;
+    display:none;
 }
 
 #cc_time {
+    display: none;
     text-align: center;
 }
 
 .time {
     font-size: 3.5vw;
     color: white;
-    width: 90vw;
     text-align: center;
-    padding-bottom: 1vw;
-    margin-top: 1vh;
 }
 
-.time_slash {
-    display: none;
-    font-size: 3.5vw;
-    color: white;
-    width: 5vw;
-    margin-top: 1vh;
-    text-align: center;
-}
 
 #cc_duration {
     display: none;
@@ -387,10 +356,10 @@ input:focus {
 
 #canvas_progress {
     background: #ffa79c;
-    width: 90vw;
-    height: 2vh;
+    width: 100vw;
+    height: 10%;
     cursor: pointer;
-    margin-top: 1vh;
+    font-size: 0;
     -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */
     -moz-user-select: none; /* Firefox */
@@ -413,10 +382,6 @@ input:focus {
     border-bottom: 24px solid transparent;
     position: absolute;
     right: 1vw;
-}
-
-#btn_next:hover {
-    border-left: 20px solid blue;
 }
 
 #btn_previous {
@@ -457,4 +422,41 @@ li:focus {
 
 #p_queue_summary {
     padding: 0;
+}
+
+.queue_result_selected {
+    border-right: 40px solid #ffa79c;
+}
+
+.span_sel {
+    display: inline-block;
+    font-size: 7vw;
+    width: 33.33vw;
+    text-align: center;
+}
+
+#div_sel {
+    padding-top: 1vh;
+    padding-bottom: 1vh;
+    display: inline-block;
+    height: 5.5vh;
+    width: 100vw;
+}
+
+#div_stuff {
+    display: inline-block;
+    height: 75vh;
+    width: 100vw;
+}
+
+#div_current_content {
+    display: inline-block;
+    width: 100vw;
+    height: 17.5vh;
+    font-size: 0;
+    border: 0;
+}
+
+.sel_selected {
+    border-bottom: 10px solid #ffa79c;
 }

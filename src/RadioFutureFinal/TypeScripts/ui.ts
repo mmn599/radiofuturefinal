@@ -36,7 +36,30 @@ export class UI {
         this.setupSpinnerUI();
         this.setupInfoRolloverUI();
         this.setupInputUI();
+        if (this.mobileBrowser) {
+            this.setupSelectorsUI();
+        }
+        this.select($("#btn_sel_queue"), $("#div_queue_results"));
     }
+
+    select = function (btnSel, divToFade) {
+        $(".span_sel").removeClass('sel_selected');
+        btnSel.addClass('sel_selected');
+        $(".stuff").hide();
+        divToFade.fadeIn();
+    }
+
+    private setupSelectorsUI = () => {
+        $("#btn_sel_queue").click(() => {
+            this.select($("#btn_sel_queue"), $("#div_queue_results"));
+        });
+        $("#btn_sel_search").click(() => {
+            this.select($("#btn_sel_search"), $("#div_search"));
+        });
+        $("#btn_sel_users").click(() => {
+            this.select($("#btn_sel_users"), $("#div_user_results"));
+        });
+    } 
 
     public sessionReady = () => {
         $("#div_loading").hide();
@@ -303,10 +326,12 @@ export class UI {
             $(spanTitle).addClass('result_title');
             $(spanTitle).appendTo(innerDiv);
             $(spanTitle).text(media.Title);
-            var spanDescription = document.createElement('p');
-            $(spanDescription).addClass('result_description');
-            $(spanDescription).appendTo(innerDiv);
-            $(spanDescription).html(media.Description);
+            if (!this.mobileBrowser) {
+                var spanDescription = document.createElement('p');
+                $(spanDescription).addClass('result_description');
+                $(spanDescription).appendTo(innerDiv);
+                $(spanDescription).html(media.Description);
+            }
             var deleteX = document.createElement('span');
             $(deleteX).text('X');
             $(deleteX).addClass('span_delete');
@@ -315,11 +340,7 @@ export class UI {
             });
             $(deleteX).appendTo(divQueueResult);
             if (queuePosition == i) {
-                $(divQueueResult).css({
-                    "border-color": "#ffa79c",
-                    "border-width": "2px",
-                    "border-style": "solid"
-                });
+                $(divQueueResult).addClass('queue_result_selected');
             }
         }
    }

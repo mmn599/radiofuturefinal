@@ -21,7 +21,8 @@
     <div class="everything" id="div_loading"></div>
     <div class="everything" id="div_everything">
 
-        <div id="div_all_info">
+        <!--<div id="div_all_info">
+
             <div id="div_users_overall" class="info">
                 <div class="dropper arrow-down img_drop_right"></div>
                 <p id="p_users_summary"></p>
@@ -37,33 +38,44 @@
         <div id="div_search">
             <input class="myinput" id="input_name" placeholder="type in your name and press enter">
             <input class="myinput" id="input_search" placeholder="search for podcasts">
-            <div id="div_search_results" class="results"></div>
-        </div>
-
-        <div id="div_current_content">
-            <div class="div_player" id="div_yt_player"></div>
-            <div class="div_player" id="div_podcast_player">
-                <div class="div_inner_podcast_player">
-                    <div id="cc_info">
-                        <p id="cc_title"></p>
-                        <p id="cc_show"></p>
-                        <canvas id="canvas_progress"></canvas>
-                        <p class="time" id="cc_time"></p>
-                    </div>
-                </div>
-                <audio id="html5audio"></audio>
-            </div>
-            <div id="div_damn">
-                <div id="btn_previous"></div>
-                <div id="btn_play_pause" class="play_btn"></div>
-                <div id="btn_next"></div>
-            </div>
         </div>
 
         <div id="div_chat_results">
             <ul id="ul_chat"></ul>
             <input class="myinput" id="input_chat" placeholder="Enter your chat message" />
         </div>
+
+        <div id="div_search_results" class="results"></div>
+        192.168.1.7-->
+
+        <div id="div_sel">
+            <span id="btn_sel_queue" class="span_sel">queue</span>
+            <span id="btn_sel_search" class="span_sel">search</span>
+            <span id="btn_sel_users" class="span_sel">users</span>
+        </div>
+
+        <div id="div_stuff">
+            <div id="div_queue_results" class="results stuff"></div>
+            <div id="div_search" class="stuff">
+                <input class="myinput" id="input_name" placeholder="type in your name and press enter">
+                <input class="myinput" id="input_search" placeholder="search for podcasts">
+                <div id="div_search_results" class="results"></div>
+            </div>
+            <div id="div_user_results" class="results stuff"></div>
+        </div>
+
+        <div id="div_current_content">
+            <canvas id="canvas_progress"></canvas>
+            <div class="div_player" id="div_podcast_player">
+                <div class="div_inner_podcast_player">
+                    <div id="btn_play_pause" class="play_btn"></div>
+                    <span id="cc_title"></span>
+                    <span id="cc_time" class="time"></span>
+                </div>
+                <audio id="html5audio"></audio>
+            </div>
+        </div>
+
 
     </div>
 </body>
