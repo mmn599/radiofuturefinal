@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using RadioFutureFinal.Contracts;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.WebSockets;
@@ -58,12 +59,14 @@ namespace RadioFutureFinal.Messaging
             return SendResult.CreateSuccess();
         }
 
-        public async Task<List<SendResult>> SendMessageToSessionAsync(WsMessage message, List<MySocket> socketsInSession)
+        public async Task<List<SendResult>> SendMessageToSessionAsync(WsMessage message, 
+                ConcurrentDictionary<WebSocket, MySocket> socketsInSession)
         {
             var sendResults = new List<SendResult>();
-            foreach(var socket in socketsInSession)
+            foreach(var kvPair in socketsInSession)
             {
-                var sendResult = await SendMessageAsync(socket.WebSocket, message);
+                var socket = kvPair.Key;
+                var sendResult = await SendMessageAsync(socket, message);
                 sendResults.Add(sendResult);
             }
 

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using RadioFutureFinal.DAL;
+using RadioFutureFinal.Errors;
 using RadioFutureFinal.Messaging;
 using System;
 using System.Collections.Concurrent;
@@ -18,7 +19,8 @@ namespace RadioFutureFinal.Messaging
         IConfigurationRoot _config;
 
         // key is session id
-        ConcurrentDictionary<int, List<MySocket>> _activeSession;
+        // TODO: these data structures are wasteful and are O(n) with respect to the nubmer of users logged on
+        ConcurrentDictionary<int, ConcurrentDictionary<WebSocket, MySocket>> _activeSession;
         ConcurrentDictionary<WebSocket, MySocket> _activeSockets;
 
         public MyContext(IConfigurationRoot configuration, IDbRepository db, MessageSenderFactory senderFactory)
@@ -27,7 +29,7 @@ namespace RadioFutureFinal.Messaging
             _db = db;
             _wsSender = senderFactory.Create(SocketDisconnected);
             _activeSockets = new ConcurrentDictionary<WebSocket, MySocket>();
-            _activeSession = new ConcurrentDictionary<int, List<MySocket>>();
+            _activeSession = new ConcurrentDictionary<int, ConcurrentDictionary<WebSocket, MySocket>>();
         }
 
         public MySocket GetMySocket(WebSocket socket)
@@ -44,17 +46,18 @@ namespace RadioFutureFinal.Messaging
         public MySocket GetSocketIdForUser(int sessionId, int userId)
         {
             var socketsInSession = GetSocketsInSession(sessionId);
-            var userSocket = socketsInSession.Find(s => s.UserId == userId);
+            var userSocket = socketsInSession.Values.First(s => s.UserId == userId);
             if(userSocket == null)
             {
                 // TODO: exception 
+                throw new RadioException("couldnt find user socket");
             }
             return userSocket;
         }
 
-        public List<MySocket> GetSocketsInSession(int sessionId)
+        public ConcurrentDictionary<WebSocket,MySocket> GetSocketsInSession(int sessionId)
         {
-            List<MySocket> socketsInSession;
+            ConcurrentDictionary<WebSocket,MySocket> socketsInSession;
             var found = _activeSession.TryGetValue(sessionId, out socketsInSession);
 
             if(!found)
@@ -73,17 +76,19 @@ namespace RadioFutureFinal.Messaging
 
         public void SocketJoinSession(MySocket socket, int sessionId, int userId)
         {
-            List<MySocket> sessionSockets;
+            ConcurrentDictionary<WebSocket,MySocket> sessionSockets;
             var sessionFound = _activeSession.TryGetValue(sessionId, out sessionSockets);
 
             if(sessionFound)
             {
-                sessionSockets.Add(socket);
+                sessionSockets.TryAdd(socket.WebSocket, socket);
             }
             else
             {
                 // First socket in the session
-                var result = _activeSession.TryAdd(sessionId, new List<MySocket>() { socket });
+                var newDict = new ConcurrentDictionary<WebSocket, MySocket>();
+                newDict.TryAdd(socket.WebSocket, socket);
+                var result = _activeSession.TryAdd(sessionId, newDict);
                 if(result == false)
                 {
                     // TODO: throw exception
@@ -95,7 +100,7 @@ namespace RadioFutureFinal.Messaging
 
         private void DeactiveSession(int sessionId)
         {
-            List<MySocket> socketsInSession;
+            ConcurrentDictionary<WebSocket,MySocket> socketsInSession;
             var found = _activeSession.TryRemove(sessionId, out socketsInSession);
             if(!found)
             {
@@ -108,20 +113,26 @@ namespace RadioFutureFinal.Messaging
         }
 
         // TODO: terrible name
-        private List<MySocket> RemoveSocketFromDataStructures(MySocket socket)
+        private ConcurrentDictionary<WebSocket,MySocket> RemoveSocketFromDataStructures(MySocket socket)
         {
             var found = _activeSockets.TryRemove(socket.WebSocket, out socket);
             if(!found)
             {
                 // TODO: throw exception
+                throw new RadioException("Could not find my socket!");
             }
-            List<MySocket> socketsInSession;
+            ConcurrentDictionary<WebSocket,MySocket> socketsInSession;
             found = _activeSession.TryGetValue(socket.SessionId, out socketsInSession);
             if(!found)
             {
-                // TODO: throw exception
+                throw new RadioException("Could not find session in activeSession struct!");
             }
-            socketsInSession.Remove(socket);
+            MySocket removedSocket;
+            found = socketsInSession.TryRemove(socket.WebSocket, out removedSocket);
+            if(!found)
+            {
+                throw new RadioException("Could not find socket to remove in socketsInSession!");
+            }
 
             return socketsInSession;
         }

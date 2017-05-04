@@ -1,6 +1,8 @@
 ﻿using RadioFutureFinal.Contracts;
 using RadioFutureFinal.Models;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Net.WebSockets;
 using System.Threading.Tasks;
 
 namespace RadioFutureFinal.Messaging
@@ -75,7 +77,7 @@ namespace RadioFutureFinal.Messaging
             return await _senderBase.SendMessageAsync(socket.WebSocket, wsMessage);
         }
 
-        private async Task<List<SendResult>> ClientsUpdateSession(Session session, string action, List<MySocket> socketsInSession)
+        private async Task<List<SendResult>> ClientsUpdateSession(Session session, string action, ConcurrentDictionary<WebSocket, MySocket> socketsInSession)
         {
             var wsMessage = new WsMessage();
             wsMessage.Action = action;
@@ -84,19 +86,21 @@ namespace RadioFutureFinal.Messaging
         }
 
         // TODO: don't use full WsMessage
-        public async Task<List<SendResult>> ClientsSendChatMessage(WsMessage message, List<MySocket> socketsInSession)
+        public async Task<List<SendResult>> ClientsSendChatMessage(WsMessage message, 
+            ConcurrentDictionary<WebSocket, MySocket> socketsInSession)
         {
             message.Action = "clientChatMessage";
             return await _senderBase.SendMessageToSessionAsync(message, socketsInSession);
         }
 
         //TODO: probably shouldn't be sending full session for user and queue updates
-        public async Task<List<SendResult>> ClientsUpdateSessionUsers(Session session, List<MySocket> socketsInSession)
+        public async Task<List<SendResult>> ClientsUpdateSessionUsers(Session session, 
+            ConcurrentDictionary<WebSocket, MySocket> socketsInSession)
         {
             return await ClientsUpdateSession(session, "clientUpdateUsersList", socketsInSession);
         }
 
-        public async Task<List<SendResult>> ClientsUpdateSessionQueue(Session session, List<MySocket> socketsInSession)
+        public async Task<List<SendResult>> ClientsUpdateSessionQueue(Session session, ConcurrentDictionary<WebSocket, MySocket> socketsInSession)
         {
             return await ClientsUpdateSession(session, "clientUpdateQueue", socketsInSession);
         }
