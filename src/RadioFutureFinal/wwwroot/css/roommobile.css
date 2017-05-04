@@ -93,8 +93,10 @@ input:focus {
     top: 40%;
     z-index: 1;
     width: 100%;
-    max-height: 90vh;
+    max-height: 90%;
     overflow-y: auto;
+    padding-top: 2vh;
+    background: #f1f1f1;
 }
 
 #div_queue_results {
@@ -173,7 +175,10 @@ input:focus {
 }
 
 #input_search {
-    display: none;
+    background-image: url('../images/search.jpg');
+    background-repeat: no-repeat;
+    background-position: right center;
+    outline: 0;
 }
 
 .myinput {
@@ -459,4 +464,9 @@ li:focus {
 
 .sel_selected {
     border-bottom: 10px solid #ffa79c;
+}
+
+#input_name {
+    border-bottom: 2px solid black;
+    margin-bottom: 3vh;
 }

@@ -46,7 +46,7 @@ export class UI {
         $(".span_sel").removeClass('sel_selected');
         btnSel.addClass('sel_selected');
         $(".stuff").hide();
-        divToFade.fadeIn();
+        divToFade.show();
     }
 
     private setupSelectorsUI = () => {
@@ -156,6 +156,9 @@ export class UI {
 
     private setupInputUI() {
         var inputSearch = $("#input_search");
+        inputSearch.click(() => {
+            this.searchEnterPressed(inputSearch);
+        });
         inputSearch.keypress((e) => {
             if (e.which == 13) {
                 this.searchEnterPressed(inputSearch);
@@ -353,7 +356,7 @@ export class UI {
             summary = users.length + " user listening";
         }
         $("#p_users_summary").text(summary);
-        var userResults = $("#div_user_results");
+        var userResults = $("#div_inner_user_results");
         var html = [];
         for (var i = 0; i < users.length; i++) {
             var user = users[i];
@@ -375,7 +378,6 @@ export class UI {
 
     public userNameChange(name_input) {
         name_input.hide();
-        $("#input_search").fadeIn();
         this.callbacks.uiNameChange(name_input.val());
     }
 

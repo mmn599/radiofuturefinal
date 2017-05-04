@@ -181,6 +181,16 @@ input:focus {
 
 #input_search {
     display: none;
+    font-size: 2vw;
+    background-image: url('../images/search.jpg');
+    background-repeat: no-repeat;
+    background-position: right center;
+    outline: 0;
+    cursor: pointer;
+}
+
+#input_name {
+    font-size: 2vw;
 }
 
 .myinput {

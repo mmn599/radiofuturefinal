@@ -57,11 +57,13 @@
         <div id="div_stuff">
             <div id="div_queue_results" class="results stuff"></div>
             <div id="div_search" class="stuff">
-                <input class="myinput" id="input_name" placeholder="type in your name and press enter">
-                <input class="myinput" id="input_search" placeholder="search for podcasts">
+                <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="myinput" id="input_search" placeholder="search for podcasts">
                 <div id="div_search_results" class="results"></div>
             </div>
-            <div id="div_user_results" class="results stuff"></div>
+            <div id="div_user_results" class="results stuff">
+                <input autocomplete="off" autocorrect="off" autocapitalize="on" spellcheck="false" class="myinput" id="input_name" placeholder="type in your name and press enter">
+                <div id="div_inner_user_results"></div>
+            </div>
         </div>
 
         <div id="div_current_content">
