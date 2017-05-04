@@ -71,30 +71,21 @@ export class UI {
         this.spinner = new Spinner(opts).spin(target);
     }
 
-    private dropperSwitch(dropper: JQuery) {
-        if (dropper.hasClass('arrow-down')) {
-            dropper.removeClass('arrow-down');
-            dropper.addClass('arrow-up');
-        }
-        else {
-            dropper.removeClass('arrow-up');
-            dropper.addClass('arrow-down');
-        }
-    }
-
     private setupFadeUI(overall: JQuery, results) {
         overall.mouseenter((e) => {
             if (!results.is(':visible')) {
                 results.fadeIn();
                 let dropper = overall.find('.dropper');
-                this.dropperSwitch(dropper);
+                dropper.removeClass('arrow-down');
+                dropper.addClass('arrow-up');
             }
         });
         overall.mouseleave((e) => {
             if (results.is(':visible')) {
                 results.fadeOut();
                 let dropper = overall.find('.dropper');
-                this.dropperSwitch(dropper);
+                dropper.removeClass('arrow-up');
+                dropper.addClass('arrow-down');
             }
         });
     }
@@ -336,10 +327,8 @@ export class UI {
     public onChatMessage(userName: string, msg: string, color: string) {
         //TODO: color stuff
         var ul_chat = $("#ul_chat");
-        var html = '<li class="chat"><span style="margin: 0; color: ' + color + ';">' + userName + ': </span><span>' + msg + '</span></li>';
+        var html = '<li tabindex="1" class="chat"><span style="margin: 0; color: ' + color + ';">' + userName + ': </span><span>' + msg + '</span></li>';
         ul_chat.append(html);
-        if (ul_chat.length >= 10) {
-            ul_chat.children()[0].remove(); 
-        }
+        ul_chat.children().last().focus();
     }
 }
