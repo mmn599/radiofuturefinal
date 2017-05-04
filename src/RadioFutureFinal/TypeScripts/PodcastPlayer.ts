@@ -32,7 +32,11 @@ export class PodcastPlayer implements IPlayer {
                 xPos = 0;
             }
             var percentage = xPos / this.canvas.width;
-            this.updatePlayerTime(percentage * this.audio.duration);
+            var time = percentage * this.audio.duration;
+            if (time < 0 || time == NaN) {
+                time = 0;
+            }
+            this.updatePlayerTime(time);
         });
 
         this.setupControls();
@@ -46,7 +50,9 @@ export class PodcastPlayer implements IPlayer {
     }
 
     public updatePlayerTime = (time: number) => {
-        this.audio.currentTime = time;
+        if (time != NaN) {
+            this.audio.currentTime = time;
+        }
     }
 
     public nothingPlaying = () => {
@@ -55,17 +61,15 @@ export class PodcastPlayer implements IPlayer {
         this.audio.pause();
         this.audio.currentTime = 0;
         this.removeSource();
-        this.updateProgressUI(0, 1);
-    }
-
-    private removeSource = () => {
-        let mp3 = $("#mp3Source");
-        if (mp3) {
-            mp3.remove();
-        }
+        this.audio.load;
+        $("#btn_play_pause").css('visibility', 'hidden');
+        setTimeout(() => {
+            this.updateProgressUI(0, 0);
+        }, 100);
     }
 
     audioTimeUpdate() {
+        var duration = this.audio.duration == 0 ? 1 : this.audio.duration;
         var percentage = this.audio.currentTime / this.audio.duration;
         this.updateProgressUI(this.audio.currentTime, this.audio.duration);
     }
@@ -118,6 +122,11 @@ export class PodcastPlayer implements IPlayer {
         $("#cc_duration").text(this.format(duration));
     }
 
+    private removeSource() {
+        let mp3 = $("#mp3Source");
+        mp3.remove();
+    }
+
     setPlayerContent = (media: Media, time: number) => {
         this.removeSource();
         let newmp3 = $(document.createElement('source'));
@@ -126,7 +135,9 @@ export class PodcastPlayer implements IPlayer {
         newmp3.appendTo(this.audio);
         newmp3.attr('src', media.MP3Source);
         this.updateInfoUI(media);
+        this.audio.load();
         this.play();
+        $("#btn_play_pause").css('visibility', 'visible');
     }
 
     updateInfoUI(media: Media) {

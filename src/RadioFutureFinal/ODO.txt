@@ -1,4 +1,5 @@
 ﻿little
+-loading ui
 -fix still playing on delete bug
 -fix triangles
 

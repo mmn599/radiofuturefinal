@@ -11,7 +11,11 @@ var PodcastPlayer = (function () {
                     xPos = 0;
                 }
                 var percentage = xPos / _this.canvas.width;
-                _this.updatePlayerTime(percentage * _this.audio.duration);
+                var time = percentage * _this.audio.duration;
+                if (time < 0 || time == NaN) {
+                    time = 0;
+                }
+                _this.updatePlayerTime(time);
             });
             _this.setupControls();
             _this.nothingPlaying();
@@ -23,7 +27,9 @@ var PodcastPlayer = (function () {
             };
         };
         this.updatePlayerTime = function (time) {
-            _this.audio.currentTime = time;
+            if (time != NaN) {
+                _this.audio.currentTime = time;
+            }
         };
         this.nothingPlaying = function () {
             $("#cc_title").text('Nothing currently playing.');
@@ -31,13 +37,11 @@ var PodcastPlayer = (function () {
             _this.audio.pause();
             _this.audio.currentTime = 0;
             _this.removeSource();
-            _this.updateProgressUI(0, 1);
-        };
-        this.removeSource = function () {
-            var mp3 = $("#mp3Source");
-            if (mp3) {
-                mp3.remove();
-            }
+            _this.audio.load;
+            $("#btn_play_pause").css('visibility', 'hidden');
+            setTimeout(function () {
+                _this.updateProgressUI(0, 0);
+            }, 100);
         };
         this.setupControls = function () {
             var btnPlayPause = $("#btn_play_pause");
@@ -74,7 +78,9 @@ var PodcastPlayer = (function () {
             newmp3.appendTo(_this.audio);
             newmp3.attr('src', media.MP3Source);
             _this.updateInfoUI(media);
+            _this.audio.load();
             _this.play();
+            $("#btn_play_pause").css('visibility', 'visible');
         };
         this.play = function () {
             $("#btn_play_pause").removeClass('play_btn').addClass('pause_btn');
@@ -109,6 +115,7 @@ var PodcastPlayer = (function () {
     }
     ;
     PodcastPlayer.prototype.audioTimeUpdate = function () {
+        var duration = this.audio.duration == 0 ? 1 : this.audio.duration;
         var percentage = this.audio.currentTime / this.audio.duration;
         this.updateProgressUI(this.audio.currentTime, this.audio.duration);
     };
@@ -127,6 +134,10 @@ var PodcastPlayer = (function () {
             return "0" + num.toString();
         }
         return num.toString();
+    };
+    PodcastPlayer.prototype.removeSource = function () {
+        var mp3 = $("#mp3Source");
+        mp3.remove();
     };
     PodcastPlayer.prototype.updateInfoUI = function (media) {
         $("#cc_show").text(media.Show);
