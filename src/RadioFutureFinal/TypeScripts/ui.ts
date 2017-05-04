@@ -358,7 +358,16 @@ export class UI {
         for (var i = 0; i < users.length; i++) {
             var user = users[i];
             var thisIsMe = (user.Id === userIdMe);
-            var currentHTML = this.frameBuilder.user(this.colors[i % this.colors.length], user.Id, user.Name, thisIsMe);
+            var color = this.colors[i % this.colors.length];
+            var currentHTML = "";
+            if (!this.mobileBrowser) {
+                currentHTML = this.frameBuilder.user(color, user.Id, user.Name, thisIsMe);
+            }
+            else {
+                var theText = thisIsMe ? "you" : "sync with " + user.Name;
+                currentHTML = ' <p onclick="requestSyncWithUser(' + user.Id + ')" style="padding: 2vw; margin: 0; text-align: center; font-size: 9vw; background: ' + color + '; color: white;">' + theText + '</p>'
+            }
+            
             html.push(currentHTML);
         }
         userResults.html(html.join(""));
