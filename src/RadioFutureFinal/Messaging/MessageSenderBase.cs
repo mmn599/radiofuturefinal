@@ -21,7 +21,7 @@ namespace RadioFutureFinal.Messaging
             _onDisconnect = onDisconnect;
         }
 
-        public async Task<SendResult> SendMessageAsync(WebSocket socket, WsMessage wsMessage)
+        private async Task<SendResult> SendMessageAsyncInternal(WebSocket socket, WsMessage wsMessage)
         {
             var success = true;
 
@@ -52,11 +52,15 @@ namespace RadioFutureFinal.Messaging
 
             if(!success)
             {
-                await _onDisconnect(socket);
                 return SendResult.CreateFailure(socket);
             }
 
             return SendResult.CreateSuccess();
+        }
+
+        public async Task<SendResult> SendMessageAsync(WebSocket socket, WsMessage wsMessage)
+        {
+            return await SendMessageAsyncInternal(socket, wsMessage);
         }
 
         public async Task<List<SendResult>> SendMessageToSessionAsync(WsMessage message, 
@@ -68,6 +72,14 @@ namespace RadioFutureFinal.Messaging
                 var socket = kvPair.Key;
                 var sendResult = await SendMessageAsync(socket, message);
                 sendResults.Add(sendResult);
+            }
+
+            foreach(var sendResult in sendResults)
+            {
+                if(!sendResult.Success)
+                {
+                    await _onDisconnect.Invoke(sendResult.FaultySocket);
+                }
             }
 
             return sendResults;

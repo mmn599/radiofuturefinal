@@ -436,8 +436,8 @@ li:focus {
 }
 
 #div_sel {
-    padding-top: 1vh;
-    padding-bottom: 1vh;
+    padding-top: 1.5vh;
+    padding-bottom: 1.5vh;
     display: inline-block;
     height: 5.5vh;
     width: 100vw;
@@ -445,7 +445,7 @@ li:focus {
 
 #div_stuff {
     display: inline-block;
-    height: 75vh;
+    height: 74vh;
     width: 100vw;
 }
 
