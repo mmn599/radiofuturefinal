@@ -470,7 +470,7 @@ li:focus {
 }
 
 #input_name {
-    border-bottom: 2px solid black;
+    border-bottom: 2px solid grey;
     margin-bottom: 3vh;
 }
 
