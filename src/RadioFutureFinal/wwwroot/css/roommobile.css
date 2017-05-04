@@ -4,6 +4,7 @@
     width: 100%;
     margin: 0;
     background: #f1f1f1;
+    overflow: hidden;
 }
 
 input:focus {
@@ -78,9 +79,8 @@ input:focus {
 
 #div_search_results {
     width: 100%;
-    top: 10%;
     z-index: 1;
-    max-height: 100%;
+    max-height: 90%;
     overflow-y: auto;
 }
 
@@ -101,7 +101,7 @@ input:focus {
     width: 100vw;
     top: 40%;
     z-index: 1;
-    max-height: 100%;
+    max-height: 90%;
     overflow-y: auto;
 }
 

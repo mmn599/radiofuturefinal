@@ -38,8 +38,8 @@ export class UI {
         this.setupInputUI();
         if (this.mobileBrowser) {
             this.setupSelectorsUI();
+            this.select($("#btn_sel_search"), $("#div_search"));
         }
-        this.select($("#btn_sel_queue"), $("#div_queue_results"));
     }
 
     select = function (btnSel, divToFade) {
