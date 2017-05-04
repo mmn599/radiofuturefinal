@@ -8,7 +8,6 @@ export class PodcastPlayer implements IPlayer {
 
     private mobileBrowser: boolean;
     private audio: HTMLAudioElement;
-    private mp3source: any;
     private ui: UI;
     private canvas: HTMLCanvasElement;
 
@@ -16,7 +15,6 @@ export class PodcastPlayer implements IPlayer {
         this.ui = ui;
         this.mobileBrowser = mobileBrowser;
         this.audio = <HTMLAudioElement>document.getElementById('html5audio');
-        this.mp3source = document.getElementById('mp3Source');
         this.canvas = <HTMLCanvasElement>document.getElementById('canvas_progress');
         $("#div_yt_player").hide();
         $("#div_podcast_player").show();
@@ -54,7 +52,17 @@ export class PodcastPlayer implements IPlayer {
     public nothingPlaying = () => {
         $("#cc_title").text('Nothing currently playing.');
         $("#cc_show").text('Queue something up!');
+        this.audio.pause();
+        this.audio.currentTime = 0;
+        this.removeSource();
         this.updateProgressUI(0, 1);
+    }
+
+    private removeSource = () => {
+        let mp3 = $("#mp3Source");
+        if (mp3) {
+            mp3.remove();
+        }
     }
 
     audioTimeUpdate() {
@@ -111,8 +119,12 @@ export class PodcastPlayer implements IPlayer {
     }
 
     setPlayerContent = (media: Media, time: number) => {
-        this.mp3source.setAttribute('src', media.MP3Source);
-        this.audio.load();
+        this.removeSource();
+        let newmp3 = $(document.createElement('source'));
+        newmp3.attr('id', 'mp3Source');
+        newmp3.attr('type', 'audio/mp3');
+        newmp3.appendTo(this.audio);
+        newmp3.attr('src', media.MP3Source);
         this.updateInfoUI(media);
         this.play();
     }

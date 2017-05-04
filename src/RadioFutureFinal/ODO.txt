@@ -1,5 +1,5 @@
 ﻿little
--delete button on queue
+-fix still playing on delete bug
 -fix triangles
 
 big

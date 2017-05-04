@@ -28,7 +28,16 @@ var PodcastPlayer = (function () {
         this.nothingPlaying = function () {
             $("#cc_title").text('Nothing currently playing.');
             $("#cc_show").text('Queue something up!');
+            _this.audio.pause();
+            _this.audio.currentTime = 0;
+            _this.removeSource();
             _this.updateProgressUI(0, 1);
+        };
+        this.removeSource = function () {
+            var mp3 = $("#mp3Source");
+            if (mp3) {
+                mp3.remove();
+            }
         };
         this.setupControls = function () {
             var btnPlayPause = $("#btn_play_pause");
@@ -58,8 +67,12 @@ var PodcastPlayer = (function () {
             $("#cc_duration").text(_this.format(duration));
         };
         this.setPlayerContent = function (media, time) {
-            _this.mp3source.setAttribute('src', media.MP3Source);
-            _this.audio.load();
+            _this.removeSource();
+            var newmp3 = $(document.createElement('source'));
+            newmp3.attr('id', 'mp3Source');
+            newmp3.attr('type', 'audio/mp3');
+            newmp3.appendTo(_this.audio);
+            newmp3.attr('src', media.MP3Source);
             _this.updateInfoUI(media);
             _this.play();
         };
@@ -88,7 +101,6 @@ var PodcastPlayer = (function () {
         this.ui = ui;
         this.mobileBrowser = mobileBrowser;
         this.audio = document.getElementById('html5audio');
-        this.mp3source = document.getElementById('mp3Source');
         this.canvas = document.getElementById('canvas_progress');
         $("#div_yt_player").hide();
         $("#div_podcast_player").show();
