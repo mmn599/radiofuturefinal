@@ -31,19 +31,22 @@ namespace RadioFutureFinal.Messaging
 
             string message = JsonConvert.SerializeObject(wsMessage);
 
-            try
+            if(socket.State == WebSocketState.Open)
             {
-                await socket.SendAsync(buffer: new ArraySegment<byte>(array: Encoding.ASCII.GetBytes(message),
-                                                                      offset: 0,
-                                                                      count: message.Length),
-                                       messageType: WebSocketMessageType.Text,
-                                       endOfMessage: true,
-                                       cancellationToken: CancellationToken.None);
-            }
-            catch(WebSocketException e)
-            {
-                // TODO: indicates the websocket closed without doing the handshake. this happens on mobile. find a more robust way to fix this.
-                success = false;
+                try
+                {
+                    await socket.SendAsync(buffer: new ArraySegment<byte>(array: Encoding.ASCII.GetBytes(message),
+                                                                          offset: 0,
+                                                                          count: message.Length),
+                                           messageType: WebSocketMessageType.Text,
+                                           endOfMessage: true,
+                                           cancellationToken: CancellationToken.None);
+                }
+                catch(Exception e)
+                {
+                    // TODO: indicates the websocket closed without doing the handshake. this happens on mobile. find a more robust way to fix this.
+                    success = false;
+                }
             }
 
             if(!success)
