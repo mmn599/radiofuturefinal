@@ -24,8 +24,8 @@ namespace RadioFutureFinal.Messaging
             var strMessage = Encoding.UTF8.GetString(buffer, 0, result.Count);
             try
             {
-                WsMessage wsMessage = JsonConvert.DeserializeObject<WsMessage>(strMessage);
-                await _messageReceiver.HandleMessage(wsMessage, socket);
+                var json = JsonConvert.DeserializeObject(strMessage);
+                await _messageReceiver.HandleMessage(json, socket);
             }
             catch(JsonSerializationException e)
             {

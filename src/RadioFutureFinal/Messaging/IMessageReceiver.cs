@@ -9,6 +9,6 @@ namespace RadioFutureFinal.Messaging
 {
     public interface IMessageReceiver
     {
-        Task HandleMessage(WsMessage wsMessage, WebSocket senderSocket);
+        Task HandleMessage(dynamic json, WebSocket senderSocket);
     }
 }

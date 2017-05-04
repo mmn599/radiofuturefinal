@@ -7,20 +7,18 @@ using RadioFutureFinal.Search;
 using System;
 using System.Collections.Generic;
 using System.Net.WebSockets;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace RadioFutureFinal.Messaging
 {
-    public class MessageReceiver : IMessageReceiver
+    public class MessageReceiver : IMessageReceiver, IServerActions
     {
         IMyContext _myContext;
         IDbRepository _db;
         IMessageSender _sender;
         Searcher _searcher;
-        Dictionary<string, ResponseFunction> _responses;
-
-        public delegate Task ResponseFunction(WsMessage message, MySocket socket);
 
         public MessageReceiver(IDbRepository db, IMyContext myContext, MessageSenderFactory senderFactory, Searcher searcher)
         {
@@ -28,48 +26,56 @@ namespace RadioFutureFinal.Messaging
             _db = db;
             _sender = senderFactory.Create(_myContext.SocketDisconnected);
             _searcher = searcher;
-
-            // TODO: there's a better spot for this
-            _responses = new Dictionary<string, ResponseFunction>()
-            {
-                { "UserJoinSession", JoinSession },
-                { "AddMediaToSession", AddMediaToSession },
-                { "DeleteMediaFromSession", DeleteMediaFromSession },
-                { "SaveUserNameChange", SaveUserNameChange },
-                { "ChatMessage", ChatMessage },
-                { "RequestSyncWithUser", RequestSyncWithUser },
-                { "ProvideSyncToUser", ProvideSyncToUser },
-                { "Search", Search }
-            };
         }
 
-        public async Task HandleMessage(WsMessage wsMessage, WebSocket senderSocket)
+        public async Task HandleMessage(dynamic json, WebSocket senderSocket)
         {
-            MySocket mySocket = _myContext.GetMySocket(senderSocket);
-            ResponseFunction responseFunction;
-            var validAction = _responses.TryGetValue(wsMessage.Action, out responseFunction);
-            if (validAction)
+            string action = Convert.ToString(json.action);
+            if(string.IsNullOrEmpty(action))
             {
-                await responseFunction.Invoke(wsMessage, mySocket);
+                throw new RadioException("No action in message.");
             }
-            else
+
+            var thisType = GetType();
+            var methodInfo = thisType.GetMethod(action);
+            var methodParameters = methodInfo.GetParameters();
+            
+            object[] arguments = new object[methodParameters.Length];
+            for(int i=0; i<arguments.Length; i++)
             {
-                throw new RadioException("Action not found: " + wsMessage.Action);
+                var parameter = methodParameters[i]; 
+                var paramName = parameter.Name;
+                var paramType = parameter.GetType();
+                object paramVal;
+                if(paramType.Equals(typeof(MySocket)))
+                {
+                    paramVal = _myContext.GetMySocket(senderSocket); 
+                }
+                else
+                {
+                    paramVal = json.GetType().GetProperty(paramName).GetValue(json, null);
+                    if(paramVal == null)
+                    {
+                        throw new RadioException("Message was missing: " + paramName + " parameter.");
+                    }
+                }
+                arguments[i] = paramVal;
             }
+
+            await (Task) methodInfo.Invoke(this, arguments);
         }
 
         // TODO: significant bug where additional session is created with same name if two request are made in similar times. I may have fixed it
         // TODO: WsMessage shouldn't be same for every message
-        public async Task JoinSession(WsMessage message, MySocket socket)
+        public async Task JoinSession(MySocket socket, string sessionName)
         {
-            var sessionName = message.Session.Name;
             Session session = null;
             bool sessionFound = _db.GetSessionByName(sessionName, out session);
             if(!sessionFound)
             {
                 session = await _db.CreateSessionAsync(sessionName);
             }
-            var userName = message.User.Name;
+            var userName = "Anonymous";
             var user = await _db.AddNewUserToSessionAsync(userName, session);
 
             var sessionId = session.SessionID;
@@ -80,56 +86,51 @@ namespace RadioFutureFinal.Messaging
             await _sender.ClientsUpdateSessionUsers(session, _myContext.GetSocketsInSession(sessionId));
         }
 
-        public async Task AddMediaToSession(WsMessage message, MySocket socket)
+        public async Task AddMediaToSession(MySocket socket, MediaV1 media)
         {
             var sessionId = socket.SessionId;
-            var updatedSession = await _db.AddMediaToSessionAsync(message.Media.ToModel(), sessionId);
+            var updatedSession = await _db.AddMediaToSessionAsync(media.ToModel(), sessionId);
             await _sender.ClientsUpdateSessionQueue(updatedSession, _myContext.GetSocketsInSession(sessionId));
         }
 
-        public async Task DeleteMediaFromSession(WsMessage message, MySocket socket)
+        public async Task DeleteMediaFromSession(MySocket socket, int mediaId)
         {
             var sessionId = socket.SessionId;
-            var updatedSession = await _db.RemoveMediaAsync(sessionId, message.Media.Id);
+            var updatedSession = await _db.RemoveMediaAsync(sessionId, mediaId);
             await _sender.ClientsUpdateSessionQueue(updatedSession, _myContext.GetSocketsInSession(sessionId));
         }
 
         // TODO: don't use whole session
-        public async Task SaveUserNameChange(WsMessage message, MySocket socket)
+        public async Task SaveUserNameChange(MySocket socket, int userId, string newName)
         {
-            var user = message.User;
-            await _db.UpdateUserNameAsync(user.Id, user.Name);
+            await _db.UpdateUserNameAsync(userId, newName);
             var sessionId = socket.SessionId;
             var session = _db.GetSession(sessionId);
             await _sender.ClientsUpdateSessionUsers(session, _myContext.GetSocketsInSession(sessionId));
         }
 
-        public async Task ChatMessage(WsMessage message, MySocket socket)
+        public async Task ChatMessage(MySocket socket, string chatMessage, string userName)
         {
-            await _sender.ClientsSendChatMessage(message, _myContext.GetSocketsInSession(socket.SessionId));
+            await _sender.ClientsSendChatMessage(chatMessage, _myContext.GetSocketsInSession(socket.SessionId));
         }
 
-        public async Task RequestSyncWithUser(WsMessage message, MySocket socket)
+        public async Task RequestSyncWithUser(MySocket socket, int userIdRequestee)
         {
             var userIdRequestor = socket.UserId;
-            var userIdRequestee = message.User.Id;
             var socketRequestee = _myContext.GetSocketIdForUser(socket.SessionId, userIdRequestee);
             await _sender.ClientRequestUserState(userIdRequestor, userIdRequestee, socketRequestee);
         }
 
-        public async Task ProvideSyncToUser(WsMessage message, MySocket socket)
+        public async Task ProvideSyncToUser(MySocket socket, UserState userState, int userIdRequestor)
         {
             // TODO: user ID represents the user to send to. this is stupid. WsMessage needs to be split up.
-            var userIdToSendTo = message.User.Id; // <--- dumb!
-            var socketToSendTo = _myContext.GetSocketIdForUser(socket.SessionId, userIdToSendTo);
-            await _sender.ClientProvideUserState(message.User, socketToSendTo);
+            var socketToSendTo = _myContext.GetSocketIdForUser(socket.SessionId, userIdRequestor);
+            await _sender.ClientProvideUserState(userState, socketToSendTo);
         }
 
-        public async Task Search(WsMessage message, MySocket socket)
+        public async Task Search(MySocket socket, string query, int page)
         {
             // TODO: dumb
-            var query = message.ChatMessage;
-            var page = message.Media.Id;
             var searchResults = await _searcher.searchPodcasts(query, page);
             await _sender.ClientSearchResults(socket, searchResults);
         }
