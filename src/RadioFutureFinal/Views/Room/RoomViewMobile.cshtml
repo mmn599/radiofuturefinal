@@ -2,44 +2,66 @@
 <html>
 <head>
     <title>@ViewData["roomName"]</title>
-    <link rel="stylesheet" href="~/css/roommobile.css">
+    <link rel="stylesheet" href="~/css/room.css">
     <link href="https://fonts.googleapis.com/css?family=Josefin+Sans&amp;subset=latin,latin-ext" rel="stylesheet" type="text/css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <link href="https://fonts.googleapis.com/css?family=Cousine" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:300" rel="stylesheet" type="text/css">
     <script src="~/js/spin.js"></script>
-    <script>var mobileBrowser = true;</script>
+    <script>var mobileBrowser = false;</script>
     <script>var roomType = "@ViewData["roomType"]"; var roomName = "@ViewData["roomName"]"</script>
     <script src="~/js/roombundle.js"></script>
     <script src="https://apis.google.com/js/client.js"></script>
     <script src="https://www.youtube.com/iframe_api"></script>
 </head>
-<body>
+<body style="overflow: hidden;">
+    <div class="everything" id="div_error">
+        <h1> Something went horribly wrong! We're sorry. </h1>
+    </div>
     <div class="everything" id="div_loading"></div>
     <div class="everything" id="div_everything">
 
+        <div id="div_all_info">
+            <div id="div_users_overall" class="info">
+                <div class="dropper arrow-down img_drop_right"></div>
+                <p id="p_users_summary"></p>
+                <div id="div_user_results" class="results"></div>
+            </div>
+            <div class="info" id="div_search">
+                <input class="myinput" id="input_name" placeholder="type in your name and press enter">
+                <input class="myinput" id="input_search" placeholder="search for podcasts">
+                <div id="div_search_results" class="results"></div>
+            </div>
+            <div id="div_queue_overall" class="info">
+                <p id="p_queue_summary">Nothing in the playlist. Queue something!</p>
+                <div class="dropper arrow-down img_drop_left"></div>
+                <div id="div_queue_results" class="results"></div>
+            </div>
+        </div>
+
         <div id="div_current_content">
-            <div id="div_yt_player"></div>
+            <div class="div_player" id="div_yt_player"></div>
+            <div class="div_player" id="div_podcast_player">
+                <div class="div_inner_podcast_player">
+                    <div id="btn_previous"></div>
+                    <div id="btn_play_pause" class="play_btn"></div>
+                    <div id="cc_info">
+                        <canvas id="canvas_progress"></canvas>
+                        <p id="cc_title"></p>
+                        <p id="cc_show"></p>
+                    </div>
+                    <span class="time" id="cc_time"></span>
+                    <span class="time_slash"> / </span>
+                    <span class="time" id="cc_duration"></span>
+                    <div id="btn_next"></div>
+                </div>
+                <audio id="html5audio"></audio>
+            </div>
         </div>
 
-        <div>
-            <img id="btn_previous" src="../images/arrows-1.png" class="btn_controls" style="margin-right: 5vw;" />
-            <p id="p_cc_summary"> Queue a video! </p>
-            <img id="btn_next" src="../images/arrows.png" class="btn_controls" style="margin-left: 5vw;" />
-        </div>
-
-        <div style="margin-left: 3vw; margin-right: 3vw; margin-top: 5%; width: 100%; justify-content: center;">
-            <input class="myinput" id="input_name" placeholder="enter your name">
-            <input class="myinput" id="input_search" placeholder="search for content">
-            <div id="div_search_results" class="results"></div>
-        </div>
-
-        <p style="margin-top: 8%; margin-left: 2vw; margin-bottom: 1vw;" id="p_users_summary"></p>
-        <div id="div_user_results" style="overflow-x: auto; vertical-align: middle; line-height:20vw; white-space: nowrap; display: inline-block; height: 20vw; width: 100%;">
-        </div>
-
-        <p style="margin-top: 8%; margin-left: 2vw; margin-bottom: 1vw;" id="p_queue_summary">Nothing in the playlist. Queue something!</p>
-        <div id="div_queue_results" style="overflow-x: auto; vertical-align: middle; line-height:20vw; white-space: nowrap; display: inline-block; height: 20vw; width: 100%;">
+        <div id="div_chat_results">
+            <ul id="ul_chat"></ul>
+            <input class="myinput" id="input_chat" placeholder="Enter your chat message" />
         </div>
 
     </div>

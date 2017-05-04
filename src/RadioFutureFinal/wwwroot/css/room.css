@@ -80,9 +80,6 @@ input:focus {
     bottom: 0;
 }
 
-#btn_play {
-    display: none;
-}
 
 #div_search_results {
     width: 50%;
@@ -255,13 +252,6 @@ input:focus {
 }
 
 #btn_play {
-    width: 0;
-    height: 0;
-    margin-left: 2.5%;
-    margin-right: 2.5%;
-    border-top: 10px solid transparent;
-    border-bottom: 10px solid transparent;
-    border-left: 20px solid black;
 }
 
 
@@ -319,16 +309,16 @@ input:focus {
 .play_btn {
     width: 0;
     height: 0;
-    border-top: 24px solid transparent;
-    border-left: 36px solid white;
-    border-bottom: 24px solid transparent;
+    border-top: 48px solid transparent;
+    border-left: 72px solid white;
+    border-bottom: 48px solid transparent;
 }
 
 .pause_btn {
-    width: 12px;
-    height: 48px;
-    border-right: 12px solid white;
-    border-left: 12px solid white;
+    width: 24px;
+    height: 96px;
+    border-right: 24px solid white;
+    border-left: 24px solid white;
 }
 
 .div_inner_podcast_player {
@@ -388,12 +378,18 @@ input:focus {
     height: 1vw;
     margin-left: .5%;
     cursor: pointer;
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
 }
 
 #btn_play_pause {
     display: inline-block;
-    margin-left: 2%;
     cursor: pointer;
+    margin-right: 1%;
 }
 
 #btn_next {
