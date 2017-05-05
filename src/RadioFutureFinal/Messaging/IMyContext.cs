@@ -10,8 +10,8 @@ namespace RadioFutureFinal.Messaging
     public interface IMyContext
     {
         MySocket GetMySocket(WebSocket socket);
-        MySocket GetSocketIdForUser(int sessionId, int userId);
-        ConcurrentDictionary<WebSocket, MySocket> GetSocketsInSession(int sessionId);
+        MySocket GetSocketForUser(int sessionId, int userId);
+        IEnumerable<MySocket> GetSocketsInSession(int sessionId);
         void SocketConnected(WebSocket socket);
         Task SocketDisconnected(WebSocket socket);
         void SocketJoinSession(MySocket socket, int sessionId, int userId);

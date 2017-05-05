@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace RadioFutureFinal.Messaging
 {
-    public interface IServerActions
+    public interface IActionsServer
     {
         Task JoinSession(MySocket socket, string sessionName);
         Task AddMediaToSession(MySocket socket, MediaV1 media);

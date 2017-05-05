@@ -1,23 +1,16 @@
-﻿using Newtonsoft.Json;
-using RadioFutureFinal.Contracts;
+﻿using RadioFutureFinal.Contracts;
 using RadioFutureFinal.DAL;
-using RadioFutureFinal.Errors;
 using RadioFutureFinal.Models;
 using RadioFutureFinal.Search;
-using System;
-using System.Collections.Generic;
-using System.Net.WebSockets;
-using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace RadioFutureFinal.Messaging
 {
-    public class MessageReceiver : IMessageReceiver, IServerActions
+    public class MessageReceiver : IActionsServer
     {
         IMyContext _myContext;
         IDbRepository _db;
-        IMessageSender _sender;
+        IActionsClient _sender;
         Searcher _searcher;
 
         public MessageReceiver(IDbRepository db, IMyContext myContext, MessageSenderFactory senderFactory, Searcher searcher)
@@ -26,43 +19,6 @@ namespace RadioFutureFinal.Messaging
             _db = db;
             _sender = senderFactory.Create(_myContext.SocketDisconnected);
             _searcher = searcher;
-        }
-
-        public async Task HandleMessage(dynamic json, WebSocket senderSocket)
-        {
-            string action = Convert.ToString(json.action);
-            if(string.IsNullOrEmpty(action))
-            {
-                throw new RadioException("No action in message.");
-            }
-
-            var thisType = GetType();
-            var methodInfo = thisType.GetMethod(action);
-            var methodParameters = methodInfo.GetParameters();
-            
-            object[] arguments = new object[methodParameters.Length];
-            for(int i=0; i<arguments.Length; i++)
-            {
-                var parameter = methodParameters[i]; 
-                var paramName = parameter.Name;
-                var paramType = parameter.GetType();
-                object paramVal;
-                if(paramType.Equals(typeof(MySocket)))
-                {
-                    paramVal = _myContext.GetMySocket(senderSocket); 
-                }
-                else
-                {
-                    paramVal = json.GetType().GetProperty(paramName).GetValue(json, null);
-                    if(paramVal == null)
-                    {
-                        throw new RadioException("Message was missing: " + paramName + " parameter.");
-                    }
-                }
-                arguments[i] = paramVal;
-            }
-
-            await (Task) methodInfo.Invoke(this, arguments);
         }
 
         // TODO: significant bug where additional session is created with same name if two request are made in similar times. I may have fixed it
@@ -82,22 +38,23 @@ namespace RadioFutureFinal.Messaging
 
             _myContext.SocketJoinSession(socket, sessionId, user.MyUserId);
 
-            await _sender.ClientSessionReady(socket, session, user);
-            await _sender.ClientsUpdateSessionUsers(session, _myContext.GetSocketsInSession(sessionId));
+            var sessionV1 = session.ToContract();
+            await _sender.clientSessionReady(sessionV1, user.ToContract(), socket);
+            await _sender.clientUpdateUsersList(sessionV1.Users, _myContext.GetSocketsInSession(sessionId));
         }
 
         public async Task AddMediaToSession(MySocket socket, MediaV1 media)
         {
             var sessionId = socket.SessionId;
             var updatedSession = await _db.AddMediaToSessionAsync(media.ToModel(), sessionId);
-            await _sender.ClientsUpdateSessionQueue(updatedSession, _myContext.GetSocketsInSession(sessionId));
+            await _sender.clientUpdateQueue(updatedSession.ToContract().Queue, _myContext.GetSocketsInSession(sessionId));
         }
 
         public async Task DeleteMediaFromSession(MySocket socket, int mediaId)
         {
             var sessionId = socket.SessionId;
             var updatedSession = await _db.RemoveMediaAsync(sessionId, mediaId);
-            await _sender.ClientsUpdateSessionQueue(updatedSession, _myContext.GetSocketsInSession(sessionId));
+            await _sender.clientUpdateQueue(updatedSession.ToContract().Queue, _myContext.GetSocketsInSession(sessionId));
         }
 
         // TODO: don't use whole session
@@ -106,33 +63,31 @@ namespace RadioFutureFinal.Messaging
             await _db.UpdateUserNameAsync(userId, newName);
             var sessionId = socket.SessionId;
             var session = _db.GetSession(sessionId);
-            await _sender.ClientsUpdateSessionUsers(session, _myContext.GetSocketsInSession(sessionId));
+            await _sender.clientUpdateUsersList(session.ToContract().Users, _myContext.GetSocketsInSession(sessionId));
         }
 
         public async Task ChatMessage(MySocket socket, string chatMessage, string userName)
         {
-            await _sender.ClientsSendChatMessage(chatMessage, _myContext.GetSocketsInSession(socket.SessionId));
+            await _sender.clientChatMessage(chatMessage, userName, _myContext.GetSocketsInSession(socket.SessionId));
         }
 
         public async Task RequestSyncWithUser(MySocket socket, int userIdRequestee)
         {
             var userIdRequestor = socket.UserId;
-            var socketRequestee = _myContext.GetSocketIdForUser(socket.SessionId, userIdRequestee);
-            await _sender.ClientRequestUserState(userIdRequestor, userIdRequestee, socketRequestee);
+            var socketRequestee = _myContext.GetSocketForUser(socket.SessionId, userIdRequestee);
+            await _sender.clientRequestUserState(userIdRequestor, socketRequestee);
         }
 
         public async Task ProvideSyncToUser(MySocket socket, UserState userState, int userIdRequestor)
         {
-            // TODO: user ID represents the user to send to. this is stupid. WsMessage needs to be split up.
-            var socketToSendTo = _myContext.GetSocketIdForUser(socket.SessionId, userIdRequestor);
-            await _sender.ClientProvideUserState(userState, socketToSendTo);
+            var socketToSendTo = _myContext.GetSocketForUser(socket.SessionId, userIdRequestor);
+            await _sender.clientProvideUserState(userState, socketToSendTo);
         }
 
         public async Task Search(MySocket socket, string query, int page)
         {
-            // TODO: dumb
             var searchResults = await _searcher.searchPodcasts(query, page);
-            await _sender.ClientSearchResults(socket, searchResults);
+            await _sender.clientSearchResults(searchResults, socket);
         }
 
     }

@@ -17,7 +17,8 @@ var MySocket = (function () {
             }
         };
         socket.onerror = function (event) {
-            // TODO: handle
+            $(".div_everything").hide();
+            $("#div_error").show();
         };
         this.socket = socket;
     }
@@ -32,7 +33,7 @@ var MySocket = (function () {
         this.socket.send(JSON.stringify(data));
     };
     ;
-    // TODO: maybe move
+    // Ideally we would use reflection stuff for this shit
     MySocket.prototype.JoinSession = function (sessionName) {
         var data = {
             action: 'JoinSession',
@@ -42,37 +43,56 @@ var MySocket = (function () {
     };
     MySocket.prototype.AddMediaToSession = function (media) {
         var data = {
-            action: 'JoinSession',
-            sessionName: sessionName
+            action: 'AddMediaToSesession',
+            media: media
         };
         this.emit(data);
     };
     MySocket.prototype.DeleteMediaFromSession = function (mediaId) {
         var data = {
-            action: 'JoinSession',
-            sessionName: sessionName
+            action: 'DeleteMediaFromSession',
+            meidaId: mediaId
         };
         this.emit(data);
     };
     MySocket.prototype.SaveUserNameChange = function (userId, newName) {
         var data = {
-            action: 'JoinSession',
-            sessionName: sessionName
+            action: 'SaveUserNameChange',
+            userId: userId,
+            newName: newName
         };
         this.emit(data);
     };
     MySocket.prototype.ChatMessage = function (chatMessage, userName) {
         var data = {
-            action: 'JoinSession',
-            sessionName: sessionName
+            action: 'ChatMessage',
+            chatMessage: chatMessage,
+            userName: userName
         };
         this.emit(data);
     };
     MySocket.prototype.RequestSyncWithUser = function (userIdRequestee) {
+        var data = {
+            action: 'RequestSyncWithUser',
+            userIdRequestee: userIdRequestee
+        };
+        this.emit(data);
     };
     MySocket.prototype.ProvideSyncToUser = function (userState, userIdRequestor) {
+        var data = {
+            action: 'ProvideSyncToUser',
+            userIdRequestor: userIdRequestor,
+            userState: userState
+        };
+        this.emit(data);
     };
     MySocket.prototype.Search = function (query, page) {
+        var data = {
+            action: 'Search',
+            query: query,
+            page: page
+        };
+        this.emit(data);
     };
     return MySocket;
 }());

@@ -29,7 +29,7 @@ export class MySocket implements ServerActions {
     constructor(clientActions: ClientActions) {
 
         this.clientActions = clientActions;
-
+         
         var uri = "ws://" + window.location.host + "/ws";
         var socket = new WebSocket(uri);
         socket.onopen = function (event) {};
@@ -47,7 +47,8 @@ export class MySocket implements ServerActions {
         };
 
         socket.onerror = function (event) {
-            // TODO: handle
+            $(".div_everything").hide();
+            $("#div_error").show();
         };
 
         this.socket = socket;
@@ -63,62 +64,74 @@ export class MySocket implements ServerActions {
         this.socket.send(JSON.stringify(data));
     };
 
-    // TODO: maybe move
+    // Ideally we would use reflection stuff for this shit
 
     public JoinSession(sessionName: string) {
         var data = {
             action: 'JoinSession',
-            sessionName: sessionName;
+            sessionName: sessionName
         }
         this.emit(data);
     }
 
     public AddMediaToSession(media: Media) {
         var data = {
-            action: 'JoinSession',
-            sessionName: sessionName;
+            action: 'AddMediaToSesession',
+            media: media
         }
         this.emit(data);
     }
 
     public DeleteMediaFromSession(mediaId: number) {
         var data = {
-            action: 'JoinSession',
-            sessionName: sessionName;
+            action: 'DeleteMediaFromSession',
+            meidaId: mediaId
         }
         this.emit(data);
     }
 
     public SaveUserNameChange(userId: number, newName: string) {
         var data = {
-            action: 'JoinSession',
-            sessionName: sessionName;
+            action: 'SaveUserNameChange',
+            userId: userId,
+            newName: newName
         }
         this.emit(data);
-
-        
-        
     }
 
     public ChatMessage(chatMessage: string, userName: string) {
         var data = {
-            action: 'JoinSession',
-            sessionName: sessionName;
+            action: 'ChatMessage',
+            chatMessage: chatMessage,
+            userName: userName
         }
         this.emit(data);
-
     }
 
     public RequestSyncWithUser(userIdRequestee: number) {
-
+        var data = {
+            action: 'RequestSyncWithUser',
+            userIdRequestee: userIdRequestee
+        }
+        this.emit(data);
     }
 
     public ProvideSyncToUser(userState: UserState, userIdRequestor: number) {
-
+        var data = {
+            action: 'ProvideSyncToUser',
+            userIdRequestor: userIdRequestor,
+            userState: userState
+        }
+        this.emit(data);
     }
 
     public Search(query: string, page: number) {
-
+        var data = {
+            action: 'Search',
+            query: query,
+            page: page
+        }
+        this.emit(data);
     }
 
 

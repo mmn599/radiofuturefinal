@@ -21,7 +21,7 @@ namespace RadioFutureFinal.Messaging
             _onDisconnect = onDisconnect;
         }
 
-        private async Task<SendResult> SendMessageAsyncInternal(WebSocket socket, WsMessage wsMessage)
+        private async Task<SendResult> SendMessageAsyncInternal(WebSocket socket, string message)
         {
             var success = true;
 
@@ -29,8 +29,6 @@ namespace RadioFutureFinal.Messaging
             {
                 success = false;
             }
-
-            string message = JsonConvert.SerializeObject(wsMessage);
 
             if(socket.State == WebSocketState.Open)
             {
@@ -43,9 +41,8 @@ namespace RadioFutureFinal.Messaging
                                            endOfMessage: true,
                                            cancellationToken: CancellationToken.None);
                 }
-                catch(Exception e)
+                catch
                 {
-                    // TODO: indicates the websocket closed without doing the handshake. this happens on mobile. find a more robust way to fix this.
                     success = false;
                 }
             }
@@ -58,22 +55,24 @@ namespace RadioFutureFinal.Messaging
             return SendResult.CreateSuccess();
         }
 
-        public async Task<SendResult> SendMessageAsync(WebSocket socket, WsMessage wsMessage)
+        public async Task<SendResult> SendMessageAsync(MySocket socket, string message)
         {
-            return await SendMessageAsyncInternal(socket, wsMessage);
+            var sendResult = await SendMessageAsyncInternal(socket.WebSocket, message);
+            if(!sendResult.Success)
+            {
+                await _onDisconnect.Invoke(sendResult.FaultySocket);
+            }
+            return sendResult;
         }
 
-        public async Task<List<SendResult>> SendMessageToSessionAsync(WsMessage message, 
-                ConcurrentDictionary<WebSocket, MySocket> socketsInSession)
+        public async Task<List<SendResult>> SendMessageToSessionAsync(IEnumerable<MySocket> socketsInSession, string message)
         {
             var sendResults = new List<SendResult>();
-            foreach(var kvPair in socketsInSession)
+            foreach(var socket in socketsInSession)
             {
-                var socket = kvPair.Key;
-                var sendResult = await SendMessageAsync(socket, message);
+                var sendResult = await SendMessageAsyncInternal(socket.WebSocket, message);
                 sendResults.Add(sendResult);
             }
-
             foreach(var sendResult in sendResults)
             {
                 if(!sendResult.Success)
@@ -81,7 +80,6 @@ namespace RadioFutureFinal.Messaging
                     await _onDisconnect.Invoke(sendResult.FaultySocket);
                 }
             }
-
             return sendResults;
         }
 

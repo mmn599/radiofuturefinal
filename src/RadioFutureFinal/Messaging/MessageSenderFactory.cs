@@ -6,7 +6,7 @@ namespace RadioFutureFinal.Messaging
 {
     public class MessageSenderFactory
     {
-        public IMessageSender Create(Func<WebSocket, Task> onDisconnect)
+        public IActionsClient Create(Func<WebSocket, Task> onDisconnect)
         {
             var messageSenderBase = new MessageSenderBase(onDisconnect);
             var messageSender = new MessageSender(messageSenderBase);

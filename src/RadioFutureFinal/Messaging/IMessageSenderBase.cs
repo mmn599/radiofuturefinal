@@ -1,8 +1,4 @@
-﻿using RadioFutureFinal.Contracts;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Net.WebSockets;
 using System.Threading.Tasks;
 
@@ -10,7 +6,7 @@ namespace RadioFutureFinal.Messaging
 {
     public interface IMessageSenderBase
     {
-        Task<SendResult> SendMessageAsync(WebSocket socket, WsMessage wsMessage);
-        Task<List<SendResult>> SendMessageToSessionAsync(WsMessage message, ConcurrentDictionary<WebSocket, MySocket> socketsInSession);
+        Task<SendResult> SendMessageAsync(MySocket socket, string message);
+        Task<List<SendResult>> SendMessageToSessionAsync(IEnumerable<MySocket> socketsInSession, string message);
     }
 }

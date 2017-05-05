@@ -4,10 +4,14 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net.WebSockets;
 using System.Threading.Tasks;
+using System.Reflection;
+using System;
+using System.Dynamic;
+using RadioFutureFinal.Errors;
 
 namespace RadioFutureFinal.Messaging
 {
-    public class MessageSender : IMessageSender
+    public class MessageSender : IActionsClient
     {
         IMessageSenderBase _senderBase;
 
@@ -15,94 +19,64 @@ namespace RadioFutureFinal.Messaging
         {
             _senderBase = senderBase;
         }
-            
-        public async Task<SendResult> ClientSessionReady(MySocket socket, Session session, MyUser user)
-        {
-            // TODO: How can I make sure this is somewhat updated properly?
-            var wsMessage = new WsMessage();
-            wsMessage.Action = "clientSessionReady";
-            wsMessage.Session = session.ToContract(); 
-            wsMessage.User = user.ToContract();
 
-            return await _senderBase.SendMessageAsync(socket.WebSocket, wsMessage);
+        public async Task clientProvideUserState(UserState userState, MySocket socket)
+        {
+            var json = _getJson("clientProvideUserState", userState);
+            await _senderBase.SendMessageAsync(socket, json);
         }
 
-        public async Task<SendResult> ClientRequestUserState(int userIdRequestor, int userIdRequestee, MySocket userSocket)
+        public async Task clientRequestUserState(int userIdRequestor, MySocket socket)
         {
-            var wsMessage = new WsMessage();
-            wsMessage.Action = "clientRequestUserState";
-            wsMessage.User = new MyUserV1();
-            wsMessage.User.Id = userIdRequestor;
-
-            return await _senderBase.SendMessageAsync(userSocket.WebSocket, wsMessage);
+            var json = _getJson("clientRequestUserState", userIdRequestor);
+            await _senderBase.SendMessageAsync(socket, json);
         }
 
-        public async Task<SendResult> ClientProvideUserState(MyUserV1 userInfo, MySocket userToSendTo)
+        public async Task clientSearchResults(List<MediaV1> searchResults, MySocket socket)
         {
-            var wsMessage = new WsMessage();
-            wsMessage.Action = "clientProvideUserState";
-            wsMessage.User = userInfo;
-            wsMessage.User.Id = -1; // TODO: this is because of crappy message system
-
-            return await _senderBase.SendMessageAsync(userToSendTo.WebSocket, wsMessage);
+            var json = _getJson("clientSearchResults", searchResults);
+            await _senderBase.SendMessageAsync(socket, json);
         }
 
-        public async Task<SendResult> ClientSearchResults(MySocket userToSendTo, List<MediaV1> searchResults)
+        public async Task clientSessionReady(SessionV1 session, MyUserV1 user, MySocket socket)
         {
-            var wsMessage = new WsMessage();
-            wsMessage.Action = "clientSearchResults";
-            // TODO: dumb
-            wsMessage.Session = new SessionV1();
-            wsMessage.Session.Queue = searchResults;
-            return await _senderBase.SendMessageAsync(userToSendTo.WebSocket, wsMessage);
+            var json = _getJson("clientSessionReady", session, user);
+            await _senderBase.SendMessageAsync(socket, json);
         }
 
-
-        public async Task<SendResult> ClientSetupYTAPI(MySocket socket, string secret)
+        public async Task clientUpdateQueue(List<MediaV1> queue, IEnumerable<MySocket> socketsInSession)
         {
-            var wsMessage = new WsMessage();
-            wsMessage.Action = "clientSetupYTAPI";
-            // TODO: dumb
-            wsMessage.Media = new MediaV1() { Title = secret };
-            return await _senderBase.SendMessageAsync(socket.WebSocket, wsMessage);
+            var json = _getJson("clientUpdateQueue", queue);
+            await _senderBase.SendMessageToSessionAsync(socketsInSession, json);
         }
 
-        public async Task<SendResult> ClientSetupAudioAPI(MySocket socket, string id, string secret)
+        public async Task clientUpdateUsersList(List<MyUserV1> users, IEnumerable<MySocket> socketsInSession)
         {
-            var wsMessage = new WsMessage();
-            wsMessage.Action = "clientSetupAudioAPI";
-            // TODO: dumb
-            wsMessage.User = new MyUserV1() { Name = id };
-            wsMessage.Media = new MediaV1() { Title = secret };
-            return await _senderBase.SendMessageAsync(socket.WebSocket, wsMessage);
+            var json = _getJson("clientUpdateUsersList", users);
+            await _senderBase.SendMessageToSessionAsync(socketsInSession, json);
         }
 
-        private async Task<List<SendResult>> ClientsUpdateSession(Session session, string action, ConcurrentDictionary<WebSocket, MySocket> socketsInSession)
+        public async Task clientChatMessage(string message, string userName, IEnumerable<MySocket> socketsInSession)
         {
-            var wsMessage = new WsMessage();
-            wsMessage.Action = action;
-            wsMessage.Session = session.ToContract();
-            return await _senderBase.SendMessageToSessionAsync(wsMessage, socketsInSession);
+            var json = _getJson("clientChatMessage", message, userName);
+            await _senderBase.SendMessageToSessionAsync(socketsInSession, json);
         }
 
-        // TODO: don't use full WsMessage
-        public async Task<List<SendResult>> ClientsSendChatMessage(WsMessage message, 
-            ConcurrentDictionary<WebSocket, MySocket> socketsInSession)
+        private string _getJson(string action, params object[] values)
         {
-            message.Action = "clientChatMessage";
-            return await _senderBase.SendMessageToSessionAsync(message, socketsInSession);
+            var json = new ExpandoObject() as IDictionary<string, Object>;
+
+            var methodInfo = GetType().GetMethod(action);
+            var parameters = methodInfo.GetParameters();
+            for(int i=0; i< values.Length; i++)
+            {
+                var parameter = parameters[i];
+                var value = values[i];
+                json.Add(parameter.Name, value);
+            }
+
+            return Newtonsoft.Json.JsonConvert.SerializeObject(json);
         }
 
-        //TODO: probably shouldn't be sending full session for user and queue updates
-        public async Task<List<SendResult>> ClientsUpdateSessionUsers(Session session, 
-            ConcurrentDictionary<WebSocket, MySocket> socketsInSession)
-        {
-            return await ClientsUpdateSession(session, "clientUpdateUsersList", socketsInSession);
-        }
-
-        public async Task<List<SendResult>> ClientsUpdateSessionQueue(Session session, ConcurrentDictionary<WebSocket, MySocket> socketsInSession)
-        {
-            return await ClientsUpdateSession(session, "clientUpdateQueue", socketsInSession);
-        }
     }
 }
