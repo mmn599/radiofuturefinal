@@ -1,5 +1,4 @@
 ﻿little
--gets yncing wrokings
 -werid search ui shit
 -play/pause to canvas
 -next/back to canvas

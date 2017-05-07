@@ -180,10 +180,10 @@ export class UI {
                 }
             });
         }
-        jQuery(document.body).on("click", ":not(#btn_search, #div_search_results, #div_search_results *)", (event) => {
+        $("#div_stuff, #div_current_content").click(() => {
             $("#div_search_results").fadeOut();
             $("#input_search").val("");
-        });​​​​​​​
+        });
         $("#input_search").bind("propertychange input paste", (event) => {
             this.searchTextChanged($("#input_search").val());
         });
