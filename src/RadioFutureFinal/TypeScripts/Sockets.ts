@@ -37,7 +37,7 @@ export class MySocket implements ServerActions {
 
         socket.onmessage = (event) => {
             var message = JSON.parse(event.data);
-            var action = message.Action;
+            var action = message.action;
             if (clientActions[action]) {
                 clientActions[action](message); 
             }
@@ -76,7 +76,7 @@ export class MySocket implements ServerActions {
 
     public AddMediaToSession(media: Media) {
         var data = {
-            action: 'AddMediaToSesession',
+            action: 'AddMediaToSession',
             media: media
         }
         this.emit(data);

@@ -47,57 +47,51 @@ class RoomManager implements UICallbacks, ClientActions {
     // WebSocket message response functions
     //==================================================================
 
-    clientProvideUserState(userState: UserState) {
-        this.user.State.QueuePosition = userState.QueuePosition;
-        this.user.State.Time = userState.Time;
-        this.user.State.PlayerState = userState.PlayerState;
+    clientProvideUserState(msg) {
+        this.user.State.QueuePosition = msg.userState.QueuePosition;
+        this.user.State.Time = msg.userState.Time;
+        this.user.State.PlayerState = msg.userState.PlayerState;
         this.ui.updateQueue(this.session.Queue, this.user.Id, this.user.State.QueuePosition);
         this.onUserStateChange();
     }
 
-    clientRequestUserState(userIdRequestor: number) {
+    clientRequestUserState(msg) {
         var myUserState = new UserState();
         myUserState.QueuePosition = this.user.State.QueuePosition;
         myUserState.Time = Math.round(this.player.getCurrentTime());
         myUserState.PlayerState = this.player.getCurrentState();
-        this.socket.ProvideSyncToUser(myUserState, userIdRequestor);
+        this.socket.ProvideSyncToUser(myUserState, msg.userIdRequestor);
     }
 
-    clientSessionReady(session: Session, user: MyUser) {
-        this.session = session;
-        this.user = user;
+    clientSessionReady(msg) {
+        this.session = msg.session;
+        this.user = msg.user;
         this.uiNextMedia();
         this.ui.updateQueue(this.session.Queue, this.user.Id, this.user.State.QueuePosition);
         this.ui.updateUsersList(this.session.Users, this.user.Id);
         this.ui.sessionReady();
     }
 
-    clientUpdateUsersList(users: MyUser[]) {
-        this.session.Users = users;
+    clientUpdateUsersList(msg) {
+        this.session.Users = msg.users;
         this.ui.updateUsersList(this.session.Users, this.user.Id);	
     }
 
-    clientUpdateQueue(queue: Media[]) {
+    clientUpdateQueue(msg) {
         var wasWaiting = this.isUserWaiting();
-        this.session.Queue = queue;
+        this.session.Queue = msg.queue;
         if (wasWaiting) {
             this.uiNextMedia();
         }
         this.ui.updateQueue(this.session.Queue, this.user.Id, this.user.State.QueuePosition);
     }
 
-    clientChatMessage(message: string, userName: string) {
-        this.ui.onChatMessage(userName, message, 'blue');
+    clientChatMessage(msg) {
+        this.ui.onChatMessage(msg.userName, msg.message, 'blue');
     }
 
-    clientSearchResults(searchResults: Media[]) {
-        this.ui.onSearchResults(searchResults);
-    }
-
-    isUserWaiting = (): boolean => {
-        var pos = this.user.State.QueuePosition;
-        var length = this.session.Queue.length;
-        return pos < 0 || ((pos == (length - 1)) && this.player.isStopped());
+    clientSearchResults(msg) {
+        this.ui.onSearchResults(msg.searchResults);
     }
 
     //
@@ -171,6 +165,13 @@ class RoomManager implements UICallbacks, ClientActions {
     //
     // Misc
     //
+
+    isUserWaiting = (): boolean => {
+        var pos = this.user.State.QueuePosition;
+        var length = this.session.Queue.length;
+        return pos < 0 || ((pos == (length - 1)) && this.player.isStopped());
+    }
+
 
     onUserStateChange() {
         if (this.user.State.QueuePosition >= 0 && this.user.State.QueuePosition < this.session.Queue.length) {

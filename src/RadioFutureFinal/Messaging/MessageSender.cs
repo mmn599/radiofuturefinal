@@ -65,6 +65,7 @@ namespace RadioFutureFinal.Messaging
         private string _getJson(string action, params object[] values)
         {
             var json = new ExpandoObject() as IDictionary<string, Object>;
+            json.Add("action", action); 
 
             var methodInfo = GetType().GetMethod(action);
             var parameters = methodInfo.GetParameters();

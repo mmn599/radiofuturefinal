@@ -6,11 +6,6 @@ var PodcastPlayer_1 = require("./PodcastPlayer");
 var RoomManager = (function () {
     function RoomManager(roomType, mobileBrowser) {
         var _this = this;
-        this.isUserWaiting = function () {
-            var pos = _this.user.State.QueuePosition;
-            var length = _this.session.Queue.length;
-            return pos < 0 || ((pos == (length - 1)) && _this.player.isStopped());
-        };
         this.uiNextMedia = function () {
             var queue = _this.session.Queue;
             if (_this.user.State.QueuePosition + 1 < queue.length) {
@@ -49,6 +44,14 @@ var RoomManager = (function () {
         this.requestSyncWithUser = function (userId) {
             _this.socket.RequestSyncWithUser(userId);
         };
+        //
+        // Misc
+        //
+        this.isUserWaiting = function () {
+            var pos = _this.user.State.QueuePosition;
+            var length = _this.session.Queue.length;
+            return pos < 0 || ((pos == (length - 1)) && _this.player.isStopped());
+        };
         this.onPlayerStateChange = function (event) {
             if (event.data == 0) {
                 _this.uiNextMedia();
@@ -85,45 +88,45 @@ var RoomManager = (function () {
     //==================================================================
     // WebSocket message response functions
     //==================================================================
-    RoomManager.prototype.clientProvideUserState = function (userState) {
-        this.user.State.QueuePosition = userState.QueuePosition;
-        this.user.State.Time = userState.Time;
-        this.user.State.PlayerState = userState.PlayerState;
+    RoomManager.prototype.clientProvideUserState = function (msg) {
+        this.user.State.QueuePosition = msg.userState.QueuePosition;
+        this.user.State.Time = msg.userState.Time;
+        this.user.State.PlayerState = msg.userState.PlayerState;
         this.ui.updateQueue(this.session.Queue, this.user.Id, this.user.State.QueuePosition);
         this.onUserStateChange();
     };
-    RoomManager.prototype.clientRequestUserState = function (userIdRequestor) {
+    RoomManager.prototype.clientRequestUserState = function (msg) {
         var myUserState = new Contracts_1.UserState();
         myUserState.QueuePosition = this.user.State.QueuePosition;
         myUserState.Time = Math.round(this.player.getCurrentTime());
         myUserState.PlayerState = this.player.getCurrentState();
-        this.socket.ProvideSyncToUser(myUserState, userIdRequestor);
+        this.socket.ProvideSyncToUser(myUserState, msg.userIdRequestor);
     };
-    RoomManager.prototype.clientSessionReady = function (session, user) {
-        this.session = session;
-        this.user = user;
+    RoomManager.prototype.clientSessionReady = function (msg) {
+        this.session = msg.session;
+        this.user = msg.user;
         this.uiNextMedia();
         this.ui.updateQueue(this.session.Queue, this.user.Id, this.user.State.QueuePosition);
         this.ui.updateUsersList(this.session.Users, this.user.Id);
         this.ui.sessionReady();
     };
-    RoomManager.prototype.clientUpdateUsersList = function (users) {
-        this.session.Users = users;
+    RoomManager.prototype.clientUpdateUsersList = function (msg) {
+        this.session.Users = msg.users;
         this.ui.updateUsersList(this.session.Users, this.user.Id);
     };
-    RoomManager.prototype.clientUpdateQueue = function (queue) {
+    RoomManager.prototype.clientUpdateQueue = function (msg) {
         var wasWaiting = this.isUserWaiting();
-        this.session.Queue = queue;
+        this.session.Queue = msg.queue;
         if (wasWaiting) {
             this.uiNextMedia();
         }
         this.ui.updateQueue(this.session.Queue, this.user.Id, this.user.State.QueuePosition);
     };
-    RoomManager.prototype.clientChatMessage = function (message, userName) {
-        this.ui.onChatMessage(userName, message, 'blue');
+    RoomManager.prototype.clientChatMessage = function (msg) {
+        this.ui.onChatMessage(msg.userName, msg.message, 'blue');
     };
-    RoomManager.prototype.clientSearchResults = function (searchResults) {
-        this.ui.onSearchResults(searchResults);
+    RoomManager.prototype.clientSearchResults = function (msg) {
+        this.ui.onSearchResults(msg.searchResults);
     };
     //
     // Mostly UI callback functions
@@ -142,9 +145,6 @@ var RoomManager = (function () {
         this.user.State.Time = 0;
         this.onUserStateChange();
     };
-    //
-    // Misc
-    //
     RoomManager.prototype.onUserStateChange = function () {
         if (this.user.State.QueuePosition >= 0 && this.user.State.QueuePosition < this.session.Queue.length) {
             this.player.setPlayerContent(this.session.Queue[this.user.State.QueuePosition], this.user.State.Time);

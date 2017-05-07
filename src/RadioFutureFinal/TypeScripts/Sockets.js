@@ -8,7 +8,7 @@ var MySocket = (function () {
         socket.onclose = function (event) { };
         socket.onmessage = function (event) {
             var message = JSON.parse(event.data);
-            var action = message.Action;
+            var action = message.action;
             if (clientActions[action]) {
                 clientActions[action](message);
             }
@@ -43,7 +43,7 @@ var MySocket = (function () {
     };
     MySocket.prototype.AddMediaToSession = function (media) {
         var data = {
-            action: 'AddMediaToSesession',
+            action: 'AddMediaToSession',
             media: media
         };
         this.emit(data);
