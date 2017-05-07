@@ -23,7 +23,8 @@ namespace RadioFutureFinal
             Configuration = builder.Build();
 
             Searcher = new Searcher(Configuration);
-            Searcher.init();
+            // TODO: probably smother way to do this
+            Searcher.init().GetAwaiter().GetResult();
         }
 
         public IConfigurationRoot Configuration { get; }

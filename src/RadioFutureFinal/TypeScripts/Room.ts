@@ -107,6 +107,7 @@ class RoomManager implements UICallbacks, ClientActions {
     }
 
     uiNameChange(newName) {
+        this.user.Name = newName;
         this.socket.SaveUserNameChange(this.user.Id, this.user.Name);
     }
 

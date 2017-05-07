@@ -190,7 +190,6 @@ export class UI {
 
     public onSearchResults(results: Media[]) {
         var divResults = $("#div_search_results");
-        divResults.show();
         divResults.html("");
         for (let i = 0; i < results.length; i++) {
             let media = results[i];
@@ -247,6 +246,9 @@ export class UI {
         }
 
         $("#input_search").blur();
+        if (!divResults.is(':visible')) {
+            divResults.show();
+        }
     }
 
     previousPage = () => {
