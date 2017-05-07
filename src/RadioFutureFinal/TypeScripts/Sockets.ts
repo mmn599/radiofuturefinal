@@ -64,8 +64,6 @@ export class MySocket implements ServerActions {
         this.socket.send(JSON.stringify(data));
     };
 
-    // Ideally we would use reflection stuff for this shit
-
     public JoinSession(sessionName: string) {
         var data = {
             action: 'JoinSession',

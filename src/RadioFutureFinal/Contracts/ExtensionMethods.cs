@@ -21,7 +21,7 @@ namespace RadioFutureFinal.Contracts
             {
                 Id = user.MyUserId,
                 Name = user.Name,
-                State = new UserState()
+                State = new UserStateV1()
                 {
                     Time = 0,
                     QueuePosition = -1,

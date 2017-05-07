@@ -33,7 +33,6 @@ var MySocket = (function () {
         this.socket.send(JSON.stringify(data));
     };
     ;
-    // Ideally we would use reflection stuff for this shit
     MySocket.prototype.JoinSession = function (sessionName) {
         var data = {
             action: 'JoinSession',

@@ -7,7 +7,7 @@ namespace RadioFutureFinal.Contracts
         public MyUserV1()
         {
             // TODO: this is wacky
-            State = new UserState();
+            State = new UserStateV1();
         }
 
         [JsonProperty]
@@ -17,6 +17,6 @@ namespace RadioFutureFinal.Contracts
         public string Name { get; set; }
 
         [JsonProperty] 
-        public UserState State { get; set; }
+        public UserStateV1 State { get; set; }
     }
 }

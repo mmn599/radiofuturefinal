@@ -20,7 +20,7 @@ namespace RadioFutureFinal.Messaging
             _senderBase = senderBase;
         }
 
-        public async Task clientProvideUserState(UserState userState, MySocket socket)
+        public async Task clientProvideUserState(UserStateV1 userState, MySocket socket)
         {
             var json = _getJson("clientProvideUserState", userState);
             await _senderBase.SendMessageAsync(socket, json);

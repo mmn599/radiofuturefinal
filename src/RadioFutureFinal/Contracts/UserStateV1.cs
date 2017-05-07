@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace RadioFutureFinal.Contracts
 {
-    public class UserState
+    public class UserStateV1
     {
-        public UserState()
+        public UserStateV1()
         {
             Time = 0;
             PlayerState = 0;
