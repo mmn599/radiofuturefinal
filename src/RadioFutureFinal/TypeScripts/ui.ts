@@ -12,6 +12,7 @@ export interface UICallbacks {
     uiQueueMedia: (media: Media) => void;
     uiGoToMedia: (newQueuePosition: number) => void;
     uiDeleteMedia: (mediaId: number, position: number) => void;
+    uiRequestSyncWithUser: (userId: number) => void;
 }
 
 export class UI {
@@ -337,13 +338,16 @@ export class UI {
                 $(spanDescription).appendTo(innerDiv);
                 $(spanDescription).html(media.Description);
             }
-            var deleteX = document.createElement('span');
-            $(deleteX).text('X');
-            $(deleteX).addClass('span_delete');
-            $(deleteX).click(() => {
-                this.callbacks.uiDeleteMedia(media.Id, i);
-            });
-            $(deleteX).appendTo(divQueueResult);
+            if (userIdMe == media.UserId) {
+                var deleteX = document.createElement('span');
+                $(deleteX).text('X');
+                $(deleteX).addClass('span_delete');
+                $(deleteX).click(() => {
+                    this.callbacks.uiDeleteMedia(media.Id, i);
+                });
+                $(deleteX).appendTo(divQueueResult);
+            }
+            
             if (queuePosition == i) {
                 $(divQueueResult).addClass('queue_result_selected');
             }
@@ -359,23 +363,36 @@ export class UI {
         }
         $("#p_users_summary").text(summary);
         var userResults = $("#div_inner_user_results");
-        var html = [];
+        userResults.html("");
         for (var i = 0; i < users.length; i++) {
-            var user = users[i];
-            var thisIsMe = (user.Id === userIdMe);
-            var color = this.colors[i % this.colors.length];
-            var currentHTML = "";
+            let user = users[i];
+            let thisIsMe = (user.Id === userIdMe);
+            let color = this.colors[i % this.colors.length];
+            let currentHTML = "";
             if (!this.mobileBrowser) {
-                currentHTML = this.frameBuilder.user(color, user.Id, user.Name, thisIsMe);
+                var syncHTML = thisIsMe ? 'you' : 'sync';
+                var syncHTMLMobile = thisIsMe ? 'you' : 'sync with ' + user.Name;
+                currentHTML =
+                    `<div class="user_result_outer" style="text-align: left; display: flex; align-items: center;"> 
+                        <div style="display: flex; align-items: center; justify-content: center; float: left; cursor: pointer; margin-right: 16px; height: 48px; width: 48px; background:${color};">${syncHTML}</div> 
+                        <span style="margin-right: 16px; float: right;"> ${user.Name} </span> 
+                    </div>`;
             }
             else {
                 var theText = thisIsMe ? "you" : "sync with " + user.Name;
-                currentHTML = ' <p onclick="requestSyncWithUser(' + user.Id + ')" style="padding: 2vw; margin: 0; text-align: center; font-size: 9vw; background: ' + color + '; color: white;">' + theText + '</p>'
+                currentHTML = `<p class="user_result_outer" onclick="requestSyncWithUser(${user.Id})" style="padding: 2vw; margin: 0; text-align: center; font-size: 9vw; background: ${color} color: white;">${theText}</p>`;
             }
-            
-            html.push(currentHTML);
+
+            var cur = $($.parseHTML(currentHTML));
+            var outer = cur.filter('.user_result_outer');
+
+            if (!thisIsMe) {
+                $(outer).click(() => this.callbacks.uiRequestSyncWithUser(user.Id));
+            }
+
+            outer.appendTo(userResults);
         }
-        userResults.html(html.join(""));
+
     }
 
     public userNameChange(name_input) {

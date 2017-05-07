@@ -136,7 +136,8 @@ export class PodcastPlayer implements IPlayer {
         newmp3.attr('src', media.MP3Source);
         this.updateInfoUI(media);
         this.audio.load();
-        this.pause();
+        this.audio.currentTime = time;
+        this.audio.play();
         this.updateProgressUI(0, 0);
         // $("#btn_play_pause").css('visibility', 'visible');
     }

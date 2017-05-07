@@ -29,10 +29,13 @@ var RoomManager = (function () {
             }
         };
         this.uiQueueMedia = function (media) {
+            // TODO: awkward
+            media.UserId = _this.user.Id;
+            media.UserName = _this.user.Name;
             _this.socket.AddMediaToSession(media);
         };
         this.uiDeleteMedia = function (mediaId, position) {
-            // TODO: this should be done once the update is sent from server
+            // TODO: important: this should be done once the update is sent from server
             _this.session.Queue.splice(position, 1);
             if (_this.user.State.QueuePosition >= position) {
                 _this.user.State.QueuePosition -= 1;
@@ -41,7 +44,7 @@ var RoomManager = (function () {
             _this.ui.updateQueue(_this.session.Queue, _this.user.Id, _this.user.State.QueuePosition);
             _this.socket.DeleteMediaFromSession(mediaId);
         };
-        this.requestSyncWithUser = function (userId) {
+        this.uiRequestSyncWithUser = function (userId) {
             _this.socket.RequestSyncWithUser(userId);
         };
         //
@@ -61,8 +64,6 @@ var RoomManager = (function () {
             $("#div_everything").hide();
             $("#div_error").show();
         };
-        // TODO: find a better way to expose these functions to html?
-        window.requestSyncWithUser = this.requestSyncWithUser;
         this.roomType = roomType;
         this.mobileBrowser = mobileBrowser;
     }

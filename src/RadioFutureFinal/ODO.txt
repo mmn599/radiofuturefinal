@@ -1,14 +1,18 @@
 ﻿little
--ensure parity
--player loading ui
+-gets yncing wrokings
+-werid search ui shit
 -play/pause to canvas
 -next/back to canvas
+-mobile ui basic
+-player loading ui
+-fix bugs with deleting
 -figure out queueing bug
 
 big
 -serious manual testing and debugging
 -mobile ui on various devices
 -better search
+-some sort of user system
 
 Performance and Code stuff
 -how are we going to do both? should we?

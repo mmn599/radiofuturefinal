@@ -79,7 +79,8 @@ var PodcastPlayer = (function () {
             newmp3.attr('src', media.MP3Source);
             _this.updateInfoUI(media);
             _this.audio.load();
-            _this.pause();
+            _this.audio.currentTime = time;
+            _this.audio.play();
             _this.updateProgressUI(0, 0);
             // $("#btn_play_pause").css('visibility', 'visible');
         };

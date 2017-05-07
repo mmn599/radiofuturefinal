@@ -16,8 +16,6 @@ class RoomManager implements UICallbacks, ClientActions {
     mobileBrowser: boolean;
 
     constructor(roomType: string, mobileBrowser: boolean) {
-        // TODO: find a better way to expose these functions to html?
-        (<any>window).requestSyncWithUser = this.requestSyncWithUser;
         this.roomType = roomType;
         this.mobileBrowser = mobileBrowser;
     }
@@ -144,11 +142,14 @@ class RoomManager implements UICallbacks, ClientActions {
     }
 
     uiQueueMedia = (media: Media) => {
+        // TODO: awkward
+        media.UserId = this.user.Id;
+        media.UserName = this.user.Name;
         this.socket.AddMediaToSession(media);
     }
 
     uiDeleteMedia = (mediaId: number, position: number) => {
-        // TODO: this should be done once the update is sent from server
+        // TODO: important: this should be done once the update is sent from server
         this.session.Queue.splice(position, 1);
         if (this.user.State.QueuePosition >= position) {
             this.user.State.QueuePosition -= 1;
@@ -159,7 +160,7 @@ class RoomManager implements UICallbacks, ClientActions {
         this.socket.DeleteMediaFromSession(mediaId);
     }
 
-    requestSyncWithUser = (userId) => {
+    uiRequestSyncWithUser = (userId) => {
         this.socket.RequestSyncWithUser(userId);
     }
 
