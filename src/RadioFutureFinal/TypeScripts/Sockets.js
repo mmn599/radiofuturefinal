@@ -33,6 +33,7 @@ var MySocket = (function () {
         this.socket.send(JSON.stringify(data));
     };
     ;
+    // TODO: fancy way to generalize these functions
     MySocket.prototype.JoinSession = function (sessionName) {
         var data = {
             action: 'JoinSession',
@@ -48,9 +49,10 @@ var MySocket = (function () {
         this.emit(data);
     };
     MySocket.prototype.DeleteMediaFromSession = function (mediaId) {
+        this.DeleteMediaFromSession.toString();
         var data = {
             action: 'DeleteMediaFromSession',
-            meidaId: mediaId
+            mediaId: mediaId
         };
         this.emit(data);
     };

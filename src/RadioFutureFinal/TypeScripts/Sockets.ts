@@ -64,6 +64,8 @@ export class MySocket implements ServerActions {
         this.socket.send(JSON.stringify(data));
     };
 
+    // TODO: fancy way to generalize these functions
+
     public JoinSession(sessionName: string) {
         var data = {
             action: 'JoinSession',
@@ -81,9 +83,10 @@ export class MySocket implements ServerActions {
     }
 
     public DeleteMediaFromSession(mediaId: number) {
+        this.DeleteMediaFromSession.toString();
         var data = {
             action: 'DeleteMediaFromSession',
-            meidaId: mediaId
+            mediaId: mediaId
         }
         this.emit(data);
     }

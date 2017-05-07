@@ -7,6 +7,7 @@ using RadioFutureFinal.Models;
 using RadioFutureFinal.Search;
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Net.WebSockets;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -21,14 +22,7 @@ namespace RadioFutureFinal.Messaging
         Searcher _searcher;
         Dictionary<string, ResponseFunction> _responseFunctions;
         
-        private delegate Task ResponseFunction(MySocket socket, string json);
-        private delegate Task ServerAction<T>(MySocket socket, T msg);
-
-        private async Task Handle<T>(MySocket socket, string json, ServerAction<T> func)
-        {
-            var msg = JsonConvert.DeserializeObject<T>(json);
-            await func.Invoke(socket, msg);
-        }
+        public delegate Task ResponseFunction(MySocket socket, JObject json);
 
         public MessageReceiver(IDbRepository db, IMyContext myContext, MessageSenderFactory senderFactory, Searcher searcher)
         {
@@ -36,19 +30,9 @@ namespace RadioFutureFinal.Messaging
             _db = db;
             _sender = senderFactory.Create(_myContext.SocketDisconnected);
             _searcher = searcher;
-            _responseFunctions = new Dictionary<string, ResponseFunction>()
-            {
-                { "JoinSession", async (socket, json) => { await Handle<MsgJoinSession>(socket, json, JoinSession); }},
-                { "AddMediaToSession", async (socket, json) => { await Handle<MsgAddMediaToSession>(socket, json, AddMediaToSession); }},
-                { "DeleteMediaFromSession", async (socket, json) => { await Handle<MsgDeleteMediaFromSession>(socket, json, DeleteMediaFromSession); }},
-                { "SaveUserNameChange", async (socket, json) => { await Handle<MsgSaveUserNameChange>(socket, json, SaveUserNameChange); }},
-                { "ChatMessage", async (socket, json) => { await Handle<MsgChatMessage>(socket, json, ChatMessage); }},
-                { "RequestSyncWithUser", async (socket, json) => { await Handle<MsgRequestSyncWithUser>(socket, json, RequestSyncWithUser); }},
-                { "ProvideSyncToUser", async (socket, json) => { await Handle<MsgProvideSyncToUser>(socket, json, ProvideSyncToUser); }},
-                { "Search", async (socket, json) => { await Handle<MsgSearch>(socket, json, Search); }},
-            };
-        }
 
+            _responseFunctions = Mapper.BuildResponseFunctions(this);
+        }
 
         public async Task HandleMessage(string json, WebSocket senderSocket)
         {
@@ -72,18 +56,16 @@ namespace RadioFutureFinal.Messaging
                 throw new RadioException("No server function for action: " + action);
             }
 
-            await response.Invoke(mySocket, json);
+            await response.Invoke(mySocket, jObject);
         }
 
-        // TODO: significant bug where additional session is created with same name if two request are made in similar times. I may have fixed it
-        // TODO: WsMessage shouldn't be same for every message
-        public async Task JoinSession(MySocket socket, MsgJoinSession msg)
+        public async Task JoinSession(MySocket socket, string sessionName)
         {
             Session session = null;
-            bool sessionFound = _db.GetSessionByName(msg.sessionName, out session);
+            bool sessionFound = _db.GetSessionByName(sessionName, out session);
             if(!sessionFound)
             {
-                session = await _db.CreateSessionAsync(msg.sessionName);
+                session = await _db.CreateSessionAsync(sessionName);
             }
             var userName = "Anonymous";
             var user = await _db.AddNewUserToSessionAsync(userName, session);
@@ -97,51 +79,61 @@ namespace RadioFutureFinal.Messaging
             await _sender.clientUpdateUsersList(sessionV1.Users, _myContext.GetSocketsInSession(sessionId));
         }
 
-        public async Task AddMediaToSession(MySocket socket, MsgAddMediaToSession msg)
+        public async Task AddMediaToSession(MySocket socket, MediaV1 media)
         {
             var sessionId = socket.SessionId;
-            var updatedSession = await _db.AddMediaToSessionAsync(msg.media.ToModel(), sessionId);
+            var updatedSession = await _db.AddMediaToSessionAsync(media.ToModel(), sessionId);
             await _sender.clientUpdateQueue(updatedSession.ToContract().Queue, _myContext.GetSocketsInSession(sessionId));
         }
 
-        public async Task DeleteMediaFromSession(MySocket socket, MsgDeleteMediaFromSession msg)
+        public async Task DeleteMediaFromSession(MySocket socket, int mediaId)
         {
             var sessionId = socket.SessionId;
-            var updatedSession = await _db.RemoveMediaAsync(sessionId, msg.mediaId);
+            var updatedSession = await _db.RemoveMediaAsync(sessionId, mediaId);
             await _sender.clientUpdateQueue(updatedSession.ToContract().Queue, _myContext.GetSocketsInSession(sessionId));
         }
 
         // TODO: don't use whole session
-        public async Task SaveUserNameChange(MySocket socket, MsgSaveUserNameChange msg)
+        public async Task SaveUserNameChange(MySocket socket, int userId, string newName)
         {
-            await _db.UpdateUserNameAsync(msg.userId, msg.newName);
+            await _db.UpdateUserNameAsync(userId, newName);
             var sessionId = socket.SessionId;
             var session = _db.GetSession(sessionId);
             await _sender.clientUpdateUsersList(session.ToContract().Users, _myContext.GetSocketsInSession(sessionId));
         }
 
-        public async Task ChatMessage(MySocket socket, MsgChatMessage msg)
+        public async Task ChatMessage(MySocket socket, string userName, string chatMessage)
         {
-            await _sender.clientChatMessage(msg.chatMessage, msg.userName, _myContext.GetSocketsInSession(socket.SessionId));
+            await _sender.clientChatMessage(chatMessage, userName, _myContext.GetSocketsInSession(socket.SessionId));
         }
 
-        public async Task RequestSyncWithUser(MySocket socket, MsgRequestSyncWithUser msg)
+        public async Task RequestSyncWithUser(MySocket socket, int userIdRequestee)
         {
             var userIdRequestor = socket.UserId;
-            var socketRequestee = _myContext.GetSocketForUser(socket.SessionId, msg.userIdRequestee);
+            var socketRequestee = _myContext.GetSocketForUser(socket.SessionId, userIdRequestee);
             await _sender.clientRequestUserState(userIdRequestor, socketRequestee);
         }
 
-        public async Task ProvideSyncToUser(MySocket socket, MsgProvideSyncToUser msg)
+        public async Task ProvideSyncToUser(MySocket socket, int userIdRequestor, UserStateV1 userState)
         {
-            var socketToSendTo = _myContext.GetSocketForUser(socket.SessionId, msg.userIdRequestor);
-            await _sender.clientProvideUserState(msg.userState, socketToSendTo);
+            var socketToSendTo = _myContext.GetSocketForUser(socket.SessionId, userIdRequestor);
+            await _sender.clientProvideUserState(userState, socketToSendTo);
         }
 
-        public async Task Search(MySocket socket, MsgSearch msg)
+        public async Task Search(MySocket socket, string query, int page)
         {
-            var searchResults = await _searcher.searchPodcasts(msg.query, msg.page);
+            var searchResults = await _searcher.searchPodcasts(query, page);
             await _sender.clientSearchResults(searchResults, socket);
+        }
+
+        private static MethodInfo GetMethodInfo<MessageReceiver>(Expression<Action<MessageReceiver>> expression)
+        {
+            var member = expression.Body as MethodCallExpression;
+
+            if (member != null)
+                return member.Method;
+
+            throw new ArgumentException("Expression is not a method", "expression");
         }
 
     }

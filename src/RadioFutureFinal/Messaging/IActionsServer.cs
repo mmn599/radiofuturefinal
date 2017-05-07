@@ -5,13 +5,13 @@ namespace RadioFutureFinal.Messaging
 {
     public interface IActionsServer
     {
-        Task JoinSession(MySocket socket, MsgJoinSession message);
-        Task AddMediaToSession(MySocket socket, MsgAddMediaToSession message);
-        Task DeleteMediaFromSession(MySocket socket, MsgDeleteMediaFromSession message);
-        Task SaveUserNameChange(MySocket socket, MsgSaveUserNameChange message);
-        Task ChatMessage(MySocket socket, MsgChatMessage message);
-        Task RequestSyncWithUser(MySocket socket, MsgRequestSyncWithUser message);
-        Task ProvideSyncToUser(MySocket socket, MsgProvideSyncToUser message);
-        Task Search(MySocket socket, MsgSearch message);
+        Task JoinSession(MySocket socket, string sessionName);
+        Task AddMediaToSession(MySocket socket, MediaV1 media);
+        Task DeleteMediaFromSession(MySocket socket, int mediaId);
+        Task SaveUserNameChange(MySocket socket, int userId, string newName);
+        Task ChatMessage(MySocket socket, string userName, string chatMessage);
+        Task RequestSyncWithUser(MySocket socket, int userIdRequestee);
+        Task ProvideSyncToUser(MySocket socket, int userIdRequestor, UserStateV1 userState);
+        Task Search(MySocket socket, string query, int page);
     }
 }
