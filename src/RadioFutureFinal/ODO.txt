@@ -1,5 +1,6 @@
 ﻿little
--fix bugs with deleting
+-icon and text changes
+-introduction material
 
 big
 -serious manual testing and debugging
@@ -9,7 +10,6 @@ big
 future
 -some sort of user system
 -tests
-
 
 Performance and Code stuff
 -how are we going to do both? should we?
