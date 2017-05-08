@@ -61,6 +61,14 @@ export class UI {
         }
         this.triangle($("#btn_next"), true);
         this.triangle($("#btn_previous"), false);
+
+        var divLinkHelp = $(document.createElement('div'));
+        divLinkHelp.addClass('arrow_box');
+        divLinkHelp.html('send this link to people!');
+        divLinkHelp.appendTo(document.body);
+        setTimeout(() => {
+            divLinkHelp.fadeOut();
+        }, 5000);
     }
 
     select = function (btnSel, divToFade) {
