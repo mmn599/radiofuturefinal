@@ -42,7 +42,11 @@ function fbAsyncInit() {
 function fbStatusChangedCallback(response) {
     if (response.status === "connected") {
         $("#id_fb_login_btn").hide();
-        console.log(response.authResponse.userID);
+        var fbUserId = response.authResponse.userID;
+        var url = window.location.hostname + ("/fbusers/" + fbUserId);
+        $.get(url, function (data) {
+            alert("Data Loaded: " + data);
+        });
     }
 }
 //# sourceMappingURL=Homepage.js.map
