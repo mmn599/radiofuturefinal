@@ -72,10 +72,15 @@ namespace RadioFutureFinal
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
 
-            routes.MapRoute(
-                name: "room",
-                template: "rooms/{roomName}",
-                defaults: new { controller = "Room", action = "EnterRoom" });
+                routes.MapRoute(
+                    name: "room",
+                    template: "rooms/{roomName}",
+                    defaults: new { controller = "Room", action = "EnterRoom" });
+
+                routes.MapRoute(
+                    name: "fbuser",
+                    template: "fbusers/{facebookId}",
+                    defaults: new { controller = "FbUser", action = "Get" });
             });
         }
 
