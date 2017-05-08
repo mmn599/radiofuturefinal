@@ -30,7 +30,10 @@ var MySocket = (function () {
             }, 50);
             return;
         }
-        this.socket.send(JSON.stringify(data));
+        else {
+            var jsonString = JSON.stringify(data);
+            this.socket.send(jsonString);
+        }
     };
     ;
     // TODO: fancy way to generalize these functions

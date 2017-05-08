@@ -156,6 +156,7 @@ export class PodcastPlayer implements IPlayer {
         this.audio.load();
         this.audio.currentTime = time;
         $("#cc_title").text('loading...');
+        $("#cc_show").text('');
         this.audio.oncanplay = () => {
             $("#cc_show").text(media.Show);
             $("#cc_title").text(media.Title);

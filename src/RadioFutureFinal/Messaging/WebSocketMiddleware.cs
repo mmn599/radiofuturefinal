@@ -1,8 +1,12 @@
 ﻿using Microsoft.AspNetCore.Http;
+using RadioFutureFinal.Errors;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net.Sockets;
 using System.Net.WebSockets;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,14 +15,14 @@ namespace RadioFutureFinal.Messaging
     public class WebSocketMiddleware
     {
         private readonly RequestDelegate _next;
-        private IMessageReceiverBase _messageReceiveBase { get; set; }
+        private IMessageReceiver _messageReceiver { get; set; }
         private IMyContext _myContext { get; set; }
 
         public WebSocketMiddleware(RequestDelegate next,
-                                          IMessageReceiverBase receiver, IMyContext context)
+                                          IMessageReceiver receiver, IMyContext context)
         {
             _next = next;
-            _messageReceiveBase = receiver;
+            _messageReceiver = receiver;
             _myContext = context;
         }
 
@@ -32,11 +36,11 @@ namespace RadioFutureFinal.Messaging
             var socket = await context.WebSockets.AcceptWebSocketAsync();
             _myContext.SocketConnected(socket);
 
-            await Receive(socket, async (result, buffer) =>
+            await Receive(socket, async (result, message) =>
             {
                 if (result.MessageType == WebSocketMessageType.Text)
                 {
-                    await _messageReceiveBase.ReceiveMessageAsync(socket, result, buffer);
+                    await _messageReceiver.HandleMessage(message, socket);
                     return;
                 }
 
@@ -48,15 +52,31 @@ namespace RadioFutureFinal.Messaging
             });
         }
 
-        private async Task Receive(WebSocket socket, Action<WebSocketReceiveResult, byte[]> handleMessage)
+        private async Task Receive(WebSocket socket, Action<WebSocketReceiveResult, string> handleMessage)
         {
-            var buffer = new byte[1024 * 4];
 
             while (socket.State == WebSocketState.Open)
             {
-                var result = await socket.ReceiveAsync(buffer: new ArraySegment<byte>(buffer),
-                                                       cancellationToken: CancellationToken.None);
-                handleMessage(result, buffer);
+                var buffer = new ArraySegment<byte>(new byte[1024 * 8]);
+                WebSocketReceiveResult result = null;
+
+                using (var ms = new MemoryStream())
+                {
+                    do
+                    {
+                        result = await socket.ReceiveAsync(buffer, CancellationToken.None);
+                        ms.Write(buffer.Array, buffer.Offset, result.Count);
+                    }
+                    while (!result.EndOfMessage);
+
+                    ms.Seek(0, SeekOrigin.Begin);
+
+                    using (var reader = new StreamReader(ms, Encoding.UTF8))
+                    {
+                        var message = reader.ReadToEnd();
+                        handleMessage(result, message);
+                    }
+                }
             }
         }
     }

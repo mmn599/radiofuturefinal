@@ -1,15 +1,12 @@
 ﻿using Newtonsoft.Json.Linq;
 using RadioFutureFinal.Contracts;
 using System.Collections.Generic;
-using System.Reflection;
 using static RadioFutureFinal.Messaging.MessageReceiver;
 
 namespace RadioFutureFinal.Messaging
 {
     public static class Mapper
     {
-
-
 
         public static Dictionary<string, ResponseFunction> BuildResponseFunctions(IActionsServer actions)
         {

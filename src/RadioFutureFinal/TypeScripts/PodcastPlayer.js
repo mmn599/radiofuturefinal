@@ -98,6 +98,7 @@ var PodcastPlayer = (function () {
             _this.audio.load();
             _this.audio.currentTime = time;
             $("#cc_title").text('loading...');
+            $("#cc_show").text('');
             _this.audio.oncanplay = function () {
                 $("#cc_show").text(media.Show);
                 $("#cc_title").text(media.Title);

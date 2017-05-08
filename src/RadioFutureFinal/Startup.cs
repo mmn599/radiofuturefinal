@@ -40,7 +40,6 @@ namespace RadioFutureFinal
 
             services.AddSingleton<MessageSenderFactory>();
             services.AddSingleton<IMyContext, MyContext>();
-            services.AddSingleton<IMessageReceiverBase, MessageReceiverBase>();
             services.AddSingleton<IMessageReceiver, MessageReceiver>();
 
             services.AddSingleton(Searcher);
@@ -65,7 +64,7 @@ namespace RadioFutureFinal
 
             app.UseStaticFiles();
             app.UseWebSockets();
-            app.Map("/ws", (_app) => _app.UseMiddleware<WebSocketMiddleware>(serviceProvider.GetService<IMessageReceiverBase>()));
+            app.Map("/ws", (_app) => _app.UseMiddleware<WebSocketMiddleware>(serviceProvider.GetService<IMessageReceiver>()));
 
             app.UseMvc(routes =>
             {
