@@ -1,8 +1,4 @@
-﻿using RadioFutureFinal.Contracts;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace RadioFutureFinal.Models
 {
@@ -10,19 +6,24 @@ namespace RadioFutureFinal.Models
     {
         public int MyUserId { get; set; }
         public string Name { get; set; }
-        public List<Media> Recs { get; set; }
+        public List<SessionHistory> PriorSessions { get; set; }
+        public int FacebookId { get; set; }
         public bool Temporary { get; set; }
 
         public MyUser(string userName)
         {
             Name = userName;
-            Recs = new List<Media>();
             Temporary = true;
+        }
+
+        public MyUser(int facebookId)
+        {
+            FacebookId = facebookId;
         }
 
         public MyUser()
         {
-            Recs = new List<Media>();
+
         }
     }
 }

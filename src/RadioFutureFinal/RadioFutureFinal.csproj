@@ -12,6 +12,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="TypeScripts\Homepage\Homepage.ts">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
     <Content Include="wwwroot\css\both.css" />
     <Content Include="wwwroot\css\homepagemobile.css" />
     <Content Include="wwwroot\css\homepagemobile.min.css" />

@@ -17,6 +17,8 @@ namespace RadioFutureFinal.Data
             base.OnModelCreating(builder);
 
             builder.Entity<Session>().HasIndex(b => b.Name).IsUnique();
+            builder.Entity<MyUser>().HasMany(b => b.PriorSessions);
+
         }
 
         public DbSet<Session> Session { get; set; }

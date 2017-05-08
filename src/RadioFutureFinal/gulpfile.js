@@ -9,7 +9,7 @@ gulp.task('watch', function () {
 });
 
 gulp.task("default", function () {
-    return browserify({
+    browserify({
         basedir: '.',
         debug: true,
         entries: 
@@ -29,5 +29,20 @@ gulp.task("default", function () {
         .plugin(tsify, { noImplicitAny: false, inlineSourceMap: true, inlineSources: true })
         .bundle()
         .pipe(source('roombundle.js'))
+        .pipe(gulp.dest("wwwroot/js"));
+
+    browserify({
+        basedir: '.',
+        debug: true,
+        entries: 
+        [
+            './TypeScripts/Homepage/Homepage.ts',
+        ],
+        cache: {},
+        packageCache: {}
+    })
+        .plugin(tsify, { noImplicitAny: false, inlineSourceMap: true, inlineSources: true })
+        .bundle()
+        .pipe(source('homebundle.js'))
         .pipe(gulp.dest("wwwroot/js"));
 });

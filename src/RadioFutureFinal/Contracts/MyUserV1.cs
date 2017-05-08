@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace RadioFutureFinal.Contracts
 {
@@ -6,8 +7,8 @@ namespace RadioFutureFinal.Contracts
     {
         public MyUserV1()
         {
-            // TODO: this is wacky
             State = new UserStateV1();
+            PriorSessions = new List<SessionHistoryV1>();
         }
 
         [JsonProperty]
@@ -21,5 +22,11 @@ namespace RadioFutureFinal.Contracts
 
         [JsonProperty] 
         public bool Temporary { get; set; }
+
+        [JsonProperty]
+        public List<SessionHistoryV1> PriorSessions { get; set; }
+
+        [JsonProperty]
+        public int FacebookId { get; set; }
     }
 }

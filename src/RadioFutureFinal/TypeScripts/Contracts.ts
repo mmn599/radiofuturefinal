@@ -20,6 +20,8 @@ export class MyUser {
     Id: number;
     Name: string;
     State: UserState;
+    Temporary: boolean;
+    Sessions: Session[];
 }
 
 export class UserState {

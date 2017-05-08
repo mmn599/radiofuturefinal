@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using RadioFutureFinal.Data;
 using RadioFutureFinal.Models;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -36,7 +37,13 @@ namespace RadioFutureFinal.DAL
 
         private MyUser _getUserInternal(int userId, ApplicationDbContext sourceContext)
         {
-            return sourceContext.MyUser.FirstOrDefault(t => t.MyUserId == userId);
+            return sourceContext.MyUser.Where(t => t.MyUserId == userId).FirstOrDefault();
+        }
+
+        private MyUser _getUserByFacebookId(int facebookId, ApplicationDbContext sourceContext)
+        {
+            return sourceContext.MyUser.Where(t => t.FacebookId == facebookId)
+                                    .Include(s => s.PriorSessions).FirstOrDefault();
         }
 
         public MyUser GetUser(int userId)
@@ -82,7 +89,7 @@ namespace RadioFutureFinal.DAL
             using (var context = ContextFactory())
             {
                 var session = _getSessionInternal(context, sessionId);
-                var user = session.Users.FirstOrDefault(m => m.MyUserId == userId);
+                var user = session.Users.Where(m => m.MyUserId == userId).FirstOrDefault();
                 session.Users.Remove(user);
                 context.Session.Update(session);
                 await context.SaveChangesAsync();
@@ -151,7 +158,7 @@ namespace RadioFutureFinal.DAL
             using (var context = ContextFactory())
             {
                 var session = _getSessionInternal(context, sessionId);
-                var media = session.Queue.FirstOrDefault(m => m.MediaID == mediaId);
+                var media = session.Queue.Where(m => m.MediaID == mediaId).FirstOrDefault();
                 session.Queue.Remove(media);
                 context.Session.Update(session);
                 await context.SaveChangesAsync();
@@ -168,6 +175,32 @@ namespace RadioFutureFinal.DAL
                 context.MyUser.Attach(user);
                 context.MyUser.Remove(user);
                 await context.SaveChangesAsync();
+            }
+        }
+
+        public bool GetUserByFacebookId(int facebookUserId, out MyUser user)
+        {
+            using (var context = ContextFactory())
+            {
+                var userResult = _getUserByFacebookId(facebookUserId, context);
+                if(userResult != null)
+                {
+                    user = userResult;
+                    return true;
+                }
+                user = null;
+                return false;
+            }
+        }
+
+        public MyUser AddNewFbUser(int facebookUserId)
+        {
+            using (var context = ContextFactory())
+            {
+                var user = new MyUser(facebookUserId);
+                context.MyUser.Add(user);
+                context.SaveChanges();
+                return user;
             }
         }
 

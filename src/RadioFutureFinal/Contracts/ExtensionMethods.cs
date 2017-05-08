@@ -11,8 +11,14 @@ namespace RadioFutureFinal.Contracts
             {
                 MyUserId = user.Id,
                 Name = user.Name,
-                Temporary = user.Temporary
+                Temporary = user.Temporary,
+                PriorSessions = new List<SessionHistory>(),
+                FacebookId = user.FacebookId
             };
+            foreach(var sessionHistory in user.PriorSessions)
+            {
+                userModel.PriorSessions.Add(sessionHistory.ToModel());
+            }
             return userModel;
         }
 
@@ -29,8 +35,14 @@ namespace RadioFutureFinal.Contracts
                     PlayerState = 0,
                     Waiting = true
                 },
-                Temporary = user.Temporary
+                Temporary = user.Temporary,
+                PriorSessions = new List<SessionHistoryV1>(),
+                FacebookId = user.FacebookId,
             };
+            foreach(var sessionHistory in user.PriorSessions)
+            {
+                userContract.PriorSessions.Add(sessionHistory.ToContract());
+            }
             return userContract;
         }
 
@@ -52,6 +64,26 @@ namespace RadioFutureFinal.Contracts
                 sessionContract.Queue.Add(media.ToContract());
             }
             return sessionContract;
+        }
+
+        public static Session ToModel(this SessionV1 session)
+        {
+            var sessionModel = new Session()
+            {
+                SessionID = session.Id,
+                Name = session.Name,
+                Users = new List<MyUser>(),
+                Queue = new List<Media>(),
+            };
+            foreach (var user in session.Users)
+            { 
+                sessionModel.Users.Add(user.ToModel());
+            }
+            foreach(var media in session.Queue)
+            {
+                sessionModel.Queue.Add(media.ToModel());
+            }
+            return sessionModel;
         }
 
         public static Media ToModel(this MediaV1 media)
@@ -88,6 +120,30 @@ namespace RadioFutureFinal.Contracts
                 Show = media.Show
             };
             return mediaContract;
+        }
+
+        public static SessionHistoryV1 ToContract(this SessionHistory history)
+        {
+            var contractHistory = new SessionHistoryV1()
+            {
+                Name = history.Name,
+                SessionID = history.SessionID,
+                URL = history.URL,
+                SessionHistoryId = history.SessionHistoryID
+            };
+            return contractHistory;
+        }
+
+        public static SessionHistory ToModel(this SessionHistoryV1 history)
+        {
+            var modelHistory = new SessionHistory()
+            {
+                Name = history.Name,
+                SessionID = history.SessionID,
+                URL = history.URL,
+                SessionHistoryID = history.SessionHistoryId
+            };
+            return modelHistory;
         }
 
     }

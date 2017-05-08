@@ -1,4 +1,5 @@
 ﻿using RadioFutureFinal.Models;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace RadioFutureFinal.DAL
@@ -16,5 +17,7 @@ namespace RadioFutureFinal.DAL
         Task<Session> RemoveMediaFromSessionAsync(int sessionId, int mediaId);
         MyUser GetUser(int userId);
         Task DeleteUserAsync(int userId);
+        bool GetUserByFacebookId(int facebookUserId, out MyUser user);
+        MyUser AddNewFbUser(int facebookUserId);
     }
 }
