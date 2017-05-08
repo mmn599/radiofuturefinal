@@ -1,5 +1,4 @@
 ﻿little
--werid search ui shit
 -play/pause to canvas
 -next/back to canvas
 -mobile ui basic
