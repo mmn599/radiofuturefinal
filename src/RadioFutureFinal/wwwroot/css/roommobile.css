@@ -301,21 +301,6 @@ input:focus {
     color: cornflowerblue;
 }
 
-.play_btn {
-    width: 0;
-    height: 0;
-    border-top: 96px solid transparent;
-    border-left: 144px solid white;
-    border-bottom: 96px solid transparent;
-}
-
-.pause_btn {
-    width: 48px;
-    height: 192px;
-    border-right: 48px solid white;
-    border-left: 48px solid white;
-}
-
 .div_inner_podcast_player {
     display: flex;
     width: 100%;
@@ -383,23 +368,13 @@ input:focus {
 }
 
 #btn_next {
-    width: 0;
-    height: 0;
-    border-top: 24px solid transparent;
-    border-left: 36px solid white;
-    border-bottom: 24px solid transparent;
     position: absolute;
     right: 1vw;
 }
 
 #btn_previous {
-    width: 0;
-    height: 0;
     position: absolute;
     left: 1vw;
-    border-top: 24px solid transparent;
-    border-right: 36px solid white;
-    border-bottom: 24px solid transparent;
 }
 
 #btn_previous:hover {

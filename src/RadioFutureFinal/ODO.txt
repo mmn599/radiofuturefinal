@@ -1,10 +1,10 @@
 ﻿little
--play/pause to canvas
--next/back to canvas
+-play/pause/next/back to size
 -mobile ui basic
 -player loading ui
--fix bugs with deleting
 -figure out queueing bug
+-fix bugs with deleting
+-figure out how to properly control html5 audio player
 
 big
 -serious manual testing and debugging

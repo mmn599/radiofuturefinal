@@ -17,7 +17,6 @@ var PodcastPlayer = (function () {
                 }
                 _this.updatePlayerTime(time);
             });
-            _this.setupControls();
             _this.nothingPlaying();
             _this.audio.onended = function () {
                 onPlayerStateChange({ data: 0 });
@@ -38,21 +37,40 @@ var PodcastPlayer = (function () {
             _this.audio.currentTime = 0;
             _this.removeSource();
             _this.audio.load;
-            // $("#btn_play_pause").css('visibility', 'hidden');
+            _this.uiBtnPlay();
             setTimeout(function () {
                 _this.updateProgressUI(0, 0);
             }, 100);
         };
-        this.setupControls = function () {
+        // Maybe move this seperate player ui class
+        this.uiBtnPlay = function () {
             var btnPlayPause = $("#btn_play_pause");
-            btnPlayPause.attr('class', 'play_btn');
+            btnPlayPause.width(0);
+            btnPlayPause.height(0);
+            var parentHeight = btnPlayPause.parent().height();
+            var length = parentHeight * .2;
+            btnPlayPause.css('border', '0');
+            btnPlayPause.css('border-top', length + "px solid transparent");
+            btnPlayPause.css('border-left', 1.5 * length + "px solid white");
+            btnPlayPause.css('border-bottom', length + "px solid transparent");
+            btnPlayPause.css('border-right', '0');
             btnPlayPause.click(function () {
-                if (_this.audio.paused) {
-                    _this.play();
-                }
-                else {
-                    _this.pause();
-                }
+                _this.play();
+            });
+        };
+        this.uiBtnPause = function () {
+            var btnPlayPause = $("#btn_play_pause");
+            var parentHeight = btnPlayPause.parent().height();
+            var length = parentHeight * .2 * .5;
+            btnPlayPause.width(length);
+            btnPlayPause.height(4 * length);
+            btnPlayPause.css('border', '0');
+            btnPlayPause.css('border-right', length + "px solid white");
+            btnPlayPause.css('border-left', length + "px solid white");
+            btnPlayPause.css('border-top', 0);
+            btnPlayPause.css('border-bottom', 0);
+            btnPlayPause.click(function () {
+                _this.pause();
             });
         };
         this.updateProgressUI = function (time, duration) {
@@ -80,16 +98,15 @@ var PodcastPlayer = (function () {
             _this.updateInfoUI(media);
             _this.audio.load();
             _this.audio.currentTime = time;
-            _this.audio.play();
+            _this.play();
             _this.updateProgressUI(0, 0);
-            // $("#btn_play_pause").css('visibility', 'visible');
         };
         this.play = function () {
-            $("#btn_play_pause").removeClass('play_btn').addClass('pause_btn');
+            _this.uiBtnPause();
             _this.audio.play();
         };
         this.pause = function () {
-            $("#btn_play_pause").removeClass('pause_btn').addClass('play_btn');
+            _this.uiBtnPlay();
             _this.audio.pause();
         };
         this.getCurrentTime = function () {

@@ -39,7 +39,7 @@ export class PodcastPlayer implements IPlayer {
             this.updatePlayerTime(time);
         });
 
-        this.setupControls();
+
         this.nothingPlaying();
         this.audio.onended = () => {
             onPlayerStateChange({ data: 0 });
@@ -62,7 +62,7 @@ export class PodcastPlayer implements IPlayer {
         this.audio.currentTime = 0;
         this.removeSource();
         this.audio.load;
-        // $("#btn_play_pause").css('visibility', 'hidden');
+        this.uiBtnPlay();
         setTimeout(() => {
             this.updateProgressUI(0, 0);
         }, 100);
@@ -74,16 +74,36 @@ export class PodcastPlayer implements IPlayer {
         this.updateProgressUI(this.audio.currentTime, this.audio.duration);
     }
 
-    setupControls = () => {
+    // Maybe move this seperate player ui class
+    uiBtnPlay = () => {
         var btnPlayPause = $("#btn_play_pause");
-        btnPlayPause.attr('class', 'play_btn');
+        btnPlayPause.width(0);
+        btnPlayPause.height(0);
+        var parentHeight = btnPlayPause.parent().height();
+        var length = parentHeight * .2;
+        btnPlayPause.css('border', '0');
+        btnPlayPause.css('border-top', `${length}px solid transparent`);
+        btnPlayPause.css('border-left', `${1.5 * length}px solid white`);
+        btnPlayPause.css('border-bottom', `${length}px solid transparent`);
+        btnPlayPause.css('border-right', '0');
         btnPlayPause.click(() => {
-            if (this.audio.paused) {
-                this.play();
-            }
-            else {
-                this.pause();
-            }
+            this.play();
+        });
+    }
+
+    uiBtnPause = () => {
+        var btnPlayPause = $("#btn_play_pause");
+        var parentHeight = btnPlayPause.parent().height();
+        var length = parentHeight * .2 * .5;
+        btnPlayPause.width(length);
+        btnPlayPause.height(4 * length);
+        btnPlayPause.css('border', '0');
+        btnPlayPause.css('border-right', `${length}px solid white`);
+        btnPlayPause.css('border-left', `${length}px solid white`);
+        btnPlayPause.css('border-top', 0);
+        btnPlayPause.css('border-bottom', 0);
+        btnPlayPause.click(() => {
+            this.pause();
         });
     }
 
@@ -137,9 +157,8 @@ export class PodcastPlayer implements IPlayer {
         this.updateInfoUI(media);
         this.audio.load();
         this.audio.currentTime = time;
-        this.audio.play();
+        this.play();
         this.updateProgressUI(0, 0);
-        // $("#btn_play_pause").css('visibility', 'visible');
     }
 
     updateInfoUI(media: Media) {
@@ -148,12 +167,12 @@ export class PodcastPlayer implements IPlayer {
     }
 
     play = () => {
-        $("#btn_play_pause").removeClass('play_btn').addClass('pause_btn');
+        this.uiBtnPause();
         this.audio.play();
     }
 
     pause = () => {
-        $("#btn_play_pause").removeClass('pause_btn').addClass('play_btn');
+        this.uiBtnPlay();
         this.audio.pause();
     }
 

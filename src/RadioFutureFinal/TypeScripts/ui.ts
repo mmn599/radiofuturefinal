@@ -33,6 +33,24 @@ export class UI {
         this.initialize();
     }
 
+    private triangle(element: JQuery, facingRight: boolean) {
+        element.width(0);
+        element.height(0);
+        var parentHeight = element.parent().height();
+        var length = parentHeight * .10;
+        element.css('border', '0');
+        element.css('border-top', `${length}px solid transparent`);
+        element.css('border-bottom', `${length}px solid transparent`);
+        if (facingRight) {
+            element.css('border-left', `${1.5 * length}px solid white`);
+            element.css('border-right', '0');
+        }
+        else {
+            element.css('border-right', `${1.5 * length}px solid white`);
+            element.css('border-left', '0');
+        }
+    }
+
     private initialize() {
         this.setupSpinnerUI();
         this.setupInfoRolloverUI();
@@ -41,6 +59,8 @@ export class UI {
             this.setupSelectorsUI();
             this.select($("#btn_sel_queue"), $("#div_queue_results"));
         }
+        this.triangle($("#btn_next"), true);
+        this.triangle($("#btn_previous"), false);
     }
 
     select = function (btnSel, divToFade) {
@@ -213,6 +233,8 @@ export class UI {
             $(spanDescription).appendTo(innerDiv);
             $(spanDescription).html(media.Description);
             divSearchResult.click(() => {
+                $("#div_search_results").fadeOut();
+                $("#input_search").val("");
                 this.callbacks.uiQueueMedia(media);
             });
         }
