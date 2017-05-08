@@ -244,7 +244,7 @@ export class UI {
             divResults.html("<p id='p_searching'>no results found, or something screwed up</p>");
             divResults.fadeIn();
         }
-        // TODO: this doesnt have to be added every time
+        // TODO: these dont have to be added every time
         if (results.length == 5) {
             var pagingDiv = $(document.createElement('div'));
             pagingDiv.addClass("div_outer_paging");
@@ -268,10 +268,42 @@ export class UI {
             nextDiv.text('next page');
         }
 
+        var notFoundDiv = $(document.createElement('div'));
+        notFoundDiv.addClass("div_not_found");
+        notFoundDiv.appendTo(divResults);
+        notFoundDiv.html("didn't find what you're looking for?")
+        notFoundDiv.click(() => {
+            this.customSearch();
+        });
+
+
         $("#input_search").blur();
         if (!divResults.is(':visible')) {
             divResults.show();
         }
+    }
+
+    customSearch = () => {
+        var divResults = $("#div_search_results");
+        var html = `
+            <div id="div_not_found_search">
+               <input class="notfoundinput" placeholder="Episode name" id="input_episode"></input>
+               <input class="notfoundinput" placeholder="Show name" id="input_show"></input>
+               <input class="notfoundinput" placeholder="MP3 URL" id="input_mp3_url"></input>
+               <button style="cursor: pointer" id="btn_not_found">queue</button>
+            </div>`;
+        divResults.html(""); 
+        divResults.html(html);
+        $("#btn_not_found").click(() => {
+            var episodeName = $("#input_episode").val();
+            var showName = $("#input_show").val();
+            var mp3URL = $("#input_mp3_url").val();
+            var media = new Media();
+            media.MP3Source = mp3URL;
+            media.Title = episodeName;
+            media.Show = showName;
+            this.callbacks.uiQueueMedia(media);
+        });
     }
 
     previousPage = () => {
@@ -342,7 +374,12 @@ export class UI {
             divQueueResult.appendTo(queueResults);
             var imgThumb = document.createElement('img');
             $(imgThumb).addClass('img_result');
-            imgThumb.src = media.ThumbURL;
+            if (media.ThumbURL && media.ThumbURL != "") {
+                imgThumb.src = media.ThumbURL;
+            }
+            else {
+                imgThumb.src = "/images/treble.png";
+            }
             $(imgThumb).appendTo(divQueueResult);
             var innerDiv = document.createElement('div');
             $(innerDiv).addClass('div_inner_results');

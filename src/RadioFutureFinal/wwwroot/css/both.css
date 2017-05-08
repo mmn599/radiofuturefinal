@@ -1,0 +1,33 @@
+﻿.div_not_found {
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+    text-align: center;
+    cursor: pointer;
+    padding: 2%;
+    font-size: 1vh;
+}
+
+.div_not_found:hover {
+    background: grey;
+}
+
+.notfoundinput {
+    display: inline-block;
+    width: 100%;
+    border: 0;
+    border-bottom: 1px solid #CCCCCC;
+    font-size: 3vh;
+    font-family: "Source Code Pro";
+    margin-top: 2%;
+}
+
+#btn_not_found {
+    margin-top: 2%;
+}
+
+#div_not_found_search {
+    padding: 2%;
+    text-align: center;
+}
+
