@@ -453,3 +453,26 @@ li:focus {
 #btn_search {
     cursor: pointer;
 }
+
+.user_result_outer {
+    text-align: left;
+    display: flex;
+    align-items: center;
+}
+
+.user_result_block {
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    float: left; 
+    cursor: pointer; 
+    margin-right: 16px; 
+    height: 48px; 
+    width: 48px; 
+}
+
+.user_result_span {
+    font-size: 16px; 
+    margin-right: 16px; 
+    float: right;
+}

@@ -391,19 +391,13 @@ export class UI {
             let thisIsMe = (user.Id === userIdMe);
             let color = this.colors[i % this.colors.length];
             let currentHTML = "";
-            if (!this.mobileBrowser) {
-                var syncHTML = thisIsMe ? 'you' : 'sync';
-                var syncHTMLMobile = thisIsMe ? 'you' : 'sync with ' + user.Name;
-                currentHTML =
-                    `<div class="user_result_outer" style="text-align: left; display: flex; align-items: center;"> 
-                        <div style="display: flex; align-items: center; justify-content: center; float: left; cursor: pointer; margin-right: 16px; height: 48px; width: 48px; background:${color};">${syncHTML}</div> 
-                        <span style="margin-right: 16px; float: right;"> ${user.Name} </span> 
-                    </div>`;
-            }
-            else {
-                var theText = thisIsMe ? "you" : "sync with " + user.Name;
-                currentHTML = `<p class="user_result_outer" onclick="requestSyncWithUser(${user.Id})" style="padding: 2vw; margin: 0; text-align: center; font-size: 9vw; background: ${color} color: white;">${theText}</p>`;
-            }
+            var syncHTML = thisIsMe ? 'you' : 'sync';
+            var syncHTMLMobile = thisIsMe ? 'you' : 'sync with ' + user.Name;
+            currentHTML =
+                `<div class="user_result_outer"> 
+                    <div class="user_result_block" style="background:${color};">${syncHTML}</div> 
+                    <span class="user_result_span"> ${user.Name} </span> 
+                </div>`;
 
             var cur = $($.parseHTML(currentHTML));
             var outer = cur.filter('.user_result_outer');

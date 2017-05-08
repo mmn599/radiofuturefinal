@@ -4,7 +4,6 @@
     width: 100%;
     margin: 0;
     background: #f1f1f1;
-    overflow: hidden;
 }
 
 input:focus {
@@ -80,7 +79,7 @@ input:focus {
 #div_search_results {
     width: 100%;
     z-index: 1;
-    max-height: 90%;
+    max-height: 100%;
     overflow-y: auto;
 }
 
@@ -93,7 +92,7 @@ input:focus {
     top: 40%;
     z-index: 1;
     width: 100%;
-    max-height: 90%;
+    max-height: 100%;
     overflow-y: auto;
     padding-top: 2vh;
     background: #f1f1f1;
@@ -101,9 +100,8 @@ input:focus {
 
 #div_queue_results {
     width: 100vw;
-    top: 40%;
     z-index: 1;
-    max-height: 90%;
+    max-height: 100%;
     overflow-y: auto;
 }
 
@@ -213,14 +211,6 @@ input:focus {
     align-items: center;
 }
 
-.img_drop_right {
-    margin-right: 8px;
-}
-
-.img_drop_left {
-    margin-left: 8px;
-}
-
 #div_player_controls {
     width: 33.33%;
     justify-content: center;
@@ -246,11 +236,8 @@ input:focus {
 }
 
 .btn_controls {
-    cursor: pointer;
     margin-left: 2.5%;
     margin-right: 2.5%;
-    width: 20px;
-    height: 20px;
 }
 
 #div_chat_overall {
@@ -275,22 +262,6 @@ input:focus {
     max-height: 85%;
 }
 
-.arrow-up {
-    width: 0;
-    height: 0;
-    border-left: 40px solid transparent;
-    border-right: 40px solid transparent;
-    border-bottom: 40px solid #ff4f39;
-}
-
-.arrow-down {
-    width: 0;
-    height: 0;
-    border-left: 40px solid transparent;
-    border-right: 40px solid transparent;
-    border-top: 40px solid #ff4f39;
-}
-
 #div_error {
     display: none;
 }
@@ -306,6 +277,7 @@ input:focus {
     width: 100%;
     background-color: #ff4f39;
     padding: 2vw;
+    align-items: center;
 }
 
 #cc_title {
@@ -377,10 +349,6 @@ input:focus {
     left: 1vw;
 }
 
-#btn_previous:hover {
-    border-right: 20px solid blue;
-}
-
 .span_delete {
     color: red;
     padding: 1%;
@@ -408,7 +376,7 @@ li:focus {
 }
 
 .queue_result_selected {
-    border-right: 40px solid #ffa79c;
+    border-right: 3vw solid #ffa79c;
 }
 
 .span_sel {
@@ -441,15 +409,39 @@ li:focus {
 }
 
 .sel_selected {
-    border-bottom: 10px solid #ffa79c;
+    border-bottom: 2vw solid #ffa79c;
 }
 
 #input_name {
-    border-bottom: 2px solid grey;
+    border-bottom: 1px solid grey;
     margin-bottom: 3vh;
 }
 
 #div_search_in {
     display: flex;
     align-items: center;
+}
+
+.user_result_outer {
+    text-align: left; 
+    display: flex; 
+    align-items: center;
+}
+
+.user_result_block {
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    float: left; 
+    cursor: pointer; 
+    margin-right: 3vw;
+    height: 14vh; 
+    width: 14vh; 
+    font-size: 7vw;
+}
+
+.user_result_span {
+    font-size: 10vw; 
+    margin-right: 1vw; 
+    float: right;
 }
