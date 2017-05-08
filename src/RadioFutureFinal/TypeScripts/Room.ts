@@ -183,6 +183,9 @@ class RoomManager implements UICallbacks, ClientActions {
         else if (this.user.State.QueuePosition < 0) {
             this.player.nothingPlaying();
         }
+        else if (this.user.State.QueuePosition >= this.session.Queue.length) {
+            this.user.State.QueuePosition = this.session.Queue.length;
+        }
     }
 
     onPlayerStateChange = (event) => {

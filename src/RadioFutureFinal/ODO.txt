@@ -1,7 +1,5 @@
 ﻿little
--figure out queueing bug
 -fix bugs with deleting
--figure out how to properly control html5 audio player
 
 big
 -serious manual testing and debugging
