@@ -11,11 +11,13 @@ namespace RadioFutureFinal.Models
         public int MyUserId { get; set; }
         public string Name { get; set; }
         public List<Media> Recs { get; set; }
+        public bool Temporary { get; set; }
 
         public MyUser(string userName)
         {
             Name = userName;
             Recs = new List<Media>();
+            Temporary = true;
         }
 
         public MyUser()

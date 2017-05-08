@@ -13,6 +13,8 @@ namespace RadioFutureFinal.DAL
         Task<Session> CreateSessionAsync(string sessionName);
         Session GetSession(int sessionId);
         bool GetSessionByName(string sessionName, out Session session);
-        Task<Session> RemoveMediaAsync(int sessionId, int mediaId);
+        Task<Session> RemoveMediaFromSessionAsync(int sessionId, int mediaId);
+        MyUser GetUser(int userId);
+        Task DeleteUserAsync(int userId);
     }
 }

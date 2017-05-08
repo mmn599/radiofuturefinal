@@ -101,10 +101,6 @@ namespace RadioFutureFinal.Messaging
         {
             ConcurrentBag<MySocket> socketsInSession;
             var found = _activeSessions.TryRemove(sessionId, out socketsInSession);
-            if(socketsInSession.Count != 0)
-            {
-                // TODO: throw exception
-            }
         }
 
         private ConcurrentBag<MySocket> RemoveSocketFromDataStructures(MySocket socketToRemove)
@@ -147,16 +143,23 @@ namespace RadioFutureFinal.Messaging
 
             var remainingSocketsInSession = RemoveSocketFromDataStructures(mySocket);
 
-            if(remainingSocketsInSession.Count == 0)
+            var updatedSession = await _db.RemoveUserFromSessionAsync(sessionId, userId);
+
+            // TODO: inneficient, everything with this db access layer is inneficient
+            var user = _db.GetUser(userId);
+            if(user.Temporary)
             {
-                DeactiveSession(sessionId);
+                await _db.DeleteUserAsync(userId);
             }
 
-            var updatedSession = await _db.RemoveUserFromSessionAsync(sessionId, userId);
             var sessionV1 = updatedSession.ToContract();
             if (remainingSocketsInSession.Count > 0)
             {
                 await _wsSender.clientUpdateUsersList(sessionV1.Users, remainingSocketsInSession);
+            }
+            else
+            {
+                DeactiveSession(sessionId);
             }
         }
 

@@ -18,5 +18,8 @@ namespace RadioFutureFinal.Contracts
 
         [JsonProperty] 
         public UserStateV1 State { get; set; }
+
+        [JsonProperty] 
+        public bool Temporary { get; set; }
     }
 }

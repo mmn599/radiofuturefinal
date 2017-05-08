@@ -26,7 +26,7 @@ namespace RadioFutureFinal.DAL
             return new ApplicationDbContext(optionsBuilder.Options); 
         }
 
-        private Session GetSessionInternal(ApplicationDbContext sourceContext, int sessionId)
+        private Session _getSessionInternal(ApplicationDbContext sourceContext, int sessionId)
         {
             return sourceContext.Session.Where(s => s.SessionID == sessionId)
                                 .Include(s => s.Queue)
@@ -34,9 +34,17 @@ namespace RadioFutureFinal.DAL
                                 .FirstOrDefault();
         }
 
-        private MyUser GetUserInternal(int userId, ApplicationDbContext sourceContext)
+        private MyUser _getUserInternal(int userId, ApplicationDbContext sourceContext)
         {
             return sourceContext.MyUser.FirstOrDefault(t => t.MyUserId == userId);
+        }
+
+        public MyUser GetUser(int userId)
+        {
+            using (var context = ContextFactory())
+            {
+                return _getUserInternal(userId, context);
+            }
         }
 
         // Assumes fully populated session
@@ -62,7 +70,7 @@ namespace RadioFutureFinal.DAL
         {
             using (var context = ContextFactory())
             {
-                var session = GetSessionInternal(context, sessionId);
+                var session = _getSessionInternal(context, sessionId);
                 session.Queue.Add(media);
                 await UpdateSessionAsyncInternal(session, context);
                 return session;
@@ -73,7 +81,7 @@ namespace RadioFutureFinal.DAL
         {
             using (var context = ContextFactory())
             {
-                var session = GetSessionInternal(context, sessionId);
+                var session = _getSessionInternal(context, sessionId);
                 var user = session.Users.FirstOrDefault(m => m.MyUserId == userId);
                 session.Users.Remove(user);
                 context.Session.Update(session);
@@ -86,7 +94,7 @@ namespace RadioFutureFinal.DAL
         {
             using (var context = ContextFactory())
             {
-                var user = GetUserInternal(userId, context);
+                var user = _getUserInternal(userId, context);
                 user.Name = newName;
                 await context.SaveChangesAsync();
             }
@@ -121,7 +129,7 @@ namespace RadioFutureFinal.DAL
         {
             using (var context = ContextFactory())
             {
-                return GetSessionInternal(context, sessionId);
+                return _getSessionInternal(context, sessionId);
             }
         }
 
@@ -137,17 +145,29 @@ namespace RadioFutureFinal.DAL
             }
         }
 
-        //TODO: Don't know how to do removing stuff properly
-        public async Task<Session> RemoveMediaAsync(int sessionId, int mediaId)
+        //TODO: Don't know how to remove stuff properly
+        public async Task<Session> RemoveMediaFromSessionAsync(int sessionId, int mediaId)
         {
             using (var context = ContextFactory())
             {
-                var session = GetSessionInternal(context, sessionId);
+                var session = _getSessionInternal(context, sessionId);
                 var media = session.Queue.FirstOrDefault(m => m.MediaID == mediaId);
                 session.Queue.Remove(media);
                 context.Session.Update(session);
                 await context.SaveChangesAsync();
                 return session;
+            }
+        }
+
+        //TODO: Don't know how to remove stuff properly
+        public async Task DeleteUserAsync(int userId)
+        {
+            using (var context = ContextFactory())
+            {
+                var user = new MyUser() { MyUserId = userId };
+                context.MyUser.Attach(user);
+                context.MyUser.Remove(user);
+                await context.SaveChangesAsync();
             }
         }
 

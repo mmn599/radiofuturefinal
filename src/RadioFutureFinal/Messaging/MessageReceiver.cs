@@ -89,7 +89,7 @@ namespace RadioFutureFinal.Messaging
         public async Task DeleteMediaFromSession(MySocket socket, int mediaId)
         {
             var sessionId = socket.SessionId;
-            var updatedSession = await _db.RemoveMediaAsync(sessionId, mediaId);
+            var updatedSession = await _db.RemoveMediaFromSessionAsync(sessionId, mediaId);
             await _sender.clientUpdateQueue(updatedSession.ToContract().Queue, _myContext.GetSocketsInSession(sessionId));
         }
 

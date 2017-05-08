@@ -11,6 +11,7 @@ namespace RadioFutureFinal.Contracts
             {
                 MyUserId = user.Id,
                 Name = user.Name,
+                Temporary = user.Temporary
             };
             return userModel;
         }
@@ -27,7 +28,8 @@ namespace RadioFutureFinal.Contracts
                     QueuePosition = -1,
                     PlayerState = 0,
                     Waiting = true
-                }
+                },
+                Temporary = user.Temporary
             };
             return userContract;
         }
