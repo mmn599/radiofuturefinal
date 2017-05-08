@@ -6,6 +6,7 @@ var tsify = require("tsify");
 
 gulp.task('watch', function () {
     gulp.watch('./TypeScripts/*.ts', ['default']);
+    gulp.watch('./TypeScripts/Homepage/*.ts', ['default']);
 });
 
 gulp.task("default", function () {

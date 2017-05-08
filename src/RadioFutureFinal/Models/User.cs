@@ -14,16 +14,19 @@ namespace RadioFutureFinal.Models
         {
             Name = userName;
             Temporary = true;
+            PriorSessions = new List<SessionHistory>();
         }
 
         public MyUser(int facebookId)
         {
             FacebookId = facebookId;
+            Temporary = false;
+            PriorSessions = new List<SessionHistory>();
         }
 
         public MyUser()
         {
-
+            PriorSessions = new List<SessionHistory>();
         }
     }
 }

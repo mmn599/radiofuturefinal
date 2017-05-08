@@ -18,6 +18,11 @@ namespace RadioFutureFinal.Controllers
             _db = db;
         }
 
+        public string Index()
+        {
+            return "yeet";
+        }
+
         public MyUserV1 Get(int facebookId)
         {
             MyUser user;
