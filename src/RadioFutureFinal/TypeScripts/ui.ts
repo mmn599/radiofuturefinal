@@ -283,6 +283,11 @@ export class UI {
         }
     }
 
+    private errorPlaceholder(el: JQuery, error: string) {
+        el.val("");
+        el.attr("placeholder", error);
+    }
+
     customSearch = () => {
         var divResults = $("#div_search_results");
         var html = `
@@ -295,14 +300,38 @@ export class UI {
         divResults.html(""); 
         divResults.html(html);
         $("#btn_not_found").click(() => {
-            var episodeName = $("#input_episode").val();
-            var showName = $("#input_show").val();
-            var mp3URL = $("#input_mp3_url").val();
-            var media = new Media();
-            media.MP3Source = mp3URL;
-            media.Title = episodeName;
-            media.Show = showName;
-            this.callbacks.uiQueueMedia(media);
+            var episode = $("#input_episode");
+            var show = $("#input_show");
+            var mp3url = $("#input_mp3_url");
+            var valid = true;
+            if (!episode.val() || episode.val() == "") {
+                valid = false;
+                this.errorPlaceholder(episode, "Enter an episode name");
+            }
+            if (episode.val().length > 400) {
+                valid = false;
+                this.errorPlaceholder(episode, "Enter a shorter episode name");
+            }
+            if (!show.val() || show.val() == "") {
+                valid = false;
+                this.errorPlaceholder(show, "Enter a show name");
+            }
+            if (show.val().length > 400) {
+                valid = false;
+                this.errorPlaceholder(show, "Enter a shorter show name");
+            }
+            if (!this.validURL(mp3url.val())) {
+                valid = false;
+                this.errorPlaceholder(mp3url, "Enter a valid url");
+            }
+            if (valid) {
+                var media = new Media();
+                media.MP3Source = mp3url.val();
+                media.Title = episode.val();
+                media.Show = show.val();
+                this.callbacks.uiQueueMedia(media);
+                divResults.fadeOut();
+            }
         });
     }
 
@@ -378,7 +407,7 @@ export class UI {
                 imgThumb.src = media.ThumbURL;
             }
             else {
-                imgThumb.src = "/images/treble.png";
+                $(imgThumb).css('background', this.colors[i]);
             }
             $(imgThumb).appendTo(divQueueResult);
             var innerDiv = document.createElement('div');
@@ -411,7 +440,21 @@ export class UI {
                 $(divQueueResult).addClass('queue_result_selected');
             }
         }
-   }
+    }
+
+    validURL = (str): boolean => {
+        if (!str || str.length < 3) {
+            return false;
+        } 
+        if (str.substring(0, 4) !== "http") {
+            return false;
+        }
+        var last = str.substring(str.length - 3, str.length);
+        if (last.toUpperCase().includes("MP3")) {
+            return false;
+        }
+        return true;
+    }
 
 
     public updateUsersList(users, userIdMe: number) {

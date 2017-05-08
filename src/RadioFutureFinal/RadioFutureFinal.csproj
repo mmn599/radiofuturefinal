@@ -12,6 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="wwwroot\css\both.css" />
     <Content Include="wwwroot\css\homepagemobile.css" />
     <Content Include="wwwroot\css\homepagemobile.min.css" />
     <Content Include="wwwroot\css\room.css" />
