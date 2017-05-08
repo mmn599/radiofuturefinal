@@ -98,7 +98,12 @@ var PodcastPlayer = (function () {
             _this.updateInfoUI(media);
             _this.audio.load();
             _this.audio.currentTime = time;
-            _this.play();
+            if (_this.mobileBrowser) {
+                _this.pause();
+            }
+            else {
+                _this.play();
+            }
             _this.updateProgressUI(0, 0);
         };
         this.play = function () {

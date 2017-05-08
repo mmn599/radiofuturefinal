@@ -1,5 +1,4 @@
 ﻿little
--mobile ui basic
 -player loading ui
 -figure out queueing bug
 -fix bugs with deleting
