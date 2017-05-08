@@ -95,9 +95,13 @@ var PodcastPlayer = (function () {
             newmp3.attr('type', 'audio/mp3');
             newmp3.appendTo(_this.audio);
             newmp3.attr('src', media.MP3Source);
-            _this.updateInfoUI(media);
             _this.audio.load();
             _this.audio.currentTime = time;
+            $("#cc_title").text('loading...');
+            _this.audio.oncanplay = function () {
+                $("#cc_show").text(media.Show);
+                $("#cc_title").text(media.Title);
+            };
             if (_this.mobileBrowser) {
                 _this.pause();
             }
@@ -162,10 +166,6 @@ var PodcastPlayer = (function () {
     PodcastPlayer.prototype.removeSource = function () {
         var mp3 = $("#mp3Source");
         mp3.remove();
-    };
-    PodcastPlayer.prototype.updateInfoUI = function (media) {
-        $("#cc_show").text(media.Show);
-        $("#cc_title").text(media.Title);
     };
     return PodcastPlayer;
 }());

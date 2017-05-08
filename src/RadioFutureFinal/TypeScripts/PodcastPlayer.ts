@@ -39,7 +39,6 @@ export class PodcastPlayer implements IPlayer {
             this.updatePlayerTime(time);
         });
 
-
         this.nothingPlaying();
         this.audio.onended = () => {
             onPlayerStateChange({ data: 0 });
@@ -154,9 +153,13 @@ export class PodcastPlayer implements IPlayer {
         newmp3.attr('type', 'audio/mp3');
         newmp3.appendTo(this.audio);
         newmp3.attr('src', media.MP3Source);
-        this.updateInfoUI(media);
         this.audio.load();
         this.audio.currentTime = time;
+        $("#cc_title").text('loading...');
+        this.audio.oncanplay = () => {
+            $("#cc_show").text(media.Show);
+            $("#cc_title").text(media.Title);
+        }
         if (this.mobileBrowser) {
             this.pause();
         }
@@ -164,11 +167,6 @@ export class PodcastPlayer implements IPlayer {
             this.play();
         }
         this.updateProgressUI(0, 0);
-    }
-
-    updateInfoUI(media: Media) {
-        $("#cc_show").text(media.Show);
-        $("#cc_title").text(media.Title);
     }
 
     play = () => {
