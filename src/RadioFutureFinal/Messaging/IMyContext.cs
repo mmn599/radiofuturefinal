@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RadioFutureFinal.Models;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,7 @@ namespace RadioFutureFinal.Messaging
         IEnumerable<MySocket> GetSocketsInSession(int sessionId);
         void SocketConnected(WebSocket socket);
         Task SocketDisconnected(WebSocket socket);
-        void SocketJoinSession(MySocket socket, int sessionId, int userId);
+        Task<SessionJoinResult> TempUserJoinSession(MySocket socket, string sessionName);
+        Task<SessionJoinResult> SwitchUserInSession(MySocket socket, int oldUserId, Guid fbUserId);
     }
 }

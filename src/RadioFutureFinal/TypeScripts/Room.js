@@ -3,9 +3,30 @@ var Contracts_1 = require("./Contracts");
 var UI_1 = require("./UI");
 var Sockets_1 = require("./Sockets");
 var PodcastPlayer_1 = require("./PodcastPlayer");
+var FBLogin_1 = require("./FBLogin");
 var RoomManager = (function () {
     function RoomManager(roomType, mobileBrowser) {
         var _this = this;
+        this.fbStatusChanged = function (response) {
+            if (response.status === "connected") {
+                var fbUserId = response.authResponse.userID;
+                _this.socket.FbLogin(_this.user.Id, fbUserId);
+            }
+        };
+        //==================================================================
+        // WebSocket message response functions
+        //==================================================================
+        this.clientProvideUserState = function (msg) {
+            _this.user.State.QueuePosition = msg.userState.QueuePosition;
+            _this.user.State.Time = msg.userState.Time;
+            _this.user.State.PlayerState = msg.userState.PlayerState;
+            _this.ui.updateQueue(_this.session.Queue, _this.user.Id, _this.user.State.QueuePosition);
+            _this.onUserStateChange();
+        };
+        this.clientUserLoggedIn = function (newUserId, newUserName) {
+            _this.user.Id = newUserId;
+            _this.user.Name = newUserName;
+        };
         this.uiNextMedia = function () {
             var queue = _this.session.Queue;
             if (_this.user.State.QueuePosition + 1 < queue.length) {
@@ -71,30 +92,14 @@ var RoomManager = (function () {
         this.user = new Contracts_1.MyUser();
         this.session = new Contracts_1.Session();
         this.ui = new UI_1.UI(this.mobileBrowser, this);
-        //if (this.roomType == "podcasts") {
         this.player = new PodcastPlayer_1.PodcastPlayer(this.ui, this.mobileBrowser, this.uiNextMedia, this.uiPreviousMedia);
-        //}
-        //else {
-        //    this.player = new YtPlayer(this.ui, this.mobileBrowser);
-        //}
         this.socket = new Sockets_1.MySocket(this);
         this.setupJamSession(encodedSessionName);
         this.player.initPlayer(this.onPlayerStateChange);
     };
     RoomManager.prototype.setupJamSession = function (encodedSessionName) {
         this.session.Name = decodeURI(encodedSessionName);
-        this.user.Name = 'Anonymous';
         this.socket.JoinSession(this.session.Name);
-    };
-    //==================================================================
-    // WebSocket message response functions
-    //==================================================================
-    RoomManager.prototype.clientProvideUserState = function (msg) {
-        this.user.State.QueuePosition = msg.userState.QueuePosition;
-        this.user.State.Time = msg.userState.Time;
-        this.user.State.PlayerState = msg.userState.PlayerState;
-        this.ui.updateQueue(this.session.Queue, this.user.Id, this.user.State.QueuePosition);
-        this.onUserStateChange();
     };
     RoomManager.prototype.clientRequestUserState = function (msg) {
         var myUserState = new Contracts_1.UserState();
@@ -104,6 +109,9 @@ var RoomManager = (function () {
         this.socket.ProvideSyncToUser(myUserState, msg.userIdRequestor);
     };
     RoomManager.prototype.clientSessionReady = function (msg) {
+        // TODO: this should get out of here!
+        // TODO: the login flow needs to change
+        var fbLogin = new FBLogin_1.FBLogin(this.fbStatusChanged);
         this.session = msg.session;
         this.user = msg.user;
         this.uiNextMedia();

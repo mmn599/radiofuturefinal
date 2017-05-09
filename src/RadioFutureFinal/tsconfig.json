@@ -21,7 +21,8 @@
     "./TypeScripts/IPlayer.ts",
     "./TypeScripts/PodcastPlayer.ts",
     "./TypeScripts/YtPlayer.ts",
-    "./TypeScripts/Homepage/Homepage.ts"
+    "./TypeScripts/Homepage/Homepage.ts",
+    "./TypeScripts/FBLogin.ts"
   ],
   "compileOnSave": true
 }

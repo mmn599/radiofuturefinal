@@ -3,7 +3,7 @@ import { UICallbacks, UI } from "./UI";
 import { MySocket, ClientActions } from "./Sockets";
 import { IPlayer } from "./IPlayer";
 import { PodcastPlayer } from "./PodcastPlayer";
-import { YtPlayer } from "./YtPlayer";
+import { FBLogin } from "./FBLogin";
 
 class RoomManager implements UICallbacks, ClientActions {
 
@@ -24,12 +24,7 @@ class RoomManager implements UICallbacks, ClientActions {
         this.user = new MyUser();
         this.session = new Session();
         this.ui = new UI(this.mobileBrowser, this);
-        //if (this.roomType == "podcasts") {
         this.player = new PodcastPlayer(this.ui, this.mobileBrowser, this.uiNextMedia, this.uiPreviousMedia);
-        //}
-        //else {
-        //    this.player = new YtPlayer(this.ui, this.mobileBrowser);
-        //}
         this.socket = new MySocket(this);
         this.setupJamSession(encodedSessionName);
         this.player.initPlayer(this.onPlayerStateChange);
@@ -37,20 +32,31 @@ class RoomManager implements UICallbacks, ClientActions {
 
     setupJamSession(encodedSessionName: string) {
         this.session.Name = decodeURI(encodedSessionName);
-        this.user.Name = 'Anonymous';
         this.socket.JoinSession(this.session.Name);
+    }
+
+    fbStatusChanged = (response) => {
+        if (response.status === "connected") {
+            var fbUserId = response.authResponse.userID;
+            this.socket.FbLogin(this.user.Id, fbUserId);
+        }
     }
 
     //==================================================================
     // WebSocket message response functions
     //==================================================================
 
-    clientProvideUserState(msg) {
+    clientProvideUserState = (msg) => {
         this.user.State.QueuePosition = msg.userState.QueuePosition;
         this.user.State.Time = msg.userState.Time;
         this.user.State.PlayerState = msg.userState.PlayerState;
         this.ui.updateQueue(this.session.Queue, this.user.Id, this.user.State.QueuePosition);
         this.onUserStateChange();
+    }
+
+    clientUserLoggedIn = (newUserId: number, newUserName: string) => {
+        this.user.Id = newUserId;
+        this.user.Name = newUserName;
     }
 
     clientRequestUserState(msg) {
@@ -62,6 +68,9 @@ class RoomManager implements UICallbacks, ClientActions {
     }
 
     clientSessionReady(msg) {
+        // TODO: this should get out of here!
+        // TODO: the login flow needs to change
+        let fbLogin = new FBLogin(this.fbStatusChanged);
         this.session = msg.session;
         this.user = msg.user;
         this.uiNextMedia();

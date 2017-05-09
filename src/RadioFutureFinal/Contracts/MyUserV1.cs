@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 
 namespace RadioFutureFinal.Contracts
@@ -27,6 +28,6 @@ namespace RadioFutureFinal.Contracts
         public List<SessionHistoryV1> PriorSessions { get; set; }
 
         [JsonProperty]
-        public int FacebookId { get; set; }
+        public Guid? FacebookId { get; set; }
     }
 }

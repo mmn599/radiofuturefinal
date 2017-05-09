@@ -98,6 +98,14 @@ var MySocket = (function () {
         };
         this.emit(data);
     };
+    MySocket.prototype.FbLogin = function (oldUserId, fbUserId) {
+        var data = {
+            action: "FbLogin",
+            oldUserId: oldUserId,
+            fbUserId: fbUserId
+        };
+        this.emit(data);
+    };
     return MySocket;
 }());
 exports.MySocket = MySocket;

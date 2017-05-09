@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using RadioFutureFinal.Contracts;
+using System;
 using System.Collections.Generic;
 using static RadioFutureFinal.Messaging.MessageReceiver;
 
@@ -73,6 +74,14 @@ namespace RadioFutureFinal.Messaging
                 await actions.Search(socket, query, page);
             };
             _responseFunctions.Add("Search", resFunc);
+
+            resFunc = async delegate (MySocket socket, JObject json)
+            {
+                var oldUserId = json.GetValue("oldUserId").ToObject<int>();
+                var fbUserId = json.GetValue("fbUserId").ToObject<Guid>();
+                await actions.FbLogin(socket, oldUserId, fbUserId);
+            };
+            _responseFunctions.Add("FbLogin", resFunc);
 
             return _responseFunctions;
         }

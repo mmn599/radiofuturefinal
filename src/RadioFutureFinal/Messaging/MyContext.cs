@@ -3,6 +3,7 @@ using RadioFutureFinal.Contracts;
 using RadioFutureFinal.DAL;
 using RadioFutureFinal.Errors;
 using RadioFutureFinal.Messaging;
+using RadioFutureFinal.Models;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -13,6 +14,9 @@ using System.Threading.Tasks;
 
 namespace RadioFutureFinal.Messaging
 {
+    // This class is messy and inefficient. Needs some cleanup.
+    // Goal: get rid of _wsSender variable here, and _db variable in receiver
+
     public class MyContext : IMyContext
     {
         IDbRepository _db;
@@ -73,7 +77,7 @@ namespace RadioFutureFinal.Messaging
             _activeSockets.TryAdd(socket, mySocket);
         }
 
-        public void SocketJoinSession(MySocket socket, int sessionId, int userId)
+        public void _socketJoinSession(MySocket socket, int sessionId, int userId)
         {
             ConcurrentBag<MySocket> sessionSockets;
             var sessionFound = _activeSessions.TryGetValue(sessionId, out sessionSockets);
@@ -97,13 +101,13 @@ namespace RadioFutureFinal.Messaging
             socket.AddSessionInfoToSocket(sessionId, userId);
         }
 
-        private void DeactiveSession(int sessionId)
+        private void _deactiveSession(int sessionId)
         {
             ConcurrentBag<MySocket> socketsInSession;
             var found = _activeSessions.TryRemove(sessionId, out socketsInSession);
         }
 
-        private ConcurrentBag<MySocket> RemoveSocketFromDataStructures(MySocket socketToRemove)
+        private ConcurrentBag<MySocket> _removeSocket(MySocket socketToRemove)
         {
             var remainingSockets = new List<MySocket>(); 
 
@@ -134,6 +138,17 @@ namespace RadioFutureFinal.Messaging
             return updatedSocketsInSession;
         }
 
+        private async Task<Session> _removeUserFromSession(int sessionId, int userId)
+        {
+            var updatedSession = await _db.RemoveUserFromSessionAsync(sessionId, userId);
+            var user = _db.GetUser(userId);
+            if(user.Temporary)
+            {
+                await _db.DeleteUserAsync(userId);
+            }
+            return updatedSession;
+        }
+
         public async Task SocketDisconnected(WebSocket socket)
         {
             var mySocket = GetMySocket(socket);
@@ -141,31 +156,75 @@ namespace RadioFutureFinal.Messaging
             var sessionId = mySocket.SessionId;
             var userId = mySocket.UserId;
 
-            var remainingSocketsInSession = RemoveSocketFromDataStructures(mySocket);
-
-            var updatedSession = await _db.RemoveUserFromSessionAsync(sessionId, userId);
-
-            // TODO: inneficient, everything with this db access layer is inneficient
-            var user = _db.GetUser(userId);
-            if(user.Temporary)
-            {
-                await _db.DeleteUserAsync(userId);
-            }
+            var remainingSocketsInSession = _removeSocket(mySocket);
+            var updatedSession = await _removeUserFromSession(sessionId, userId);
 
             var sessionV1 = updatedSession.ToContract();
+
             if (remainingSocketsInSession.Count > 0)
             {
                 await _wsSender.clientUpdateUsersList(sessionV1.Users, remainingSocketsInSession);
             }
             else
             {
-                DeactiveSession(sessionId);
+                _deactiveSession(sessionId);
             }
         }
 
-        private string CreateConnectionId()
+        private async Task<Session> _getSessionByName(string sessionName)
         {
-            return Guid.NewGuid().ToString();
+            Session session = null;
+            bool sessionFound = _db.GetSessionByName(sessionName, out session);
+            if(!sessionFound)
+            {
+                session = await _db.CreateSessionAsync(sessionName);
+            }
+            return session;
+        }
+
+        public async Task<SessionJoinResult> TempUserJoinSession(MySocket socket, string sessionName)
+        {
+            var user = await _db.AddNewTempUser();
+            var session = await _getSessionByName(sessionName);
+            await _db.AddUserToSessionAsync(user.MyUserId, session);
+
+            _socketJoinSession(socket, session.SessionID, user.MyUserId);
+
+            var result = new SessionJoinResult()
+            {
+                Session = session,
+                User = user
+            };
+            return result;
+        }
+
+        public async Task<SessionJoinResult> SwitchUserInSession(MySocket socket, int oldUserId, Guid fbUserId)
+        {
+            MyUser user;
+            var found = _db.GetUserByFacebookId(fbUserId, out user);
+            if(!found)
+            {
+                user = _db.AddNewFbUser(fbUserId);
+            }
+
+            var updatedSession = await _removeUserFromSession(socket.SessionId, oldUserId);
+            var socketsInSession = GetSocketsInSession(socket.SessionId);
+            updatedSession = await _db.AddUserToSessionAsync(user.MyUserId, updatedSession);
+
+            socket.UserId = user.MyUserId;
+            var result = new SessionJoinResult()
+            {
+                Session = updatedSession,
+                User = user
+            };
+            return result;
         }
     }
+
+    public class SessionJoinResult
+    {
+        public Session Session { get; set; }
+        public MyUser User { get; set; }
+    }
+
 }

@@ -61,22 +61,12 @@ namespace RadioFutureFinal.Messaging
 
         public async Task JoinSession(MySocket socket, string sessionName)
         {
-            Session session = null;
-            bool sessionFound = _db.GetSessionByName(sessionName, out session);
-            if(!sessionFound)
-            {
-                session = await _db.CreateSessionAsync(sessionName);
-            }
-            var userName = "Anonymous";
-            var user = await _db.AddNewUserToSessionAsync(userName, session);
-
-            var sessionId = session.SessionID;
-
-            _myContext.SocketJoinSession(socket, sessionId, user.MyUserId);
-
+            var joinResult = await _myContext.TempUserJoinSession(socket, sessionName);
+            var session = joinResult.Session;
             var sessionV1 = session.ToContract();
-            await _sender.clientSessionReady(sessionV1, user.ToContract(), socket);
-            await _sender.clientUpdateUsersList(sessionV1.Users, _myContext.GetSocketsInSession(sessionId));
+            await _sender.clientSessionReady(sessionV1, joinResult.User.ToContract(), socket);
+            await _sender.clientUpdateUsersList(sessionV1.Users, 
+                _myContext.GetSocketsInSession(session.SessionID));
         }
 
         public async Task AddMediaToSession(MySocket socket, MediaV1 media)
@@ -126,14 +116,13 @@ namespace RadioFutureFinal.Messaging
             await _sender.clientSearchResults(searchResults, socket);
         }
 
-        private static MethodInfo GetMethodInfo<MessageReceiver>(Expression<Action<MessageReceiver>> expression)
+        public async Task FbLogin(MySocket socket, int oldUserId, Guid fbUserId)
         {
-            var member = expression.Body as MethodCallExpression;
-
-            if (member != null)
-                return member.Method;
-
-            throw new ArgumentException("Expression is not a method", "expression");
+            var result = await _myContext.SwitchUserInSession(socket, oldUserId, fbUserId);
+            var user = result.User;
+            await _sender.clientUserLoggedIn(user.MyUserId, user.Name, socket);
+            await _sender.clientUpdateUsersList(result.Session.ToContract().Users,
+                        _myContext.GetSocketsInSession(socket.SessionId));
         }
 
     }

@@ -19,7 +19,6 @@ function fbStatusChangedCallback(response) {
         var fbUserId = response.authResponse.userID;
         var url = `/fbusers/${fbUserId}`;
         $.get(url, function (data) {
-            console.log(data);
             var myUser = <MyUser>data;
             console.log(myUser);
         });

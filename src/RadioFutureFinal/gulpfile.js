@@ -38,6 +38,7 @@ gulp.task("default", function () {
         entries: 
         [
             './TypeScripts/Homepage/Homepage.ts',
+            './TypeScripts/FBLogin.ts',
         ],
         cache: {},
         packageCache: {}

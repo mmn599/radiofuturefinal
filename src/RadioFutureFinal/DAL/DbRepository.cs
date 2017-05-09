@@ -3,12 +3,15 @@ using Microsoft.Extensions.Configuration;
 using RadioFutureFinal.Data;
 using RadioFutureFinal.Models;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace RadioFutureFinal.DAL
 {
+    // TODO: This entire class contains some scary stuff.
+    // For one, things are pretty inefficient because I'm not very EF savvy.
+    // Also, race conditions may fuck stuff up because I'm not very EF savvy.
+        // See: AddUserToSessionAsync
     public class DbRepository : IDbRepository
     {
 
@@ -40,9 +43,9 @@ namespace RadioFutureFinal.DAL
             return sourceContext.MyUser.Where(t => t.MyUserId == userId).FirstOrDefault();
         }
 
-        private MyUser _getUserByFacebookId(int facebookId, ApplicationDbContext sourceContext)
+        private MyUser _getUserByFacebookId(Guid facebookId, ApplicationDbContext sourceContext)
         {
-            return sourceContext.MyUser.Where(t => t.FacebookId == facebookId)
+            return sourceContext.MyUser.Where(t => Guid.Equals(t.FacebookId, facebookId))
                                     .Include(s => s.PriorSessions).FirstOrDefault();
         }
 
@@ -62,14 +65,14 @@ namespace RadioFutureFinal.DAL
         }
 
         // TODO: ensure EF just adds a user and doesn't update a non fully populated session
-        public async Task<MyUser> AddNewUserToSessionAsync(string userName, Session session)
+        public async Task<Session> AddUserToSessionAsync(int userId, Session session)
         {
             using (var context = ContextFactory())
             {
-                var user = new MyUser(userName);
+                var user = _getUserInternal(userId, context);
                 session.Users.Add(user);
                 await UpdateSessionAsyncInternal(session, context);
-                return user;
+                return session;
             }
         }
 
@@ -90,9 +93,12 @@ namespace RadioFutureFinal.DAL
             {
                 var session = _getSessionInternal(context, sessionId);
                 var user = session.Users.Where(m => m.MyUserId == userId).FirstOrDefault();
-                session.Users.Remove(user);
-                context.Session.Update(session);
-                await context.SaveChangesAsync();
+                if(user != null)
+                {
+                    session.Users.Remove(user);
+                    context.Session.Update(session);
+                    await context.SaveChangesAsync();
+                }
                 return session;
             }
         }
@@ -178,7 +184,7 @@ namespace RadioFutureFinal.DAL
             }
         }
 
-        public bool GetUserByFacebookId(int facebookUserId, out MyUser user)
+        public bool GetUserByFacebookId(Guid facebookUserId, out MyUser user)
         {
             using (var context = ContextFactory())
             {
@@ -193,7 +199,7 @@ namespace RadioFutureFinal.DAL
             }
         }
 
-        public MyUser AddNewFbUser(int facebookUserId)
+        public MyUser AddNewFbUser(Guid facebookUserId)
         {
             using (var context = ContextFactory())
             {
@@ -201,6 +207,19 @@ namespace RadioFutureFinal.DAL
                 context.MyUser.Add(user);
                 context.SaveChanges();
                 return user;
+            }
+        }
+
+        public async Task<MyUser> AddNewTempUser()
+        {
+            using (var context = ContextFactory())
+            {
+                var newTempUser = new MyUser();
+                newTempUser.Temporary = true;
+                newTempUser.Name = "Anonymous";
+                context.MyUser.Add(newTempUser);
+                await context.SaveChangesAsync();
+                return newTempUser;
             }
         }
 

@@ -12,6 +12,7 @@ namespace RadioFutureFinal.Messaging
         Task clientRequestUserState(int userIdRequestor, MySocket socket);
         Task clientProvideUserState(UserStateV1 userState, MySocket socket);
         Task clientSearchResults(List<MediaV1> searchResults, MySocket socket);
+        Task clientUserLoggedIn(int newUserId, string newUserName, MySocket socket);
 
         Task clientChatMessage(string message, string userName, IEnumerable<MySocket> socket);
         Task clientUpdateUsersList(List<MyUserV1> users, IEnumerable<MySocket> socketsInSession);

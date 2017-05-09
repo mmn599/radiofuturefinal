@@ -1,4 +1,5 @@
 ﻿using RadioFutureFinal.Contracts;
+using System;
 using System.Threading.Tasks;
 
 namespace RadioFutureFinal.Messaging
@@ -13,5 +14,6 @@ namespace RadioFutureFinal.Messaging
         Task RequestSyncWithUser(MySocket socket, int userIdRequestee);
         Task ProvideSyncToUser(MySocket socket, int userIdRequestor, UserStateV1 userState);
         Task Search(MySocket socket, string query, int page);
+        Task FbLogin(MySocket socket, int oldUserId, Guid fbUserId);
     }
 }

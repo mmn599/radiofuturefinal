@@ -62,6 +62,12 @@ namespace RadioFutureFinal.Messaging
             await _senderBase.SendMessageToSessionAsync(socketsInSession, json);
         }
 
+        public async Task clientUserLoggedIn(int newUserId, string newUserName, MySocket socket)
+        {
+            var json = _getJson("clientUserLoggedIn", newUserId, newUserName);
+            await _senderBase.SendMessageAsync(socket, json);
+        }
+
         private string _getJson(string action, params object[] values)
         {
             var json = new ExpandoObject() as IDictionary<string, Object>;

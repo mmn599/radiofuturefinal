@@ -12,25 +12,24 @@ namespace RadioFutureFinal.Messaging
         public WebSocket WebSocket { get; set; }
         public bool InSession { get { return _inSession; } }
         public int SessionId { get { return _sessionId; } }
-        public int UserId { get { return _userId; } }
+        public int UserId { get; set; }
 
         bool _inSession;
         int _sessionId;
-        int _userId;
 
         public MySocket(WebSocket webSocket)
         {
             WebSocket = webSocket;
             _inSession = false;
             _sessionId = -1;
-            _userId = -1;
+            UserId = -1;
         }
 
         public void AddSessionInfoToSocket(int sessionId, int userId)
         {
             _inSession = true;
             _sessionId = sessionId;
-            _userId = userId;
+            UserId = userId;
         }
     }
 }

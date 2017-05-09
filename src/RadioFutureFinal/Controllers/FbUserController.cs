@@ -23,7 +23,7 @@ namespace RadioFutureFinal.Controllers
             return "yeet";
         }
 
-        public MyUserV1 Get(int facebookId)
+        public MyUserV1 Get(Guid facebookId)
         {
             MyUser user;
             var found = _db.GetUserByFacebookId(facebookId, out user);
