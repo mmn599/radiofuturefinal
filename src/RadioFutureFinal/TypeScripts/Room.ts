@@ -54,9 +54,10 @@ class RoomManager implements UICallbacks, ClientActions {
         this.onUserStateChange();
     }
 
-    clientUserLoggedIn = (newUserId: number, newUserName: string) => {
-        this.user.Id = newUserId;
-        this.user.Name = newUserName;
+    clientUserLoggedIn = (msg) => {
+        this.user.Id = msg.newUserId;
+        this.user.Name = msg.newUserName;
+        this.ui.userLoggedIn(msg.newUserName);
     }
 
     clientRequestUserState(msg) {
@@ -101,13 +102,30 @@ class RoomManager implements UICallbacks, ClientActions {
         this.ui.onSearchResults(msg.searchResults);
     }
 
+    clientsUpdateUserName(msg) {
+        var users = this.session.Users;
+        // TODO: hashmap
+        for (var i = 0; i < users.length; i++) {
+            var user = users[i];
+            if (user.Id === msg.userId) {
+                user.Name = msg.newName;
+            }
+        }
+        this.ui.updateUsersList(users, this.user.Id);
+    }
+
     //
     // Mostly UI callback functions
     //
 
     uiSendChatMessage(msg: string) {
         this.socket.ChatMessage(msg, this.user.Name);
-   }
+    }
+
+    uiNameChange(newName: string) {
+        this.user.Name = newName;
+        this.socket.SaveUserNameChange(this.user.Id, this.user.Name);
+    }
 
     uiSearch(query: string, page: number) {
         this.socket.Search(query, page);

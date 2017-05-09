@@ -75,6 +75,14 @@ namespace RadioFutureFinal.Messaging
             };
             _responseFunctions.Add("FbLogin", resFunc);
 
+            resFunc = async delegate (MySocket socket, JObject json)
+            {
+                var userId = json.GetValue("userId").ToObject<int>();
+                var newName = json.GetValue("newName").ToObject<string>();
+                await actions.SaveUserNameChange(socket, userId, newName);
+            };
+            _responseFunctions.Add("SaveUserNameChange", resFunc);
+
             return _responseFunctions;
         }
     }

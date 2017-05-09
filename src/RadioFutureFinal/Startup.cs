@@ -40,6 +40,7 @@ namespace RadioFutureFinal
 
             services.AddSingleton<MessageSenderFactory>();
             services.AddSingleton<IMyContext, MyContext>();
+            services.AddSingleton<SSOManager>();
             services.AddSingleton<IMessageReceiver, MessageReceiver>();
 
             services.AddSingleton(Searcher);

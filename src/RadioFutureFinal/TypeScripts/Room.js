@@ -23,9 +23,10 @@ var RoomManager = (function () {
             _this.ui.updateQueue(_this.session.Queue, _this.user.Id, _this.user.State.QueuePosition);
             _this.onUserStateChange();
         };
-        this.clientUserLoggedIn = function (newUserId, newUserName) {
-            _this.user.Id = newUserId;
-            _this.user.Name = newUserName;
+        this.clientUserLoggedIn = function (msg) {
+            _this.user.Id = msg.newUserId;
+            _this.user.Name = msg.newUserName;
+            _this.ui.userLoggedIn(msg.newUserName);
         };
         this.uiNextMedia = function () {
             var queue = _this.session.Queue;
@@ -137,11 +138,26 @@ var RoomManager = (function () {
     RoomManager.prototype.clientSearchResults = function (msg) {
         this.ui.onSearchResults(msg.searchResults);
     };
+    RoomManager.prototype.clientsUpdateUserName = function (msg) {
+        var users = this.session.Users;
+        // TODO: hashmap
+        for (var i = 0; i < users.length; i++) {
+            var user = users[i];
+            if (user.Id === msg.userId) {
+                user.Name = msg.newName;
+            }
+        }
+        this.ui.updateUsersList(users, this.user.Id);
+    };
     //
     // Mostly UI callback functions
     //
     RoomManager.prototype.uiSendChatMessage = function (msg) {
         this.socket.ChatMessage(msg, this.user.Name);
+    };
+    RoomManager.prototype.uiNameChange = function (newName) {
+        this.user.Name = newName;
+        this.socket.SaveUserNameChange(this.user.Id, this.user.Name);
     };
     RoomManager.prototype.uiSearch = function (query, page) {
         this.socket.Search(query, page);

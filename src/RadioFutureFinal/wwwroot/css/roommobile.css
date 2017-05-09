@@ -415,6 +415,7 @@ li:focus {
 #input_name {
     border-bottom: 1px solid grey;
     margin-bottom: 3vh;
+    display: none;
 }
 
 #div_search_in {

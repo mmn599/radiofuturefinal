@@ -16,6 +16,7 @@ namespace RadioFutureFinal.Messaging
 
         Task clientChatMessage(string message, string userName, IEnumerable<MySocket> socket);
         Task clientUpdateUsersList(List<MyUserV1> users, IEnumerable<MySocket> socketsInSession);
+        Task clientsUpdateUserName(int userId, string newName, IEnumerable<MySocket> socketsInSession);
         Task clientUpdateQueue(List<MediaV1> queue, IEnumerable<MySocket> socketsInSession);
     }
 }

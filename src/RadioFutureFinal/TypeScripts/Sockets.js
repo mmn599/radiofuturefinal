@@ -98,6 +98,14 @@ var MySocket = (function () {
         };
         this.emit(data);
     };
+    MySocket.prototype.SaveUserNameChange = function (userId, newName) {
+        var data = {
+            action: "SaveUserNameChange",
+            userId: userId,
+            newName: newName
+        };
+        this.emit(data);
+    };
     return MySocket;
 }());
 exports.MySocket = MySocket;

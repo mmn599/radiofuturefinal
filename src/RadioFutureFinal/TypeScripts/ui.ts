@@ -12,6 +12,7 @@ export interface UICallbacks {
     uiGoToMedia: (newQueuePosition: number) => void;
     uiDeleteMedia: (mediaId: number, position: number) => void;
     uiRequestSyncWithUser: (userId: number) => void;
+    uiNameChange: (newName: string) => void;
 }
 
 export class UI {
@@ -500,9 +501,28 @@ export class UI {
 
     public onChatMessage(userName: string, msg: string, color: string) {
         //TODO: color stuff
+        if (!userName || userName == "") {
+            userName = "Anonymous";
+        }
         var ul_chat = $("#ul_chat");
         var html = '<li tabindex="1" class="chat"><span style="margin: 0; color: ' + color + ';">' + userName + ': </span><span>' + msg + '</span></li>';
         ul_chat.append(html);
         ul_chat.children().last().focus();
+    }
+
+    public userLoggedIn(userName: string) {
+        if (!userName || userName == "") {
+            $("#input_name").show();
+            $("#input_name").keypress((e) => {
+                if (e.which == 13) {
+                    this.callbacks.uiNameChange($("#input_name").val());
+                    $("#input_name").fadeOut();
+                }
+            });
+        }
+        else {
+            $("#input_name").hide();
+        }
+        $("#id_fb_login_btn").hide();
     }
 }

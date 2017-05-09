@@ -14,5 +14,6 @@ namespace RadioFutureFinal.Messaging
         Task ProvideSyncToUser(MySocket socket, int userIdRequestor, UserStateV1 userState);
         Task Search(MySocket socket, string query, int page);
         Task FbLogin(MySocket socket, int oldUserId, long fbUserId);
+        Task SaveUserNameChange(MySocket socket, int userId, string newName);
     }
 }

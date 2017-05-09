@@ -192,6 +192,7 @@ input:focus {
     padding-right: 3%;
     width: 94%;
     background: white;
+    display: none;
 }
 
 .myinput {

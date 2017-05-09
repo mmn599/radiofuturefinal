@@ -68,6 +68,12 @@ namespace RadioFutureFinal.Messaging
             await _senderBase.SendMessageAsync(socket, json);
         }
 
+        public async Task clientsUpdateUserName(int userId, string newName, IEnumerable<MySocket> socketsInSession)
+        {
+            var json = _getJson("clientsUpdateUserName", userId, newName);
+            await _senderBase.SendMessageToSessionAsync(socketsInSession, json);
+        }
+
         private string _getJson(string action, params object[] values)
         {
             var json = new ExpandoObject() as IDictionary<string, Object>;
@@ -84,6 +90,7 @@ namespace RadioFutureFinal.Messaging
 
             return Newtonsoft.Json.JsonConvert.SerializeObject(json);
         }
+
 
     }
 }

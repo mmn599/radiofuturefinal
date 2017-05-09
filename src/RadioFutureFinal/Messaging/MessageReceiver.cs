@@ -116,5 +116,11 @@ namespace RadioFutureFinal.Messaging
                         _myContext.GetSocketsInSession(socket.SessionId));
         }
 
+        public async Task SaveUserNameChange(MySocket socket, int userId, string newName)
+        {
+            await _db.UpdateUserNameAsync(userId, newName);
+            await _sender.clientsUpdateUserName(userId, newName, _myContext.GetSocketsInSession(socket.SessionId));
+        }
+
     }
 }

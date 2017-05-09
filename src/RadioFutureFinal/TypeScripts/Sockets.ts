@@ -9,6 +9,7 @@ export interface ClientActions {
     clientProvideUserState: (userState: UserState) => void;
     clientSearchResults: (searchResults: Media[]) => void;
     clientUserLoggedIn: (newUserId: number, newUserName: string) => void;
+    clientsUpdateUserName: (userId: number, newName: string) => void;
 }
 
 export interface ServerActions {
@@ -20,6 +21,7 @@ export interface ServerActions {
     ProvideSyncToUser(userState: UserState, userIdRequestor: number) : void;
     Search(query: string, page: number) : void;
     FbLogin(oldUserId: number, fbUserId: number) : void;
+    SaveUserNameChange(userId: number, newName: string): void;
 }
 
 export class MySocket implements ServerActions {
@@ -139,5 +141,13 @@ export class MySocket implements ServerActions {
         this.emit(data);
     }
 
+    public SaveUserNameChange(userId: number, newName: string) {
+        var data = {
+            action: "SaveUserNameChange",
+            userId: userId,
+            newName: newName
+        };
+        this.emit(data);
+    }
 
 }
