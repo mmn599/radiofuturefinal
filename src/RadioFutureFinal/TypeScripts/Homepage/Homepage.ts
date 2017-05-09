@@ -24,7 +24,6 @@ function fbStatusChangedCallback(response) {
             console.log(myUser);
         });
     }
-    // TODO: handle
     else {
        
     }
