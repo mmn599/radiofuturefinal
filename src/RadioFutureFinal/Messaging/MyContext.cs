@@ -2,6 +2,7 @@
 using RadioFutureFinal.Contracts;
 using RadioFutureFinal.DAL;
 using RadioFutureFinal.Errors;
+using RadioFutureFinal.External;
 using RadioFutureFinal.Messaging;
 using RadioFutureFinal.Models;
 using System;
@@ -22,19 +23,22 @@ namespace RadioFutureFinal.Messaging
         IDbRepository _db;
         IActionsClient _wsSender;
         IConfigurationRoot _config;
+        SSOManager _ssoManager;
 
         // key is session id
         // TODO: these data structures are wasteful 
         ConcurrentDictionary<int, ConcurrentBag<MySocket>> _activeSessions;
         ConcurrentDictionary<WebSocket, MySocket> _activeSockets;
 
-        public MyContext(IConfigurationRoot configuration, IDbRepository db, MessageSenderFactory senderFactory)
+        public MyContext(IConfigurationRoot configuration, IDbRepository db, MessageSenderFactory senderFactory,
+            SSOManager ssoManager)
         {
             _config = configuration;
             _db = db;
             _wsSender = senderFactory.Create(SocketDisconnected);
             _activeSockets = new ConcurrentDictionary<WebSocket, MySocket>();
             _activeSessions = new ConcurrentDictionary<int, ConcurrentBag<MySocket>>();
+            _ssoManager = ssoManager;
         }
 
         public MySocket GetMySocket(WebSocket socket)
@@ -198,14 +202,9 @@ namespace RadioFutureFinal.Messaging
             return result;
         }
 
-        public async Task<SessionJoinResult> SwitchUserInSession(MySocket socket, int oldUserId, Guid fbUserId)
+        public async Task<SessionJoinResult> SwitchUserInSession(MySocket socket, int oldUserId, long fbUserId)
         {
-            MyUser user;
-            var found = _db.GetUserByFacebookId(fbUserId, out user);
-            if(!found)
-            {
-                user = _db.AddNewFbUser(fbUserId);
-            }
+            MyUser user = _ssoManager.GetOrCreateFbUser(fbUserId);
 
             var updatedSession = await _removeUserFromSession(socket.SessionId, oldUserId);
             var socketsInSession = GetSocketsInSession(socket.SessionId);

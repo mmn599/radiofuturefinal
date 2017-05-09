@@ -446,10 +446,6 @@ li:focus {
     border-style: solid;
 }
 
-#div_inner_user_results {
-    display: none;
-}
-
 #btn_search {
     cursor: pointer;
 }

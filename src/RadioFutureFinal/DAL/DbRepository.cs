@@ -43,9 +43,9 @@ namespace RadioFutureFinal.DAL
             return sourceContext.MyUser.Where(t => t.MyUserId == userId).FirstOrDefault();
         }
 
-        private MyUser _getUserByFacebookId(Guid facebookId, ApplicationDbContext sourceContext)
+        private MyUser _getUserByFacebookId(long facebookId, ApplicationDbContext sourceContext)
         {
-            return sourceContext.MyUser.Where(t => Guid.Equals(t.FacebookId, facebookId))
+            return sourceContext.MyUser.Where(t => t.FacebookId == facebookId)
                                     .Include(s => s.PriorSessions).FirstOrDefault();
         }
 
@@ -184,7 +184,7 @@ namespace RadioFutureFinal.DAL
             }
         }
 
-        public bool GetUserByFacebookId(Guid facebookUserId, out MyUser user)
+        public bool GetUserByFacebookId(long facebookUserId, out MyUser user)
         {
             using (var context = ContextFactory())
             {
@@ -199,7 +199,7 @@ namespace RadioFutureFinal.DAL
             }
         }
 
-        public MyUser AddNewFbUser(Guid facebookUserId)
+        public MyUser AddNewFbUser(long facebookUserId)
         {
             using (var context = ContextFactory())
             {
@@ -216,7 +216,6 @@ namespace RadioFutureFinal.DAL
             {
                 var newTempUser = new MyUser();
                 newTempUser.Temporary = true;
-                newTempUser.Name = "Anonymous";
                 context.MyUser.Add(newTempUser);
                 await context.SaveChangesAsync();
                 return newTempUser;

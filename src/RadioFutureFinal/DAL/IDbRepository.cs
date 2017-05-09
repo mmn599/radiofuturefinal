@@ -19,7 +19,7 @@ namespace RadioFutureFinal.DAL
         Task<Session> RemoveMediaFromSessionAsync(int sessionId, int mediaId);
         MyUser GetUser(int userId);
         Task DeleteUserAsync(int userId);
-        bool GetUserByFacebookId(Guid facebookUserId, out MyUser user);
-        MyUser AddNewFbUser(Guid facebookUserId);
+        bool GetUserByFacebookId(long facebookUserId, out MyUser user);
+        MyUser AddNewFbUser(long facebookUserId);
     }
 }

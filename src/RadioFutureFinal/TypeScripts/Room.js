@@ -146,10 +146,6 @@ var RoomManager = (function () {
     RoomManager.prototype.uiSearch = function (query, page) {
         this.socket.Search(query, page);
     };
-    RoomManager.prototype.uiNameChange = function (newName) {
-        this.user.Name = newName;
-        this.socket.SaveUserNameChange(this.user.Id, this.user.Name);
-    };
     RoomManager.prototype.uiGoToMedia = function (newQueuePosition) {
         this.user.State.QueuePosition = newQueuePosition;
         this.user.State.Time = 0;

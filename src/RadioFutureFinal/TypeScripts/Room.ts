@@ -113,11 +113,6 @@ class RoomManager implements UICallbacks, ClientActions {
         this.socket.Search(query, page);
     }
 
-    uiNameChange(newName) {
-        this.user.Name = newName;
-        this.socket.SaveUserNameChange(this.user.Id, this.user.Name);
-    }
-
     uiGoToMedia(newQueuePosition: number) {
         this.user.State.QueuePosition = newQueuePosition;
         this.user.State.Time = 0;

@@ -18,7 +18,6 @@ namespace RadioFutureFinal.Data
 
             builder.Entity<Session>().HasIndex(b => b.Name).IsUnique();
             builder.Entity<MyUser>().HasMany(b => b.PriorSessions);
-
         }
 
         public DbSet<Session> Session { get; set; }

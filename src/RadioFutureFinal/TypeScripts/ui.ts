@@ -8,7 +8,6 @@ declare var Spinner: any;
 export interface UICallbacks {
     uiSendChatMessage: any;
     uiSearch: (query: string, page: number) => void;
-    uiNameChange: any;
     uiQueueMedia: (media: Media) => void;
     uiGoToMedia: (newQueuePosition: number) => void;
     uiDeleteMedia: (mediaId: number, position: number) => void;
@@ -191,12 +190,6 @@ export class UI {
         });
         $("#btn_search").click(() => {
             this.searchEnterPressed(inputSearch);
-        });
-        var input_name = $("#input_name");
-        input_name.keypress((e) => {
-            if (e.which == 13) {
-                this.userNameChange(input_name);
-            }
         });
         if (!this.mobileBrowser) {
             var input_chat = $("#input_chat");
@@ -480,10 +473,17 @@ export class UI {
             let currentHTML = "";
             var syncHTML = thisIsMe ? 'you' : 'sync';
             var syncHTMLMobile = thisIsMe ? 'you' : 'sync with ' + user.Name;
+            var name;
+            if (user.Name && user.Name.length > 0) {
+                name = user.Name;
+            }
+            else {
+                name = "Anonymous";
+            }
             currentHTML =
                 `<div class="user_result_outer"> 
                     <div class="user_result_block" style="background:${color};">${syncHTML}</div> 
-                    <span class="user_result_span"> ${user.Name} </span> 
+                    <span class="user_result_span"> ${name} </span> 
                 </div>`;
 
             var cur = $($.parseHTML(currentHTML));
@@ -496,12 +496,6 @@ export class UI {
             outer.appendTo(userResults);
         }
 
-    }
-
-    public userNameChange(name_input) {
-        name_input.hide();
-        $("#div_inner_user_results").show();
-        this.callbacks.uiNameChange(name_input.val());
     }
 
     public onChatMessage(userName: string, msg: string, color: string) {

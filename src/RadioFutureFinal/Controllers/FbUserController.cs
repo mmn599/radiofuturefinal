@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RadioFutureFinal.Contracts;
 using RadioFutureFinal.DAL;
+using RadioFutureFinal.External;
 using RadioFutureFinal.Models;
 using System;
 using System.Collections.Generic;
@@ -12,10 +13,11 @@ namespace RadioFutureFinal.Controllers
     public class FbUserController : Controller
     {
         IDbRepository _db;
+        SSOManager _ssoManager;
 
-        public FbUserController(IDbRepository db)
+        public FbUserController(SSOManager manager)
         {
-            _db = db;
+            _ssoManager = manager;
         }
 
         public string Index()
@@ -23,14 +25,10 @@ namespace RadioFutureFinal.Controllers
             return "yeet";
         }
 
-        public MyUserV1 Get(Guid facebookId)
+        // TODO: need to have some kind of auth here
+        public MyUserV1 Get(long facebookId)
         {
-            MyUser user;
-            var found = _db.GetUserByFacebookId(facebookId, out user);
-            if(!found)
-            {
-                user = _db.AddNewFbUser(facebookId);
-            }
+            MyUser user = _ssoManager.GetOrCreateFbUser(facebookId);
             return user.ToContract();
         }
     }

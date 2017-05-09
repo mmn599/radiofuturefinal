@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using RadioFutureFinal.Messaging;
 using RadioFutureFinal.DAL;
-using RadioFutureFinal.Search;
+using RadioFutureFinal.External;
 
 namespace RadioFutureFinal
 {

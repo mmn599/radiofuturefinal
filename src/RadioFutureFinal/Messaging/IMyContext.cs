@@ -16,6 +16,6 @@ namespace RadioFutureFinal.Messaging
         void SocketConnected(WebSocket socket);
         Task SocketDisconnected(WebSocket socket);
         Task<SessionJoinResult> TempUserJoinSession(MySocket socket, string sessionName);
-        Task<SessionJoinResult> SwitchUserInSession(MySocket socket, int oldUserId, Guid fbUserId);
+        Task<SessionJoinResult> SwitchUserInSession(MySocket socket, int oldUserId, long fbUserId);
     }
 }

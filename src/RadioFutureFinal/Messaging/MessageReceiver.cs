@@ -4,7 +4,7 @@ using RadioFutureFinal.Contracts;
 using RadioFutureFinal.DAL;
 using RadioFutureFinal.Errors;
 using RadioFutureFinal.Models;
-using RadioFutureFinal.Search;
+using RadioFutureFinal.External;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -83,15 +83,6 @@ namespace RadioFutureFinal.Messaging
             await _sender.clientUpdateQueue(updatedSession.ToContract().Queue, _myContext.GetSocketsInSession(sessionId));
         }
 
-        // TODO: don't use whole session
-        public async Task SaveUserNameChange(MySocket socket, int userId, string newName)
-        {
-            await _db.UpdateUserNameAsync(userId, newName);
-            var sessionId = socket.SessionId;
-            var session = _db.GetSession(sessionId);
-            await _sender.clientUpdateUsersList(session.ToContract().Users, _myContext.GetSocketsInSession(sessionId));
-        }
-
         public async Task ChatMessage(MySocket socket, string userName, string chatMessage)
         {
             await _sender.clientChatMessage(chatMessage, userName, _myContext.GetSocketsInSession(socket.SessionId));
@@ -116,7 +107,7 @@ namespace RadioFutureFinal.Messaging
             await _sender.clientSearchResults(searchResults, socket);
         }
 
-        public async Task FbLogin(MySocket socket, int oldUserId, Guid fbUserId)
+        public async Task FbLogin(MySocket socket, int oldUserId, long fbUserId)
         {
             var result = await _myContext.SwitchUserInSession(socket, oldUserId, fbUserId);
             var user = result.User;

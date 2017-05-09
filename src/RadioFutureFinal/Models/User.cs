@@ -8,10 +8,10 @@ namespace RadioFutureFinal.Models
         public int MyUserId { get; set; }
         public string Name { get; set; }
         public List<SessionHistory> PriorSessions { get; set; }
-        public Guid? FacebookId { get; set; }
+        public long? FacebookId { get; set; }
         public bool Temporary { get; set; }
 
-        public MyUser(Guid facebookId)
+        public MyUser(long facebookId)
         {
             FacebookId = facebookId;
             Temporary = false;

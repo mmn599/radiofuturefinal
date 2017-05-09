@@ -9,12 +9,12 @@ $(document).ready(function(){
 			});
 		}
 	});
-
     var facebookLogin = new FBLogin(fbStatusChangedCallback);
 });
 
 function fbStatusChangedCallback(response) {
     if (response.status === "connected") {
+        console.log(response);
         $("#id_fb_login_btn").hide();
         var fbUserId = response.authResponse.userID;
         var url = `/fbusers/${fbUserId}`;

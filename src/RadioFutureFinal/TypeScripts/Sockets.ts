@@ -15,7 +15,6 @@ export interface ServerActions {
     JoinSession(sessionName: string) : void;
     AddMediaToSession(media: Media) : void;
     DeleteMediaFromSession(mediaId: number) : void;
-    SaveUserNameChange(userId: number, newName: string) : void;
     ChatMessage(chatMessage: string, userName: string) : void;
     RequestSyncWithUser(userIdRequestee: number) : void;
     ProvideSyncToUser(userState: UserState, userIdRequestor: number) : void;
@@ -92,15 +91,6 @@ export class MySocket implements ServerActions {
         var data = {
             action: 'DeleteMediaFromSession',
             mediaId: mediaId
-        }
-        this.emit(data);
-    }
-
-    public SaveUserNameChange(userId: number, newName: string) {
-        var data = {
-            action: 'SaveUserNameChange',
-            userId: userId,
-            newName: newName
         }
         this.emit(data);
     }

@@ -38,14 +38,6 @@ namespace RadioFutureFinal.Messaging
 
             resFunc = async delegate (MySocket socket, JObject json)
             {
-                var userId = json.GetValue("userId").ToObject<int>();
-                var newName = json.GetValue("newName").ToObject<string>();
-                await actions.SaveUserNameChange(socket, userId, newName);
-            };
-            _responseFunctions.Add("SaveUserNameChange", resFunc);
-
-            resFunc = async delegate (MySocket socket, JObject json)
-            {
                 var userName = json.GetValue("userName").ToObject<string>();
                 var chatMessage = json.GetValue("chatMessage").ToObject<string>();
                 await actions.ChatMessage(socket, userName, chatMessage);
@@ -78,7 +70,7 @@ namespace RadioFutureFinal.Messaging
             resFunc = async delegate (MySocket socket, JObject json)
             {
                 var oldUserId = json.GetValue("oldUserId").ToObject<int>();
-                var fbUserId = json.GetValue("fbUserId").ToObject<Guid>();
+                var fbUserId = json.GetValue("fbUserId").ToObject<long>();
                 await actions.FbLogin(socket, oldUserId, fbUserId);
             };
             _responseFunctions.Add("FbLogin", resFunc);

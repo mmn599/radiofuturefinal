@@ -1,24 +1,25 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace RadioFutureFinal.Migrations
 {
-    public partial class FbIntToGuid : Migration
+    public partial class FbGuidToLong : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<Guid>(
+            migrationBuilder.AlterColumn<long>(
                 name: "FacebookId",
                 table: "MyUser",
-                nullable: false);
+                nullable: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<int>(
+            migrationBuilder.AlterColumn<Guid>(
                 name: "FacebookId",
                 table: "MyUser",
-                nullable: false);
+                nullable: true);
         }
     }
 }

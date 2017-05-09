@@ -28,6 +28,6 @@ namespace RadioFutureFinal.Contracts
         public List<SessionHistoryV1> PriorSessions { get; set; }
 
         [JsonProperty]
-        public Guid? FacebookId { get; set; }
+        public long? FacebookId { get; set; }
     }
 }

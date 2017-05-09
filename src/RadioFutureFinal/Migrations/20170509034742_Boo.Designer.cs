@@ -8,9 +8,10 @@ using RadioFutureFinal.Data;
 namespace RadioFutureFinal.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20170509034742_Boo")]
+    partial class Boo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.1.1")
@@ -210,7 +211,7 @@ namespace RadioFutureFinal.Migrations
                     b.Property<int>("MyUserId")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<long?>("FacebookId");
+                    b.Property<Guid?>("FacebookId");
 
                     b.Property<string>("Name");
 
@@ -219,6 +220,8 @@ namespace RadioFutureFinal.Migrations
                     b.Property<bool>("Temporary");
 
                     b.HasKey("MyUserId");
+
+                    b.HasIndex("FacebookId");
 
                     b.HasIndex("SessionID");
 
