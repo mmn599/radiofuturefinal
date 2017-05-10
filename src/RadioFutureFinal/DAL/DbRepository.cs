@@ -30,21 +30,7 @@ namespace RadioFutureFinal.DAL
         {
             return sourceContext.Session.Where(s => s.SessionID == sessionId)
                                 .Include(s => s.Queue)
-                                .Include(s => s.Users)
                                 .FirstOrDefault();
-        }
-
-        private MyUser _getUserInternal(int userId, ApplicationDbContext sourceContext)
-        {
-            return sourceContext.MyUser.FirstOrDefault(t => t.MyUserId == userId);
-        }
-
-        public MyUser GetUser(int userId)
-        {
-            using (var context = ContextFactory())
-            {
-                return _getUserInternal(userId, context);
-            }
         }
 
         // Assumes fully populated session
@@ -52,18 +38,6 @@ namespace RadioFutureFinal.DAL
         {
             sourceContext.Session.Update(session);
             await sourceContext.SaveChangesAsync();
-        }
-
-        // TODO: ensure EF just adds a user and doesn't update a non fully populated session
-        public async Task<MyUser> AddNewUserToSessionAsync(string userName, Session session)
-        {
-            using (var context = ContextFactory())
-            {
-                var user = new MyUser(userName);
-                session.Users.Add(user);
-                await UpdateSessionAsyncInternal(session, context);
-                return user;
-            }
         }
 
         public async Task<Session> AddMediaToSessionAsync(Media media, int sessionId)
@@ -76,30 +50,6 @@ namespace RadioFutureFinal.DAL
                 return session;
             }
         }
-
-        public async Task<Session> RemoveUserFromSessionAsync(int sessionId, int userId)
-        {
-            using (var context = ContextFactory())
-            {
-                var session = _getSessionInternal(context, sessionId);
-                var user = session.Users.FirstOrDefault(m => m.MyUserId == userId);
-                session.Users.Remove(user);
-                context.Session.Update(session);
-                await context.SaveChangesAsync();
-                return session;
-            }
-        }
-
-        public async Task UpdateUserNameAsync(int userId, string newName)
-        {
-            using (var context = ContextFactory())
-            {
-                var user = _getUserInternal(userId, context);
-                user.Name = newName;
-                await context.SaveChangesAsync();
-            }
-        }
-
 
         public async Task<Session> CreateSessionAsync(string sessionName)
         {
@@ -139,7 +89,6 @@ namespace RadioFutureFinal.DAL
             {
                 session = context.Session.Where(s => s.Name == sessionName)
                                     .Include(s => s.Queue)
-                                    .Include(s => s.Users)
                                     .FirstOrDefault();
                 return session != null;
             }
@@ -156,18 +105,6 @@ namespace RadioFutureFinal.DAL
                 context.Session.Update(session);
                 await context.SaveChangesAsync();
                 return session;
-            }
-        }
-
-        //TODO: Don't know how to remove stuff properly
-        public async Task DeleteUserAsync(int userId)
-        {
-            using (var context = ContextFactory())
-            {
-                var user = new MyUser() { MyUserId = userId };
-                context.MyUser.Attach(user);
-                context.MyUser.Remove(user);
-                await context.SaveChangesAsync();
             }
         }
 

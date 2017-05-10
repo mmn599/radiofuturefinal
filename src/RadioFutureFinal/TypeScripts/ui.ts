@@ -1,18 +1,14 @@
-﻿import { FrameBuilder } from "./FrameBuilder";
-import { Media } from "./Contracts";
+﻿import { Media } from "./Contracts";
 
 declare var Spinner: any;
 
 // Oh god this code is scary
 
 export interface UICallbacks {
-    uiSendChatMessage: any;
     uiSearch: (query: string, page: number) => void;
-    uiNameChange: any;
     uiQueueMedia: (media: Media) => void;
     uiGoToMedia: (newQueuePosition: number) => void;
     uiDeleteMedia: (mediaId: number, position: number) => void;
-    uiRequestSyncWithUser: (userId: number) => void;
 }
 
 export class UI {

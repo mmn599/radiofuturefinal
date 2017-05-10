@@ -21,8 +21,6 @@ namespace RadioFutureFinal.Data
 
         public DbSet<Session> Session { get; set; }
 
-        public DbSet<MyUser> MyUser { get; set; }
-
         public DbSet<Media> Media { get; set; }
     }
 }

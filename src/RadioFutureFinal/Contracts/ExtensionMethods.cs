@@ -5,48 +5,14 @@ namespace RadioFutureFinal.Contracts
 {
     public static class ExtensionMethods
     {
-        public static MyUser ToModel(this MyUserV1 user)
-        {
-            var userModel = new MyUser()
-            {
-                MyUserId = user.Id,
-                Name = user.Name,
-                Temporary = user.Temporary
-            };
-            return userModel;
-        }
-
-        public static MyUserV1 ToContract(this MyUser user)
-        {
-            var userContract = new MyUserV1()
-            {
-                Id = user.MyUserId,
-                Name = user.Name,
-                State = new UserStateV1()
-                {
-                    Time = 0,
-                    QueuePosition = -1,
-                    PlayerState = 0,
-                    Waiting = true
-                },
-                Temporary = user.Temporary
-            };
-            return userContract;
-        }
-
         public static SessionV1 ToContract(this Session session)
         {
             var sessionContract = new SessionV1()
             {
                 Id = session.SessionID,
                 Name = session.Name,
-                Users = new List<MyUserV1>(),
                 Queue = new List<MediaV1>()
             };
-            foreach (var user in session.Users)
-            { 
-                sessionContract.Users.Add(user.ToContract());
-            }
             foreach(var media in session.Queue)
             {
                 sessionContract.Queue.Add(media.ToContract());

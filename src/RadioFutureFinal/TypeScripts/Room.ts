@@ -1,65 +1,34 @@
-﻿import { MyUser, Media, Session, UserState } from "./Contracts";
+﻿import { Media, Session } from "./Contracts";
 import { UICallbacks, UI } from "./UI";
-import { MySocket, ClientActions } from "./Sockets";
-import { IPlayer } from "./IPlayer";
 import { PodcastPlayer } from "./PodcastPlayer";
-import { YtPlayer } from "./YtPlayer";
 
-class RoomManager implements UICallbacks, ClientActions {
+class RoomManager implements UICallbacks {
 
-    user: MyUser;
     session: Session;
     player: PodcastPlayer; 
-    socket: MySocket;
     ui: UI;
-    roomType: string;
     mobileBrowser: boolean;
 
-    constructor(roomType: string, mobileBrowser: boolean) {
-        this.roomType = roomType;
+    constructor(mobileBrowser: boolean) {
         this.mobileBrowser = mobileBrowser;
     }
 
     public init(encodedSessionName: string) {
-        this.user = new MyUser();
         this.session = new Session();
         this.ui = new UI(this.mobileBrowser, this);
-        //if (this.roomType == "podcasts") {
         this.player = new PodcastPlayer(this.ui, this.mobileBrowser, this.uiNextMedia, this.uiPreviousMedia);
-        //}
-        //else {
-        //    this.player = new YtPlayer(this.ui, this.mobileBrowser);
-        //}
-        this.socket = new MySocket(this);
         this.setupJamSession(encodedSessionName);
         this.player.initPlayer(this.onPlayerStateChange);
     }
 
     setupJamSession(encodedSessionName: string) {
         this.session.Name = decodeURI(encodedSessionName);
-        this.user.Name = 'Anonymous';
         this.socket.JoinSession(this.session.Name);
     }
 
     //==================================================================
     // WebSocket message response functions
     //==================================================================
-
-    clientProvideUserState(msg) {
-        this.user.State.QueuePosition = msg.userState.QueuePosition;
-        this.user.State.Time = msg.userState.Time;
-        this.user.State.PlayerState = msg.userState.PlayerState;
-        this.ui.updateQueue(this.session.Queue, this.user.Id, this.user.State.QueuePosition);
-        this.onUserStateChange();
-    }
-
-    clientRequestUserState(msg) {
-        var myUserState = new UserState();
-        myUserState.QueuePosition = this.user.State.QueuePosition;
-        myUserState.Time = Math.round(this.player.getCurrentTime());
-        myUserState.PlayerState = this.player.getCurrentState();
-        this.socket.ProvideSyncToUser(myUserState, msg.userIdRequestor);
-    }
 
     clientSessionReady(msg) {
         this.session = msg.session;
@@ -68,11 +37,6 @@ class RoomManager implements UICallbacks, ClientActions {
         this.ui.updateQueue(this.session.Queue, this.user.Id, this.user.State.QueuePosition);
         this.ui.updateUsersList(this.session.Users, this.user.Id);
         this.ui.sessionReady();
-    }
-
-    clientUpdateUsersList(msg) {
-        this.session.Users = msg.users;
-        this.ui.updateUsersList(this.session.Users, this.user.Id);	
     }
 
     clientUpdateQueue(msg) {
@@ -84,10 +48,6 @@ class RoomManager implements UICallbacks, ClientActions {
         this.ui.updateQueue(this.session.Queue, this.user.Id, this.user.State.QueuePosition);
     }
 
-    clientChatMessage(msg) {
-        this.ui.onChatMessage(msg.userName, msg.message, 'blue');
-    }
-
     clientSearchResults(msg) {
         this.ui.onSearchResults(msg.searchResults);
     }
@@ -96,17 +56,8 @@ class RoomManager implements UICallbacks, ClientActions {
     // Mostly UI callback functions
     //
 
-    uiSendChatMessage(msg: string) {
-        this.socket.ChatMessage(msg, this.user.Name);
-   }
-
     uiSearch(query: string, page: number) {
         this.socket.Search(query, page);
-    }
-
-    uiNameChange(newName) {
-        this.user.Name = newName;
-        this.socket.SaveUserNameChange(this.user.Id, this.user.Name);
     }
 
     uiGoToMedia(newQueuePosition: number) {
@@ -160,20 +111,10 @@ class RoomManager implements UICallbacks, ClientActions {
         this.socket.DeleteMediaFromSession(mediaId);
     }
 
-    uiRequestSyncWithUser = (userId) => {
-        this.socket.RequestSyncWithUser(userId);
-    }
 
     //
     // Misc
     //
-
-    isUserWaiting = (): boolean => {
-        var pos = this.user.State.QueuePosition;
-        var length = this.session.Queue.length;
-        return pos < 0 || ((pos == (length - 1)) && this.player.isStopped());
-    }
-
 
     onUserStateChange() {
         if (this.user.State.QueuePosition >= 0 && this.user.State.QueuePosition < this.session.Queue.length) {
@@ -202,10 +143,9 @@ class RoomManager implements UICallbacks, ClientActions {
 }
 
 declare var mobileBrowser: boolean;
-declare var roomType: string;
 declare var roomName: string;
 
-var mRoomManager = new RoomManager(roomType, mobileBrowser);
+var mRoomManager = new RoomManager(mobileBrowser);
 $(document).ready(function () {
     mRoomManager.init(roomName);
 });

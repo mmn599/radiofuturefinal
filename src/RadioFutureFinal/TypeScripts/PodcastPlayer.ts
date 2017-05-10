@@ -1,10 +1,7 @@
-﻿declare var YT: any;
-
-import { IPlayer } from "./IPlayer";
-import { Media, Session, UserState } from "./Contracts";
+﻿import { Media, Session } from "./Contracts";
 import { UI } from "./UI";
 
-export class PodcastPlayer implements IPlayer {
+export class PodcastPlayer {
 
     private mobileBrowser: boolean;
     private audio: HTMLAudioElement;
