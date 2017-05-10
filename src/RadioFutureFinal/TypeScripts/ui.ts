@@ -93,11 +93,13 @@ export class UI {
             $("#make_your_own").css('right', 0);
         }
         else {
-            var divSearchIn = $("#div_search_in");
+            var divSearchIn = $("#div_search");
             var pNoSearch = $(document.createElement('p'));
-            pNoSearch.text('This playlist is locked.');
+            pNoSearch.text('this playlist is locked.');
+            pNoSearch.css('font-size', '5vw');
+            pNoSearch.css('text-align', 'center');
             pNoSearch.appendTo(divSearchIn);
-            divSearchIn.append('<a href= "/" id="make_your_own" > make another playlist</a>');
+            divSearchIn.append('<a style="display: block;" href= "/" id="make_your_own" > make another playlist</a>');
         }
     }
 
