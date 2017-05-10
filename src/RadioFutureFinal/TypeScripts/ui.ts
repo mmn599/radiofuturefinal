@@ -89,8 +89,8 @@ export class UI {
         }, 5000);
 
         $(".p_session_name").text(session.name);
-        var hitsString = session.hits == 1 ? "1 person has viewed this playlist" :
-                `${session.hits} people have viewed this playlist`;
+        var hitsString = session.hits == 1 ? "1 playlist view" :
+                `${session.hits} playlist views`;
         $("#p_session_hits").text(hitsString);
     } 
 

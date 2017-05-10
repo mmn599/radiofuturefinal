@@ -98,6 +98,7 @@ input:focus {
     background: #f1f1f1;
     font-size: 5vw;
     padding: 0;
+    text-align: center;
 }
 
 #div_queue_results {
@@ -451,3 +452,13 @@ li:focus {
 #p_session_hits {
     text-align: center;
 }
+
+#make_your_own {
+    font-size: 3vw;
+    width: 100%;
+    text-align: center;
+    cursor: pointer;
+    color: black;
+}
+
+
