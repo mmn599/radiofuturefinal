@@ -1,4 +1,4 @@
-﻿import { Media } from "./Contracts";
+﻿import { Media, Session } from "./Contracts";
 
 declare var Spinner: any;
 
@@ -71,11 +71,11 @@ export class UI {
             this.select($("#btn_sel_search"), $("#div_search"));
         });
         $("#btn_sel_users").click(() => {
-            this.select($("#btn_sel_users"), $("#div_user_results"));
+            this.select($("#btn_sel_users"), $("#div_session_info_results"));
         });
     } 
 
-    public sessionReady = () => {
+    public sessionReady = (session: Session) => {
         $("#div_loading").hide();
         this.spinner.stop();
         $("#div_everything").animate({opacity: 1}, 'fast');
@@ -86,6 +86,9 @@ export class UI {
         setTimeout(() => {
             divLinkHelp.fadeOut();
         }, 5000);
+
+        $("#p_session_name").text(session.name);
+        $("#p_session_hits").text(`17 people have viewed this playlist`);
     } 
 
     private setupSpinnerUI() {
@@ -154,9 +157,9 @@ export class UI {
     }
 
     private setupInfoRolloverUI() {
-        var divUsersOverall = $("#div_users_overall");
+        var divUsersOverall = $("#div_session_info_overall");
         var divQueueOverall = $("#div_queue_overall");
-        var divUserResults = $("#div_user_results");
+        var divUserResults = $("#div_session_info_results");
         var divQueueResults = $("#div_queue_results");
         if (!this.mobileBrowser) {
             this.setupFadeUI(divUsersOverall, divUserResults); 

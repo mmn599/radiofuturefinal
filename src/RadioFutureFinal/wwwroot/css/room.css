@@ -62,7 +62,7 @@ input:focus {
     bottom: 5%;
 }
 
-#div_users_overall {
+#div_session_info_overall {
     padding-left: 1%;
     justify-content: flex-start;
     width: 24%;
@@ -90,7 +90,7 @@ input:focus {
     overflow-y: auto;
 }
 
-#div_user_results {
+#div_session_info_results {
     left: 0;
     top: 5%;
     z-index: 1;
@@ -182,16 +182,6 @@ input:focus {
 
 #input_search {
     font-size: 2vw;
-}
-
-#input_name {
-    font-size: 1vw;
-    margin-top: 3%;
-    margin-bottom: 3%;
-    padding-left: 3%;
-    padding-right: 3%;
-    width: 94%;
-    background: white;
 }
 
 .myinput {
@@ -444,10 +434,6 @@ li:focus {
     border-color: #ffa79c;
     border-width: 2px;
     border-style: solid;
-}
-
-#div_inner_user_results {
-    display: none;
 }
 
 #btn_search {

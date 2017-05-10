@@ -37,8 +37,7 @@ var PodcastPlayer = (function () {
             }
         };
         this.nothingPlaying = function () {
-            _this.audio.oncanplay = function () {
-            };
+            _this.audio.oncanplay = function () { };
             $("#cc_title").text('Nothing currently playing.');
             $("#cc_show").text('Queue something up!');
             _this.audio.pause();

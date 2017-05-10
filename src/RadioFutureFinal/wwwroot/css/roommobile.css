@@ -87,7 +87,7 @@ input:focus {
     font-size: 5vw;
 }
 
-#div_user_results {
+#div_session_info_results {
     left: 0;
     top: 40%;
     z-index: 1;
@@ -96,6 +96,7 @@ input:focus {
     overflow-y: auto;
     padding-top: 2vh;
     background: #f1f1f1;
+    font-size: 5vw;
 }
 
 #div_queue_results {

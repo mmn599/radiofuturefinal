@@ -36,7 +36,7 @@ class RoomManager implements UICallbacks {
         this.session = session;
         this.uiNextMedia();
         this.ui.updateQueue(this.session.queue, this.queuePosition);
-        this.ui.sessionReady();
+        this.ui.sessionReady(session);
     }
 
     clientSearchResults = (searchResults: Media[]) => {

@@ -12,7 +12,7 @@ var RoomManager = (function () {
             _this.session = session;
             _this.uiNextMedia();
             _this.ui.updateQueue(_this.session.queue, _this.queuePosition);
-            _this.ui.sessionReady();
+            _this.ui.sessionReady(session);
         };
         this.clientSearchResults = function (searchResults) {
             _this.ui.onSearchResults(searchResults);
