@@ -76,6 +76,7 @@
 	margin: auto;
 	width: 92%;
 	text-align: center;
+    font-size: 2vw;
 }
 
 input {
@@ -262,3 +263,18 @@ html, body {
 .li_search_result {
 	cursor: pointer;
 }
+
+#btn_go {
+    cursor: pointer;
+    color: cornflowerblue; 
+    margin: 0; 
+    margin-top: 5%; 
+    margin-bottom: 5%;
+    font-size: 3vw;
+}
+
+#btn_go:hover {
+    color: blue;
+}
+
+
