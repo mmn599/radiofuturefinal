@@ -266,15 +266,9 @@ html, body {
 
 #btn_go {
     cursor: pointer;
-    color: #ff5f99;
+    color: #ff1f39;
     margin: 0; 
     margin-top: 5%; 
     margin-bottom: 5%;
     font-size: 3vw;
 }
-
-#btn_go:hover {
-    color: #ff1f39;
-}
-
-
