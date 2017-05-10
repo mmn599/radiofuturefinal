@@ -34,28 +34,6 @@ namespace RadioFutureFinal.DAL
                                 .FirstOrDefault();
         }
 
-        // Assumes fully populated session
-        public async Task _updateSessionAsyncInternal(Session session, ApplicationDbContext sourceContext)
-        {
-            sourceContext.Session.Update(session);
-            await sourceContext.SaveChangesAsync();
-        }
-
-        public async Task<Session> AddMediaToSessionAsync(Media media, int sessionId) 
-        {
-            using (var context = ContextFactory())
-            {
-                var session = _getSessionInternal(context, sessionId);
-                if(session == null)
-                {
-                    throw new RadioException("AddMediaToSessionAsync: session with id: " + sessionId + " not found.");
-                } 
-                session.Queue.Add(media);
-                await _updateSessionAsyncInternal(session, context);
-                return session;
-            }
-        }
-
         public async Task<Session> CreateSessionAsync(string sessionName)
         {
             using (var context = ContextFactory())
@@ -99,34 +77,22 @@ namespace RadioFutureFinal.DAL
             }
         }
 
-        //TODO: Don't know how to remove stuff properly
-        public async Task<Session> RemoveMediaFromSessionAsync(int sessionId, int mediaId)
-        {
-            using (var context = ContextFactory())
-            {
-                var session = _getSessionInternal(context, sessionId);
-                if(session == null)
-                {
-                    throw new RadioException("RemoveMediaFromSessionAsync: Session not found for id: " + sessionId);
-                }
-                var media = session.Queue.FirstOrDefault(m => m.MediaID == mediaId);
-                if(media == null)
-                {
-                    throw new RadioException("RemoveMediaFromSessionAsync: Media not found for id: " + mediaId);
-                }
-                session.Queue.Remove(media);
-                context.Session.Update(session);
-                await context.SaveChangesAsync();
-                return session;
-            }
-        }
-
         public async Task SaveSessionHitsAsync(Session updatedSession)
         {
             using (var context = ContextFactory())
             {
                 context.Session.Attach(updatedSession);
                 context.Entry(updatedSession).Property(s => s.Hits).IsModified = true;
+                await context.SaveChangesAsync();
+            }
+        }
+
+        public async Task SaveSessionQueueAsync(Session updatedSession)
+        {
+            using (var context = ContextFactory())
+            {
+                context.Session.Attach(updatedSession);
+                context.Entry(updatedSession).Property(s => s.Queue).IsModified = true;
                 await context.SaveChangesAsync();
             }
         }

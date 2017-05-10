@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using System;
 using RadioFutureFinal.Errors;
 using Microsoft.AspNetCore.Hosting.Internal;
+using System.Linq;
 
 namespace RadioFutureFinal.Controllers
 {
@@ -65,10 +66,24 @@ namespace RadioFutureFinal.Controllers
                 return NotFound();
             }
 
+            Session session;
+            bool locked;
+            bool found = _getSession(sessionId, out session, out locked);
+
+            if(!found)
+            {
+                return NotFound();
+            }
+            if(locked)
+            {
+                return BadRequest();
+            }
+
             try
             {
-                var updatedSession = await _db.AddMediaToSessionAsync(mediaToQueue.ToModel(), sessionId);
-                return Ok(updatedSession.ToContract().Queue);
+                session.Queue.Add(mediaToQueue.ToModel());
+                await _db.SaveSessionQueueAsync(session);
+                return Ok(session.ToContract().Queue);
             }
             catch
             {
@@ -79,21 +94,33 @@ namespace RadioFutureFinal.Controllers
         [HttpPost]
         public async Task<IActionResult> DeleteMedia([FromRoute] int sessionId, [FromRoute] int mediaId)
         {
-            try
-            {
-                var updatedSession = await _db.RemoveMediaFromSessionAsync(sessionId, mediaId);
-                return Ok(updatedSession.ToContract().Queue);
-            }
-            catch
+            Session session;
+            bool locked;
+            bool found = _getSession(sessionId, out session, out locked);
+
+            if(!found)
             {
                 return NotFound();
             }
+            if(locked)
+            {
+                return BadRequest();
+            }
+
+            var media = session.Queue.FirstOrDefault(m => m.MediaID == mediaId);
+            if(media == null)
+            {
+                return NotFound();
+            }
+            session.Queue.Remove(media);
+            await _db.SaveSessionQueueAsync(session);
+            return Ok(session.ToContract().Queue);
         }
 
         [HttpGet]
         public async Task<IActionResult> Search([FromQuery] string query, [FromQuery] int page)
         {
-            if(!validQuery(query, page))
+            if(!_validQuery(query, page))
             {
                 return NotFound();
             }
@@ -101,7 +128,20 @@ namespace RadioFutureFinal.Controllers
             return Ok(searchResults);
         }
 
-        private bool validQuery(string query, int page)
+        private bool _getSession(int sessionId, out Session session, out bool locked)
+        {
+            session = _db.GetSession(sessionId);
+            if(session != null)
+            {
+                locked = session.Locked;
+                return true;
+            }
+
+            locked = false;
+            return false;
+        }
+
+        private bool _validQuery(string query, int page)
         {
             if(page < 0)
             {
