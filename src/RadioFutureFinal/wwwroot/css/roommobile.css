@@ -97,6 +97,7 @@ input:focus {
     padding-top: 2vh;
     background: #f1f1f1;
     font-size: 5vw;
+    padding: 0;
 }
 
 #div_queue_results {
@@ -445,4 +446,8 @@ li:focus {
     font-size: 10vw; 
     margin-right: 1vw; 
     float: right;
+}
+
+#p_session_hits {
+    text-align: center;
 }

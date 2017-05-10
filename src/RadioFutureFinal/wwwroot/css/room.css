@@ -95,6 +95,8 @@ input:focus {
     top: 5%;
     z-index: 1;
     width: 33.33%;
+    padding-left: 2%;
+    padding-right: 2%;
 }
 
 #div_queue_results {

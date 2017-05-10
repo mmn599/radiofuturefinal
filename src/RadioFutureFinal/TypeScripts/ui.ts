@@ -87,7 +87,7 @@ export class UI {
             divLinkHelp.fadeOut();
         }, 5000);
 
-        $("#p_session_name").text(session.name);
+        $(".p_session_name").text(session.name);
         $("#p_session_hits").text(`17 people have viewed this playlist`);
     } 
 
