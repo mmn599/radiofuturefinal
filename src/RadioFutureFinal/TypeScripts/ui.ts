@@ -24,7 +24,6 @@ export class UI {
         this.colors = ['red', 'orange', 'yellow', 'green', 'blue', 'violet'];
         this.mobileBrowser = mobileBrowser;
         this.callbacks = callbacks;
-        this.initialize();
     }
 
     private triangle(element: JQuery, facingRight: boolean) {
@@ -45,7 +44,7 @@ export class UI {
         }
     }
 
-    private initialize() {
+    public initialize() {
         this.setupSpinnerUI();
         this.setupInfoRolloverUI();
         this.setupInputUI();
@@ -205,7 +204,7 @@ export class UI {
             divSearchResult.appendTo(divResults);
             var imgThumb = document.createElement('img');
             $(imgThumb).addClass('img_result search_stuff');
-            imgThumb.src = media.ThumbURL;
+            imgThumb.src = media.thumbURL;
             $(imgThumb).appendTo(divSearchResult);
             var innerDiv = document.createElement('div');
             $(innerDiv).addClass('div_inner_results search_stuff');
@@ -213,11 +212,11 @@ export class UI {
             var spanTitle = document.createElement('p');
             $(spanTitle).addClass('result_title search_stuff');
             $(spanTitle).appendTo(innerDiv);
-            $(spanTitle).text(media.Title);
+            $(spanTitle).text(media.title);
             var spanDescription = document.createElement('p');
             $(spanDescription).addClass('result_description search_stuff');
             $(spanDescription).appendTo(innerDiv);
-            $(spanDescription).html(media.Description);
+            $(spanDescription).html(media.description);
             divSearchResult.click(() => {
                 $("#div_search_results").fadeOut();
                 $("#input_search").val("");
@@ -312,9 +311,9 @@ export class UI {
             }
             if (valid) {
                 var media = new Media();
-                media.MP3Source = mp3url.val();
-                media.Title = episode.val();
-                media.Show = show.val();
+                media.mp3Source = mp3url.val();
+                media.title = episode.val();
+                media.show = show.val();
                 this.callbacks.uiQueueMedia(media);
                 divResults.fadeOut();
             }
@@ -387,8 +386,8 @@ export class UI {
             divQueueResult.appendTo(queueResults);
             var imgThumb = document.createElement('img');
             $(imgThumb).addClass('img_result');
-            if (media.ThumbURL && media.ThumbURL != "") {
-                imgThumb.src = media.ThumbURL;
+            if (media.thumbURL && media.thumbURL != "") {
+                imgThumb.src = media.thumbURL;
             }
             else {
                 $(imgThumb).css('background', this.colors[i]);
@@ -403,18 +402,18 @@ export class UI {
             var spanTitle = document.createElement('p');
             $(spanTitle).addClass('result_title');
             $(spanTitle).appendTo(innerDiv);
-            $(spanTitle).text(media.Title);
+            $(spanTitle).text(media.title);
             if (!this.mobileBrowser) {
                 var spanDescription = document.createElement('p');
                 $(spanDescription).addClass('result_description');
                 $(spanDescription).appendTo(innerDiv);
-                $(spanDescription).html(media.Description);
+                $(spanDescription).html(media.description);
             }
             var deleteX = document.createElement('span');
             $(deleteX).text('X');
             $(deleteX).addClass('span_delete');
             $(deleteX).click(() => {
-                this.callbacks.uiDeleteMedia(media.Id, i);
+                this.callbacks.uiDeleteMedia(media.id, i);
             });
             $(deleteX).appendTo(divQueueResult);
             

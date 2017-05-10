@@ -1,15 +1,15 @@
 ﻿export class Media {
-    Id: number;
-    MP3Source: string;
-    OGGSource: string;
-    Title: string;
-    ThumbURL: string;
-    Description: string;
-    Show: string;
+    id: number;
+    mp3Source: string;
+    oggSource: string;
+    title: string;
+    thumbURL: string;
+    description: string;
+    show: string;
 }
 
 export class Session {
-    Id: number;
-    Name: string;
-    Queue: Media[];
+    id: number;
+    name: string;
+    queue: Media[];
 }

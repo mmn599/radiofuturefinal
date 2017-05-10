@@ -3,10 +3,12 @@ using RadioFutureFinal.Contracts;
 using RadioFutureFinal.DAL;
 using RadioFutureFinal.Models;
 using RadioFutureFinal.Search;
-using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.IO;
+using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using System;
 
 namespace RadioFutureFinal.Controllers
 {
@@ -34,9 +36,19 @@ namespace RadioFutureFinal.Controllers
         }
 
         [HttpPost]
-        public async Task<List<MediaV1>> AddMedia([FromRoute] int sessionId, [FromBody] MediaV1 media)
+        public async Task<List<MediaV1>> AddMedia([FromRoute] int sessionId, string mediaString)
         {
-            var updatedSession = await _db.AddMediaToSessionAsync(media.ToModel(), sessionId);
+            MediaV1 mediaToQueue = null;
+            try
+            {
+                mediaToQueue = JsonConvert.DeserializeObject<MediaV1>(mediaString);
+            }
+            catch(Exception e)
+            {
+
+            }
+
+            var updatedSession = await _db.AddMediaToSessionAsync(mediaToQueue.ToModel(), sessionId);
             return updatedSession.ToContract().Queue;
         }
 
@@ -48,7 +60,7 @@ namespace RadioFutureFinal.Controllers
         }
 
         [HttpGet]
-        public async Task<List<MediaV1>> SearchAsync(string query, int page)
+        public async Task<List<MediaV1>> Search([FromQuery] string query, [FromQuery] int page)
         {
             var searchResults = await _searcher.searchPodcasts(query, page);
             return searchResults;

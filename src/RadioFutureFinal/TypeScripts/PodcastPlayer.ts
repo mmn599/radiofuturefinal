@@ -8,19 +8,20 @@ export class PodcastPlayer {
     private ui: UI;
     private canvas: HTMLCanvasElement;
 
-    constructor(ui: UI, mobileBrowser: boolean, nextMedia, previousMedia, onPlayerStateChange) {
+    constructor(ui: UI, mobileBrowser: boolean) {
         this.ui = ui;
         this.mobileBrowser = mobileBrowser;
+    };
+
+    public initialize = (onPlayerStateChange, nextMedia, previousMedia) => {
+
         this.audio = <HTMLAudioElement>document.getElementById('html5audio');
         this.canvas = <HTMLCanvasElement>document.getElementById('canvas_progress');
         $("#div_yt_player").hide();
         $("#div_podcast_player").show();
         $("#btn_next").click(nextMedia);
         $("#btn_previous").click(previousMedia);
-        this.initPlayer(onPlayerStateChange);
-    };
 
-    initPlayer = (onPlayerStateChange) => {
         this.canvas.width = this.canvas.offsetWidth;
         this.canvas.height = this.canvas.offsetHeight;
 
@@ -150,13 +151,13 @@ export class PodcastPlayer {
         newmp3.attr('id', 'mp3Source');
         newmp3.attr('type', 'audio/mp3');
         newmp3.appendTo(this.audio);
-        newmp3.attr('src', media.MP3Source);
+        newmp3.attr('src', media.mp3Source);
         this.audio.load();
         $("#cc_title").text('loading...');
         $("#cc_show").text('');
         this.audio.oncanplay = () => {
-            $("#cc_show").text(media.Show);
-            $("#cc_title").text(media.Title);
+            $("#cc_show").text(media.show);
+            $("#cc_title").text(media.title);
         }
         if (this.mobileBrowser) {
             this.pause();

@@ -2,15 +2,6 @@
 
 export class Requestor {
 
-    joinSessionUrl: string;
-    searchUrl: string;
-    addMediaUrl: string;
-    deleteMediaUrl: string;
-
-    constructor() {
-        this.joinSessionUrl = window.location.origin + "/session/"
-    }
-
     private getRoot() {
         return window.location.origin + "/session";
     }
@@ -37,7 +28,8 @@ export class Requestor {
             type: 'GET',
             url: this.getJoinSessionUrl(sessionName),
             success: function (response) {
-                console.log(response);
+                var session = <Session>response;
+                callback(session);
             },
             error: function (error) {
                 console.log(error);
@@ -51,7 +43,8 @@ export class Requestor {
             url: this.getSearchUrl(),
             data: {query: query, page: page},
             success: function (response) {
-                console.log(response);
+                var searchResults = <Media[]>response;
+                callback(searchResults);
             },
             error: function (error) {
                 console.log(error)
@@ -63,9 +56,10 @@ export class Requestor {
         $.ajax({
             type: 'POST',
             url: this.getAddMediaUrl(sessionId),
-            data: {media: media},
+            data: { mediaString: JSON.stringify(media) },
             success: function (response) {
-                console.log(response);
+                var updatedQueue = <Media[]>response;
+                callback(updatedQueue);
             }
         });
     }
@@ -75,7 +69,8 @@ export class Requestor {
             type: 'POST',
             url: this.getDeleteMediaUrl(sessionId, mediaId),
             success: function (response) {
-                console.log(response);
+                var updatedQueue = <Media[]>response;
+                callback(updatedQueue);
             }
         });
     }

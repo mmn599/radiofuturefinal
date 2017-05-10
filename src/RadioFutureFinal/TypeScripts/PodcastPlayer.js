@@ -1,8 +1,14 @@
 "use strict";
 var PodcastPlayer = (function () {
-    function PodcastPlayer(ui, mobileBrowser, nextMedia, previousMedia, onPlayerStateChange) {
+    function PodcastPlayer(ui, mobileBrowser) {
         var _this = this;
-        this.initPlayer = function (onPlayerStateChange) {
+        this.initialize = function (onPlayerStateChange, nextMedia, previousMedia) {
+            _this.audio = document.getElementById('html5audio');
+            _this.canvas = document.getElementById('canvas_progress');
+            $("#div_yt_player").hide();
+            $("#div_podcast_player").show();
+            $("#btn_next").click(nextMedia);
+            $("#btn_previous").click(previousMedia);
             _this.canvas.width = _this.canvas.offsetWidth;
             _this.canvas.height = _this.canvas.offsetHeight;
             $(_this.canvas).click(function (e) {
@@ -99,13 +105,13 @@ var PodcastPlayer = (function () {
             newmp3.attr('id', 'mp3Source');
             newmp3.attr('type', 'audio/mp3');
             newmp3.appendTo(_this.audio);
-            newmp3.attr('src', media.MP3Source);
+            newmp3.attr('src', media.mp3Source);
             _this.audio.load();
             $("#cc_title").text('loading...');
             $("#cc_show").text('');
             _this.audio.oncanplay = function () {
-                $("#cc_show").text(media.Show);
-                $("#cc_title").text(media.Title);
+                $("#cc_show").text(media.show);
+                $("#cc_title").text(media.title);
             };
             if (_this.mobileBrowser) {
                 _this.pause();
@@ -139,13 +145,6 @@ var PodcastPlayer = (function () {
         };
         this.ui = ui;
         this.mobileBrowser = mobileBrowser;
-        this.audio = document.getElementById('html5audio');
-        this.canvas = document.getElementById('canvas_progress');
-        $("#div_yt_player").hide();
-        $("#div_podcast_player").show();
-        $("#btn_next").click(nextMedia);
-        $("#btn_previous").click(previousMedia);
-        this.initPlayer(onPlayerStateChange);
     }
     ;
     PodcastPlayer.prototype.format = function (seconds) {

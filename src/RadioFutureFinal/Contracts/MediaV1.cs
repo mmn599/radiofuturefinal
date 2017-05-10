@@ -9,34 +9,25 @@ namespace RadioFutureFinal.Contracts
 {
     public class MediaV1
     {
-        [JsonProperty]
+        [JsonProperty(PropertyName = "id")]
         public int Id { get; set; }
 
-        [JsonProperty]
-        public int UserId { get; set; }
-
-        [JsonProperty]
-        public string UserName { get; set; }
-
-        [JsonProperty]
-        public string YTVideoID { get; set; }
-
-        [JsonProperty]
+        [JsonProperty(PropertyName = "title")]
         public string Title { get; set; }
 
-        [JsonProperty]
+        [JsonProperty(PropertyName = "thumbURL")]
         public string ThumbURL { get; set; }
 
-        [JsonProperty]
+        [JsonProperty(PropertyName = "mp3Source")]
         public string MP3Source { get; set; }
 
-        [JsonProperty]
+        [JsonProperty(PropertyName = "oggSource")]
         public string OGGSource { get; set; }
 
-        [JsonProperty]
+        [JsonProperty(PropertyName = "description")]
         public string Description { get; set; }
 
-        [JsonProperty]
+        [JsonProperty(PropertyName = "show")]
         public string Show { get; set; }
     }
 }

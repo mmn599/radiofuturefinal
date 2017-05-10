@@ -7,7 +7,8 @@ var Requestor = (function () {
                 type: 'GET',
                 url: _this.getJoinSessionUrl(sessionName),
                 success: function (response) {
-                    console.log(response);
+                    var session = response;
+                    callback(session);
                 },
                 error: function (error) {
                     console.log(error);
@@ -20,7 +21,8 @@ var Requestor = (function () {
                 url: _this.getSearchUrl(),
                 data: { query: query, page: page },
                 success: function (response) {
-                    console.log(response);
+                    var searchResults = response;
+                    callback(searchResults);
                 },
                 error: function (error) {
                     console.log(error);
@@ -31,9 +33,10 @@ var Requestor = (function () {
             $.ajax({
                 type: 'POST',
                 url: _this.getAddMediaUrl(sessionId),
-                data: { media: media },
+                data: { mediaString: JSON.stringify(media) },
                 success: function (response) {
-                    console.log(response);
+                    var updatedQueue = response;
+                    callback(updatedQueue);
                 }
             });
         };
@@ -42,11 +45,11 @@ var Requestor = (function () {
                 type: 'POST',
                 url: _this.getDeleteMediaUrl(sessionId, mediaId),
                 success: function (response) {
-                    console.log(response);
+                    var updatedQueue = response;
+                    callback(updatedQueue);
                 }
             });
         };
-        this.joinSessionUrl = window.location.origin + "/session/";
     }
     Requestor.prototype.getRoot = function () {
         return window.location.origin + "/session";
