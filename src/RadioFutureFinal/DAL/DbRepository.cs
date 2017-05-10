@@ -77,6 +77,8 @@ namespace RadioFutureFinal.DAL
             }
         }
 
+        // TODO: make the below more generic
+
         public async Task SaveSessionHitsAsync(Session updatedSession)
         {
             using (var context = ContextFactory())
@@ -92,7 +94,17 @@ namespace RadioFutureFinal.DAL
             using (var context = ContextFactory())
             {
                 context.Session.Attach(updatedSession);
-                context.Entry(updatedSession).Property(s => s.Queue).IsModified = true;
+                context.Entry(updatedSession).Collection(s => s.Queue).IsModified = true;
+                await context.SaveChangesAsync();
+            }
+        }
+
+        public async Task SaveSessionLockedAsync(Session updatedSession)
+        {
+            using (var context = ContextFactory())
+            {
+                context.Session.Attach(updatedSession);
+                context.Entry(updatedSession).Property(s => s.Locked).IsModified = true;
                 await context.SaveChangesAsync();
             }
         }

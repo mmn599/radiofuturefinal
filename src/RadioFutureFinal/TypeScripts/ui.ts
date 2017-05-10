@@ -20,6 +20,7 @@ export class UI {
     private mobileBrowser: boolean;
     private currentPage: number;
     private currentQuery: string;
+    private locked: boolean;
 
     constructor(mobileBrowser: boolean, callbacks: UICallbacks) {
         this.colors = ['red', 'orange', 'yellow', 'green', 'blue', 'violet'];
@@ -77,7 +78,9 @@ export class UI {
     } 
 
     public lockUI = () => {
+        $("#p_lock").show();
         $("#p_lock").text('this playlist is locked');
+        $(".span_delete").css('display', 'none');
     }
 
     public sessionReady = (session: Session) => {
@@ -99,9 +102,12 @@ export class UI {
         $("#p_session_hits").text(hitsString);
 
         if (session.locked) {
+            console.log('locked!');
+            this.locked = true;
             this.lockUI();
         }
         else {
+            console.log('not locked!');
             if (session.userCanLock) {
                 $("#p_lock").click(() => {
                     this.callbacks.uiLock();
@@ -443,13 +449,15 @@ export class UI {
                 $(spanDescription).appendTo(innerDiv);
                 $(spanDescription).html(media.description);
             }
-            var deleteX = document.createElement('span');
-            $(deleteX).text('X');
-            $(deleteX).addClass('span_delete');
-            $(deleteX).click(() => {
-                this.callbacks.uiDeleteMedia(media.id, i);
-            });
-            $(deleteX).appendTo(divQueueResult);
+            if (!this.locked) {
+                var deleteX = document.createElement('span');
+                $(deleteX).text('X');
+                $(deleteX).addClass('span_delete');
+                $(deleteX).click(() => {
+                    this.callbacks.uiDeleteMedia(media.id, i);
+                });
+                $(deleteX).appendTo(divQueueResult);
+            }
             
             if (queuePosition == i) {
                 $(divQueueResult).addClass('queue_result_selected');

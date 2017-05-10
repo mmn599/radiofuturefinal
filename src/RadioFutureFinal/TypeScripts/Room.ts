@@ -24,7 +24,9 @@ class RoomManager implements UICallbacks {
         this.ui.initialize();
         this.player.initialize(this.onPlayerStateChange, this.uiNextMedia, this.uiPreviousMedia);
         var sessionName = decodeURI(sessionName);
-        this.requestor.JoinSession(sessionName, this.clientSessionReady);
+        this.requestor.JoinSession(sessionName, this.clientSessionReady, (error) => {
+            console.log(error);
+        });
     }
 
     //==================================================================
@@ -45,7 +47,6 @@ class RoomManager implements UICallbacks {
     clientUpdateQueue = (updatedQueue: Media[]) => {
 
         // Checks for redundant updates because queue is locally updated
-
         // TODO: more robust equality check (this just checks if someone else added something)
         if (updatedQueue.length != this.session.queue.length) {
             var wasWaiting = this.isUserWaiting();
@@ -126,7 +127,7 @@ class RoomManager implements UICallbacks {
     }
 
     uiLock = () => {
-        console.log('locking');
+        this.requestor.Lock(this.session.id);
     }
 
     //

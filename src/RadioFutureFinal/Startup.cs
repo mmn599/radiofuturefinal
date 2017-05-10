@@ -82,6 +82,11 @@ namespace RadioFutureFinal
                     defaults: new { controller = "Session", action = "Search" });
 
                 routes.MapRoute(
+                    name: "lock",
+                    template: "session/Lock/{sessionId}", 
+                    defaults: new { controller = "Session", action = "Lock" });
+
+                routes.MapRoute(
                     name: "room",
                     template: "rooms/{roomName}",
                     defaults: new { controller = "Room", action = "EnterRoom" });

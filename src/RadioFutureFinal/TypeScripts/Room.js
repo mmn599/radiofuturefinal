@@ -72,7 +72,7 @@ var RoomManager = (function () {
             _this.requestor.DeleteMediaFromSession(_this.session.id, mediaId, _this.clientUpdateQueue);
         };
         this.uiLock = function () {
-            console.log('locking');
+            _this.requestor.Lock(_this.session.id);
         };
         //
         // Misc
@@ -101,7 +101,9 @@ var RoomManager = (function () {
         this.ui.initialize();
         this.player.initialize(this.onPlayerStateChange, this.uiNextMedia, this.uiPreviousMedia);
         var sessionName = decodeURI(sessionName);
-        this.requestor.JoinSession(sessionName, this.clientSessionReady);
+        this.requestor.JoinSession(sessionName, this.clientSessionReady, function (error) {
+            console.log(error);
+        });
     };
     //
     // Mostly UI callback functions

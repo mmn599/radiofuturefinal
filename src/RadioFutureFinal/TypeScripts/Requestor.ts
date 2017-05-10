@@ -18,6 +18,10 @@ export class Requestor {
         return this.getRoot() + "/DeleteMedia/" + sessionId + "/" + mediaId;
     }
 
+    private getLockUrl(sessionId: number) {
+        return this.getRoot() + "/Lock/" + sessionId;
+    }
+
     private getSearchUrl() {
         return this.getRoot() + "/Search";
     }
@@ -84,6 +88,23 @@ export class Requestor {
             success: function (response) {
                 var updatedQueue = <Media[]>response;
                 callback(updatedQueue);
+            },
+            error: function (error) {
+                if (errorCallback) {
+                    errorCallback(error);
+                }
+            }
+        });
+    }
+
+    public Lock = (sessionId: number, callback: () => void = null, errorCallback: (error) => void = null) => {
+        $.ajax({
+            type: 'GET',
+            url: this.getLockUrl(sessionId),
+            success: function (response) {
+                if (callback) {
+                    callback();
+                }
             },
             error: function (error) {
                 if (errorCallback) {

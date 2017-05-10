@@ -68,6 +68,24 @@ var Requestor = (function () {
                 }
             });
         };
+        this.Lock = function (sessionId, callback, errorCallback) {
+            if (callback === void 0) { callback = null; }
+            if (errorCallback === void 0) { errorCallback = null; }
+            $.ajax({
+                type: 'GET',
+                url: _this.getLockUrl(sessionId),
+                success: function (response) {
+                    if (callback) {
+                        callback();
+                    }
+                },
+                error: function (error) {
+                    if (errorCallback) {
+                        errorCallback(error);
+                    }
+                }
+            });
+        };
     }
     Requestor.prototype.getRoot = function () {
         return window.location.origin + "/session";
@@ -80,6 +98,9 @@ var Requestor = (function () {
     };
     Requestor.prototype.getDeleteMediaUrl = function (sessionId, mediaId) {
         return this.getRoot() + "/DeleteMedia/" + sessionId + "/" + mediaId;
+    };
+    Requestor.prototype.getLockUrl = function (sessionId) {
+        return this.getRoot() + "/Lock/" + sessionId;
     };
     Requestor.prototype.getSearchUrl = function () {
         return this.getRoot() + "/Search";

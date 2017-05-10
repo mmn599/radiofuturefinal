@@ -88,7 +88,7 @@ namespace RadioFutureFinal.Controllers
                 await _db.SaveSessionQueueAsync(session);
                 return Ok(session.ToContract().Queue);
             }
-            catch
+            catch(Exception e)
             {
                 return NotFound();
             }
@@ -130,6 +130,25 @@ namespace RadioFutureFinal.Controllers
             var searchResults = await _searcher.searchPodcasts(query, page);
             return Ok(searchResults);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Lock([FromRoute] int sessionId)
+        {
+            Session session;
+            bool locked;
+            var found = _getSession(sessionId, out session, out locked);
+
+            if(!found)
+            {
+                return NotFound();
+            }
+
+            session.Locked = true;
+            await _db.SaveSessionLockedAsync(session);
+
+            return Ok();
+        }
+
 
         private bool _getSession(int sessionId, out Session session, out bool locked)
         {
