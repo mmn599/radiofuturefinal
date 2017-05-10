@@ -23,7 +23,7 @@ $(document).ready(function(){
             }
             else {
                 $(".wrapper").fadeOut(700, function() {
-                    window.location.href = "/rooms/" + playlistName;
+                    window.location.href = "/playlists/" + playlistName;
                 });
             }
 
