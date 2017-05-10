@@ -313,7 +313,7 @@ export class UI {
                 var media = new Media();
                 media.mp3Source = mp3url.val();
                 media.title = episode.val();
-                media.show = show.val();
+                media.Show = show.val();
                 this.callbacks.uiQueueMedia(media);
                 divResults.fadeOut();
             }

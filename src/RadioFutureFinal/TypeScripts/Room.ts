@@ -103,7 +103,6 @@ class RoomManager implements UICallbacks {
         this.requestor.DeleteMediaFromSession(this.session.id, mediaId, this.clientUpdateQueue);
     }
 
-
     //
     // Misc
     //

@@ -5,7 +5,7 @@
     title: string;
     thumbURL: string;
     description: string;
-    show: string;
+    Show: string;
 }
 
 export class Session {

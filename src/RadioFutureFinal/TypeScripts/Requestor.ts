@@ -15,7 +15,7 @@ export class Requestor {
     }
 
     private getDeleteMediaUrl(sessionId: number, mediaId: number) {
-        return this.getRoot() + "/AddMedia/" + sessionId + "/" + mediaId;
+        return this.getRoot() + "/DeleteMedia/" + sessionId + "/" + mediaId;
     }
 
     private getSearchUrl() {

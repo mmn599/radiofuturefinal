@@ -37,6 +37,8 @@ var PodcastPlayer = (function () {
             }
         };
         this.nothingPlaying = function () {
+            _this.audio.oncanplay = function () {
+            };
             $("#cc_title").text('Nothing currently playing.');
             $("#cc_show").text('Queue something up!');
             _this.audio.pause();
@@ -110,7 +112,7 @@ var PodcastPlayer = (function () {
             $("#cc_title").text('loading...');
             $("#cc_show").text('');
             _this.audio.oncanplay = function () {
-                $("#cc_show").text(media.show);
+                $("#cc_show").text(media.Show);
                 $("#cc_title").text(media.title);
             };
             if (_this.mobileBrowser) {

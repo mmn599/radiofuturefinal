@@ -54,6 +54,8 @@ export class PodcastPlayer {
     }
 
     public nothingPlaying = () => {
+        this.audio.oncanplay = () => {
+        }
         $("#cc_title").text('Nothing currently playing.');
         $("#cc_show").text('Queue something up!');
         this.audio.pause();
@@ -156,7 +158,7 @@ export class PodcastPlayer {
         $("#cc_title").text('loading...');
         $("#cc_show").text('');
         this.audio.oncanplay = () => {
-            $("#cc_show").text(media.show);
+            $("#cc_show").text(media.Show);
             $("#cc_title").text(media.title);
         }
         if (this.mobileBrowser) {

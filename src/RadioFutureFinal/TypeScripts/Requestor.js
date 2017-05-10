@@ -61,7 +61,7 @@ var Requestor = (function () {
         return this.getRoot() + "/AddMedia/" + sessionId;
     };
     Requestor.prototype.getDeleteMediaUrl = function (sessionId, mediaId) {
-        return this.getRoot() + "/AddMedia/" + sessionId + "/" + mediaId;
+        return this.getRoot() + "/DeleteMedia/" + sessionId + "/" + mediaId;
     };
     Requestor.prototype.getSearchUrl = function () {
         return this.getRoot() + "/Search";
