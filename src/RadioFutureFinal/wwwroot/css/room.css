@@ -475,10 +475,6 @@ li:focus {
     color: black;
 }
 
-#make_your_own:hover {
-    background: grey;
-}
-
 #p_lock {
     display: none;
     cursor: pointer;

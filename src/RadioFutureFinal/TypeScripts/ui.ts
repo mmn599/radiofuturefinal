@@ -81,6 +81,24 @@ export class UI {
         $("#p_lock").show();
         $("#p_lock").text('this playlist is locked');
         $(".span_delete").css('display', 'none');
+        $("#input_search").hide();
+        $("#btn_search").hide();
+        if (!this.mobileBrowser) {
+            $("#make_your_own").css('top', '1%');
+            $("#make_your_own").css('width', '15%');
+            $("#make_your_own").css('height', '5%');
+            $("#make_your_own").css('margin-left', 'auto');
+            $("#make_your_own").css('margin-right', 'auto');
+            $("#make_your_own").css('left', 0);
+            $("#make_your_own").css('right', 0);
+        }
+        else {
+            var divSearchIn = $("#div_search_in");
+            var pNoSearch = $(document.createElement('p'));
+            pNoSearch.text('This playlist is locked.');
+            pNoSearch.appendTo(divSearchIn);
+            divSearchIn.append('<a href= "/" id="make_your_own" > make another playlist</a>');
+        }
     }
 
     public sessionReady = (session: Session) => {
@@ -88,13 +106,15 @@ export class UI {
         this.spinner.stop();
         $("#div_everything").animate({opacity: 1}, 'fast');
 
-        var divLinkHelp = $(document.createElement('div'));
-        divLinkHelp.addClass('arrow_box');
-        divLinkHelp.html('send this link to people!');
-        divLinkHelp.appendTo(document.body);
-        setTimeout(() => {
-            divLinkHelp.fadeOut();
-        }, 5000);
+        if (!session.locked) {
+            var divLinkHelp = $(document.createElement('div'));
+            divLinkHelp.addClass('arrow_box');
+            divLinkHelp.html('send this link to people!');
+            divLinkHelp.appendTo(document.body);
+            setTimeout(() => {
+                divLinkHelp.fadeOut();
+            }, 5000);
+        }
 
         $(".p_session_name").text(session.name);
         var hitsString = session.hits == 1 ? "1 playlist view" :
@@ -382,11 +402,13 @@ export class UI {
     }
 
     private searchEnterPressed(input_search) {
-        this.currentPage = 0;
-        this.currentQuery = input_search.val();
-        if (this.currentQuery && this.currentQuery != "") {
-            this.callbacks.uiSearch(this.currentQuery, this.currentPage);
-            this.displaySearching();
+        if (!this.locked) {
+            this.currentPage = 0;
+            this.currentQuery = input_search.val();
+            if (this.currentQuery && this.currentQuery != "") {
+                this.callbacks.uiSearch(this.currentQuery, this.currentPage);
+                this.displaySearching();
+            }
         }
     }
 
