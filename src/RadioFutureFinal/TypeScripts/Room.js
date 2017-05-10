@@ -18,12 +18,16 @@ var RoomManager = (function () {
             _this.ui.onSearchResults(searchResults);
         };
         this.clientUpdateQueue = function (updatedQueue) {
-            var wasWaiting = _this.isUserWaiting();
-            _this.session.queue = updatedQueue;
-            if (wasWaiting) {
-                _this.uiNextMedia();
+            // Checks for redundant updates because queue is locally updated
+            // TODO: more robust equality check (this just checks if someone else added something)
+            if (updatedQueue.length != _this.session.queue.length) {
+                var wasWaiting = _this.isUserWaiting();
+                _this.session.queue = updatedQueue;
+                if (wasWaiting) {
+                    _this.uiNextMedia();
+                }
+                _this.ui.updateQueue(_this.session.queue, _this.queuePosition);
             }
-            _this.ui.updateQueue(_this.session.queue, _this.queuePosition);
         };
         this.uiNextMedia = function () {
             var queue = _this.session.queue;
@@ -46,15 +50,25 @@ var RoomManager = (function () {
             }
         };
         this.uiQueueMedia = function (media) {
+            // Local add
+            _this.session.queue.push(media);
+            var wasWaiting = _this.isUserWaiting();
+            if (wasWaiting) {
+                _this.uiNextMedia();
+            }
+            _this.ui.updateQueue(_this.session.queue, _this.queuePosition);
+            // Notify the server
             _this.requestor.AddMediaToSession(_this.session.id, media, _this.clientUpdateQueue);
         };
         this.uiDeleteMedia = function (mediaId, position) {
+            // Local delete
             _this.session.queue.splice(position, 1);
             if (_this.queuePosition >= position) {
                 _this.queuePosition -= 1;
                 _this.onUserStateChange();
             }
             _this.ui.updateQueue(_this.session.queue, _this.queuePosition);
+            // Notify the server
             _this.requestor.DeleteMediaFromSession(_this.session.id, mediaId, _this.clientUpdateQueue);
         };
         //
@@ -90,21 +104,28 @@ var RoomManager = (function () {
     // Mostly UI callback functions
     //
     RoomManager.prototype.uiSearch = function (query, page) {
-        this.requestor.Search(query, page, this.clientSearchResults);
+        var _this = this;
+        this.requestor.Search(query, page, this.clientSearchResults, function (error) { _this.ui.onSearchError; });
     };
     RoomManager.prototype.uiGoToMedia = function (newQueuePosition) {
         this.queuePosition = newQueuePosition;
         this.onUserStateChange();
     };
     RoomManager.prototype.onUserStateChange = function () {
-        if (this.queuePosition >= 0 && this.queuePosition < this.session.queue.length) {
+        var length = this.session.queue.length;
+        if (this.queuePosition >= 0 && this.queuePosition < length) {
             this.player.setPlayerContent(this.session.queue[this.queuePosition]);
             this.ui.updateQueue(this.session.queue, this.queuePosition);
         }
         else if (this.queuePosition < 0) {
-            this.player.nothingPlaying();
+            if (length > 0) {
+                this.uiNextMedia();
+            }
+            else {
+                this.player.nothingPlaying();
+            }
         }
-        else if (this.queuePosition >= this.session.queue.length) {
+        else if (this.queuePosition >= length) {
             this.queuePosition = this.session.queue.length;
         }
     };

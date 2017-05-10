@@ -2,7 +2,8 @@
 var Requestor = (function () {
     function Requestor() {
         var _this = this;
-        this.JoinSession = function (sessionName, callback) {
+        this.JoinSession = function (sessionName, callback, errorCallback) {
+            if (errorCallback === void 0) { errorCallback = null; }
             $.ajax({
                 type: 'GET',
                 url: _this.getJoinSessionUrl(sessionName),
@@ -11,11 +12,14 @@ var Requestor = (function () {
                     callback(session);
                 },
                 error: function (error) {
-                    console.log(error);
+                    if (errorCallback) {
+                        errorCallback(error);
+                    }
                 }
             });
         };
-        this.Search = function (query, page, callback) {
+        this.Search = function (query, page, callback, errorCallback) {
+            if (errorCallback === void 0) { errorCallback = null; }
             $.ajax({
                 type: 'GET',
                 url: _this.getSearchUrl(),
@@ -25,11 +29,14 @@ var Requestor = (function () {
                     callback(searchResults);
                 },
                 error: function (error) {
-                    console.log(error);
+                    if (errorCallback) {
+                        errorCallback(error);
+                    }
                 }
             });
         };
-        this.AddMediaToSession = function (sessionId, media, callback) {
+        this.AddMediaToSession = function (sessionId, media, callback, errorCallback) {
+            if (errorCallback === void 0) { errorCallback = null; }
             $.ajax({
                 type: 'POST',
                 url: _this.getAddMediaUrl(sessionId),
@@ -37,16 +44,27 @@ var Requestor = (function () {
                 success: function (response) {
                     var updatedQueue = response;
                     callback(updatedQueue);
+                },
+                error: function (error) {
+                    if (errorCallback) {
+                        errorCallback(error);
+                    }
                 }
             });
         };
-        this.DeleteMediaFromSession = function (sessionId, mediaId, callback) {
+        this.DeleteMediaFromSession = function (sessionId, mediaId, callback, errorCallback) {
+            if (errorCallback === void 0) { errorCallback = null; }
             $.ajax({
                 type: 'POST',
                 url: _this.getDeleteMediaUrl(sessionId, mediaId),
                 success: function (response) {
                     var updatedQueue = response;
                     callback(updatedQueue);
+                },
+                error: function (error) {
+                    if (errorCallback) {
+                        errorCallback(error);
+                    }
                 }
             });
         };

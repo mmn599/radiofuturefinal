@@ -44,12 +44,19 @@ class RoomManager implements UICallbacks {
     }
 
     clientUpdateQueue = (updatedQueue: Media[]) => {
-        var wasWaiting = this.isUserWaiting();
-        this.session.queue = updatedQueue;
-        if (wasWaiting) {
-            this.uiNextMedia();
+
+        // Checks for redundant updates because queue is locally updated
+
+        // TODO: more robust equality check (this just checks if someone else added something)
+        if (updatedQueue.length != this.session.queue.length) {
+            var wasWaiting = this.isUserWaiting();
+            this.session.queue = updatedQueue;
+            if (wasWaiting) {
+                this.uiNextMedia();
+            }
+            this.ui.updateQueue(this.session.queue, this.queuePosition);
         }
-        this.ui.updateQueue(this.session.queue, this.queuePosition);
+
     }
 
     //
@@ -57,7 +64,7 @@ class RoomManager implements UICallbacks {
     //
 
     uiSearch(query: string, page: number) {
-        this.requestor.Search(query, page, this.clientSearchResults);
+        this.requestor.Search(query, page, this.clientSearchResults, (error) => { this.ui.onSearchError } );
     }
 
     uiGoToMedia(newQueuePosition: number) {
@@ -90,17 +97,33 @@ class RoomManager implements UICallbacks {
     }
 
     uiQueueMedia = (media: Media) => {
+
+        // Local add
+        this.session.queue.push(media);
+        var wasWaiting = this.isUserWaiting();
+        if (wasWaiting) {
+            this.uiNextMedia();
+        }
+        this.ui.updateQueue(this.session.queue, this.queuePosition);
+
+        // Notify the server
         this.requestor.AddMediaToSession(this.session.id, media, this.clientUpdateQueue);
+
     }
 
     uiDeleteMedia = (mediaId: number, position: number) => {
+
+        // Local delete
         this.session.queue.splice(position, 1);
         if (this.queuePosition >= position) {
             this.queuePosition -= 1;
             this.onUserStateChange();
         }
         this.ui.updateQueue(this.session.queue, this.queuePosition);
+
+        // Notify the server
         this.requestor.DeleteMediaFromSession(this.session.id, mediaId, this.clientUpdateQueue);
+
     }
 
     //
@@ -114,14 +137,22 @@ class RoomManager implements UICallbacks {
     }
 
     onUserStateChange() {
-        if (this.queuePosition >= 0 && this.queuePosition < this.session.queue.length) {
+
+        let length = this.session.queue.length;
+
+        if (this.queuePosition >= 0 && this.queuePosition < length) {
             this.player.setPlayerContent(this.session.queue[this.queuePosition]);
             this.ui.updateQueue(this.session.queue, this.queuePosition);
         }
         else if (this.queuePosition < 0) {
-            this.player.nothingPlaying();
+            if (length > 0) {
+                this.uiNextMedia();
+            }
+            else {
+                this.player.nothingPlaying();
+            }
         }
-        else if (this.queuePosition >= this.session.queue.length) {
+        else if (this.queuePosition >= length) {
             this.queuePosition = this.session.queue.length;
         }
     }

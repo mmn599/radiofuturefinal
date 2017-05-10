@@ -197,6 +197,13 @@ export class UI {
         });
     }
 
+    public onSearchError() {
+        var divResults = $("#div_search_results");
+        divResults.html("");
+        divResults.html("<p id='p_searching'>no results found, or something screwed up</p>");
+        divResults.fadeIn();
+    }
+
     public onSearchResults(results: Media[]) {
         var divResults = $("#div_search_results");
         divResults.html("");
@@ -227,10 +234,7 @@ export class UI {
             });
         }
         if (results.length == 0) {
-            var divResults = $("#div_search_results");
-            divResults.html("");
-            divResults.html("<p id='p_searching'>no results found, or something screwed up</p>");
-            divResults.fadeIn();
+            this.onSearchError();
         }
         // TODO: these dont have to be added every time
         if (results.length == 5) {

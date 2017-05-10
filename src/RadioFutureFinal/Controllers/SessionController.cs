@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System;
+using RadioFutureFinal.Errors;
 
 namespace RadioFutureFinal.Controllers
 {
@@ -36,34 +37,66 @@ namespace RadioFutureFinal.Controllers
         }
 
         [HttpPost]
-        public async Task<List<MediaV1>> AddMedia([FromRoute] int sessionId, string mediaString)
+        public async Task<IActionResult> AddMedia([FromRoute] int sessionId, string mediaString)
         {
             MediaV1 mediaToQueue = null;
             try
             {
                 mediaToQueue = JsonConvert.DeserializeObject<MediaV1>(mediaString);
             }
-            catch(Exception e)
+            catch
             {
-
+                return NotFound();
             }
 
-            var updatedSession = await _db.AddMediaToSessionAsync(mediaToQueue.ToModel(), sessionId);
-            return updatedSession.ToContract().Queue;
+            try
+            {
+                var updatedSession = await _db.AddMediaToSessionAsync(mediaToQueue.ToModel(), sessionId);
+                return Ok(updatedSession.ToContract().Queue);
+            }
+            catch
+            {
+                return NotFound();
+            }
         }
 
         [HttpPost]
-        public async Task<List<MediaV1>> DeleteMedia([FromRoute] int sessionId, [FromRoute] int mediaId)
+        public async Task<IActionResult> DeleteMedia([FromRoute] int sessionId, [FromRoute] int mediaId)
         {
-            var updatedSession = await _db.RemoveMediaFromSessionAsync(sessionId, mediaId);
-            return updatedSession.ToContract().Queue;
+            try
+            {
+                var updatedSession = await _db.RemoveMediaFromSessionAsync(sessionId, mediaId);
+                return Ok(updatedSession.ToContract().Queue);
+            }
+            catch
+            {
+                return NotFound();
+            }
         }
 
         [HttpGet]
-        public async Task<List<MediaV1>> Search([FromQuery] string query, [FromQuery] int page)
+        public async Task<IActionResult> Search([FromQuery] string query, [FromQuery] int page)
         {
+            if(!validQuery(query, page))
+            {
+                return NotFound();
+            }
             var searchResults = await _searcher.searchPodcasts(query, page);
-            return searchResults;
+            return Ok(searchResults);
+        }
+
+        private bool validQuery(string query, int page)
+        {
+            if(page < 0)
+            {
+                return false;
+            }
+            if(string.IsNullOrEmpty(query))
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }

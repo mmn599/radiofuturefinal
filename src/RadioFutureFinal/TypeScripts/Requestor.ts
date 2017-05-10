@@ -23,7 +23,8 @@ export class Requestor {
     }
 
 
-    public JoinSession = (sessionName: string, callback: (session: Session) => void) => {
+    public JoinSession = (sessionName: string, callback: (session: Session) => void,
+                                                errorCallback: (error) => void = null) => {
         $.ajax({
             type: 'GET',
             url: this.getJoinSessionUrl(sessionName),
@@ -32,12 +33,15 @@ export class Requestor {
                 callback(session);
             },
             error: function (error) {
-                console.log(error);
+                if (errorCallback) {
+                    errorCallback(error);
+                }
             }
         });
     }
 
-    public Search = (query: string, page: number, callback: (searchResults: Media[]) => void) => {
+    public Search = (query: string, page: number, callback: (searchResults: Media[]) => void,
+                                                    errorCallback: (error) => void = null) => {
         $.ajax({
             type: 'GET',
             url: this.getSearchUrl(),
@@ -47,12 +51,15 @@ export class Requestor {
                 callback(searchResults);
             },
             error: function (error) {
-                console.log(error)
+                if (errorCallback) {
+                    errorCallback(error);
+                }
             }
         });
     }
 
-    public AddMediaToSession = (sessionId: number, media: Media, callback: (updatedQueue: Media[]) => void) => {
+    public AddMediaToSession = (sessionId: number, media: Media, callback: (updatedQueue: Media[]) => void,
+                                                                    errorCallback: (error) => void = null) => {
         $.ajax({
             type: 'POST',
             url: this.getAddMediaUrl(sessionId),
@@ -60,17 +67,28 @@ export class Requestor {
             success: function (response) {
                 var updatedQueue = <Media[]>response;
                 callback(updatedQueue);
+            },
+            error: function (error) {
+                if (errorCallback) {
+                    errorCallback(error);
+                }
             }
         });
     }
 
-    public DeleteMediaFromSession = (sessionId: number, mediaId: number, callback: (updatedQueue: Media[]) => void) => {
+    public DeleteMediaFromSession = (sessionId: number, mediaId: number, callback: (updatedQueue: Media[]) => void,
+                                                                            errorCallback: (error) => void = null) => {
         $.ajax({
             type: 'POST',
             url: this.getDeleteMediaUrl(sessionId, mediaId),
             success: function (response) {
                 var updatedQueue = <Media[]>response;
                 callback(updatedQueue);
+            },
+            error: function (error) {
+                if (errorCallback) {
+                    errorCallback(error);
+                }
             }
         });
     }

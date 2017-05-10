@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using RadioFutureFinal.Data;
+using RadioFutureFinal.Errors;
 using RadioFutureFinal.Models;
 using System;
 using System.Linq;
@@ -34,19 +35,23 @@ namespace RadioFutureFinal.DAL
         }
 
         // Assumes fully populated session
-        public async Task UpdateSessionAsyncInternal(Session session, ApplicationDbContext sourceContext)
+        public async Task _updateSessionAsyncInternal(Session session, ApplicationDbContext sourceContext)
         {
             sourceContext.Session.Update(session);
             await sourceContext.SaveChangesAsync();
         }
 
-        public async Task<Session> AddMediaToSessionAsync(Media media, int sessionId)
+        public async Task<Session> AddMediaToSessionAsync(Media media, int sessionId) 
         {
             using (var context = ContextFactory())
             {
                 var session = _getSessionInternal(context, sessionId);
+                if(session == null)
+                {
+                    throw new RadioException("AddMediaToSessionAsync: session with id: " + sessionId + " not found.");
+                } 
                 session.Queue.Add(media);
-                await UpdateSessionAsyncInternal(session, context);
+                await _updateSessionAsyncInternal(session, context);
                 return session;
             }
         }
@@ -100,7 +105,15 @@ namespace RadioFutureFinal.DAL
             using (var context = ContextFactory())
             {
                 var session = _getSessionInternal(context, sessionId);
+                if(session == null)
+                {
+                    throw new RadioException("RemoveMediaFromSessionAsync: Session not found for id: " + sessionId);
+                }
                 var media = session.Queue.FirstOrDefault(m => m.MediaID == mediaId);
+                if(media == null)
+                {
+                    throw new RadioException("RemoveMediaFromSessionAsync: Media not found for id: " + mediaId);
+                }
                 session.Queue.Remove(media);
                 context.Session.Update(session);
                 await context.SaveChangesAsync();
