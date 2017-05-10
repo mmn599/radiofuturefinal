@@ -266,7 +266,7 @@ html, body {
 
 #btn_go {
     cursor: pointer;
-    color: cornflowerblue; 
+    color: #ff5f99;
     margin: 0; 
     margin-top: 5%; 
     margin-bottom: 5%;
@@ -274,7 +274,7 @@ html, body {
 }
 
 #btn_go:hover {
-    color: blue;
+    color: #ff1f39;
 }
 
 

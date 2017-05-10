@@ -13,7 +13,11 @@ $(document).ready(function(){
             var playlistName = $("#txt_group_join").val();
             var valid = validPlaylistName(playlistName);
 
-            if (!valid) {
+            if (!playlistName || playlistName == "") {
+                $("#txt_group_join").attr("placeholder", "enter a playlist name");
+                $("#txt_group_join").val("");
+            }
+            else if (!valid) {
                 $("#txt_group_join").attr("placeholder", "don't use special characters");
                 $("#txt_group_join").val("");
             }

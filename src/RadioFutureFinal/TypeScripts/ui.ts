@@ -79,6 +79,7 @@ export class UI {
         $("#div_loading").hide();
         this.spinner.stop();
         $("#div_everything").animate({opacity: 1}, 'fast');
+
         var divLinkHelp = $(document.createElement('div'));
         divLinkHelp.addClass('arrow_box');
         divLinkHelp.html('send this link to people!');
