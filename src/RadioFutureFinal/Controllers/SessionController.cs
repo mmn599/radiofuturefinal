@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System;
 using RadioFutureFinal.Errors;
+using Microsoft.AspNetCore.Hosting.Internal;
 
 namespace RadioFutureFinal.Controllers
 {
@@ -25,15 +26,30 @@ namespace RadioFutureFinal.Controllers
         }
 
         [HttpGet]
-        public async Task<SessionV1> JoinSession([FromRoute] string sessionName)
+        public async Task<IActionResult> JoinSession([FromRoute] string sessionName)
         {
             Session session = null;
-            bool sessionFound = _db.GetSessionByName(sessionName, out session);
-            if (!sessionFound)
+
+            try
             {
-                session = await _db.CreateSessionAsync(sessionName);
+                bool sessionFound = _db.GetSessionByName(sessionName, out session);
+                if (!sessionFound)
+                {
+                    session = await _db.CreateSessionAsync(sessionName);
+                }
             }
-            return session.ToContract();
+            catch
+            {
+                return NotFound();
+            }
+
+            session.Hits += 1;
+            var sessionContract = session.ToContract();
+
+            // TODO: do this in background
+            await _db.SaveSessionHitsAsync(session);
+
+            return Ok(sessionContract);
         }
 
         [HttpPost]

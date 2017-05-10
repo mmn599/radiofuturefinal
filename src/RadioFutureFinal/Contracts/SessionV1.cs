@@ -18,6 +18,9 @@ namespace RadioFutureFinal.Contracts
         [JsonProperty(PropertyName = "queue")]
         public List<MediaV1> Queue { get; set; }
 
+        [JsonProperty(PropertyName = "hits")]
+        public int Hits { get; set; }
+
         public SessionV1()
         {
             

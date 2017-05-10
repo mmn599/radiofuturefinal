@@ -12,17 +12,19 @@ namespace RadioFutureFinal.Models
     {
         public int SessionID { get; set; }
         public string Name { get; set; }
+        public int Hits { get; set; }
         public List<Media> Queue { get; set; }
+
+        public Session()
+        {
+            Hits = 0; 
+        }
 
         public Session(string name)
         {
             Queue = new List<Media>();
             Name = name;
-        }
-
-        public Session()
-        {
-
+            Hits = 0;
         }
     }
 }

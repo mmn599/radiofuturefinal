@@ -11,5 +11,6 @@ namespace RadioFutureFinal.DAL
         Session GetSession(int sessionId);
         bool GetSessionByName(string sessionName, out Session session);
         Task<Session> RemoveMediaFromSessionAsync(int sessionId, int mediaId);
+        Task SaveSessionHitsAsync(Session session);
     }
 }

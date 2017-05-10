@@ -121,5 +121,15 @@ namespace RadioFutureFinal.DAL
             }
         }
 
+        public async Task SaveSessionHitsAsync(Session updatedSession)
+        {
+            using (var context = ContextFactory())
+            {
+                context.Session.Attach(updatedSession);
+                context.Entry(updatedSession).Property(s => s.Hits).IsModified = true;
+                await context.SaveChangesAsync();
+            }
+        }
+
     }
 }

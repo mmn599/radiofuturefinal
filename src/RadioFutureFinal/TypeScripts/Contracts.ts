@@ -12,4 +12,5 @@ export class Session {
     id: number;
     name: string;
     queue: Media[];
+    hits: number;
 }

@@ -12,7 +12,6 @@ class RoomManager implements UICallbacks {
     mobileBrowser: boolean;
     queuePosition: number;
 
-
     constructor(mobileBrowser: boolean) {
         this.queuePosition = -1;
         this.mobileBrowser = mobileBrowser;
