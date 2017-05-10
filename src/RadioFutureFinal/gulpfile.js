@@ -14,14 +14,11 @@ gulp.task("default", function () {
         debug: true,
         entries: 
         [
-            './TypeScripts/Contracts.ts',
-            './TypeScripts/Sockets.ts',
-            './TypeScripts/FrameBuilder.ts',
-            './TypeScripts/UI.ts',
-            './TypeScripts/Room.ts',
-            './TypeScripts/IPlayer.ts',
-            './TypeScripts/PodcastPlayer.ts',
-            './TypeScripts/YtPlayer.ts'
+            "./TypeScripts/Contracts.ts",
+            "./TypeScripts/UI.ts",
+            "./TypeScripts/Room.ts",
+            "./TypeScripts/PodcastPlayer.ts",
+            "./TypeScripts/Requestor.ts"
         ],
         cache: {},
         packageCache: {}

@@ -17,14 +17,12 @@ export class UI {
     private spinner: any;
     private callbacks: UICallbacks;
     private mobileBrowser: boolean;
-    private frameBuilder: FrameBuilder;
     private currentPage: number;
     private currentQuery: string;
 
     constructor(mobileBrowser: boolean, callbacks: UICallbacks) {
         this.colors = ['red', 'orange', 'yellow', 'green', 'blue', 'violet'];
         this.mobileBrowser = mobileBrowser;
-        this.frameBuilder = new FrameBuilder();
         this.callbacks = callbacks;
         this.initialize();
     }
@@ -188,21 +186,6 @@ export class UI {
         $("#btn_search").click(() => {
             this.searchEnterPressed(inputSearch);
         });
-        var input_name = $("#input_name");
-        input_name.keypress((e) => {
-            if (e.which == 13) {
-                this.userNameChange(input_name);
-            }
-        });
-        if (!this.mobileBrowser) {
-            var input_chat = $("#input_chat");
-            input_chat.keypress((e) => {
-                if (e.which == 13) {
-                    this.callbacks.uiSendChatMessage(input_chat.val());
-                    input_chat.val("");
-                }
-            });
-        }
         $("#div_stuff, #div_current_content").click(() => {
             $("#div_search_results").fadeOut();
             $("#input_search").val("");
@@ -368,9 +351,7 @@ export class UI {
         }
     }
 
-    public updateQueue(queue: Media[], userIdMe: number, queuePosition: number) {
-
-        // TODO: this should get out of here
+    public updateQueue(queue: Media[], queuePosition: number) {
         var hasNext = (queuePosition + 1) < queue.length;
         var hasPrevious = queuePosition > 0;
         if (hasNext) {
@@ -429,15 +410,13 @@ export class UI {
                 $(spanDescription).appendTo(innerDiv);
                 $(spanDescription).html(media.Description);
             }
-            if (userIdMe == media.UserId) {
-                var deleteX = document.createElement('span');
-                $(deleteX).text('X');
-                $(deleteX).addClass('span_delete');
-                $(deleteX).click(() => {
-                    this.callbacks.uiDeleteMedia(media.Id, i);
-                });
-                $(deleteX).appendTo(divQueueResult);
-            }
+            var deleteX = document.createElement('span');
+            $(deleteX).text('X');
+            $(deleteX).addClass('span_delete');
+            $(deleteX).click(() => {
+                this.callbacks.uiDeleteMedia(media.Id, i);
+            });
+            $(deleteX).appendTo(divQueueResult);
             
             if (queuePosition == i) {
                 $(divQueueResult).addClass('queue_result_selected');
@@ -459,52 +438,4 @@ export class UI {
         return true;
     }
 
-
-    public updateUsersList(users, userIdMe: number) {
-        var num = users.length;
-        var summary = users.length + " users listening";
-        if (num == 1) {
-            summary = users.length + " user listening";
-        }
-        $("#p_users_summary").text(summary);
-        var userResults = $("#div_inner_user_results");
-        userResults.html("");
-        for (var i = 0; i < users.length; i++) {
-            let user = users[i];
-            let thisIsMe = (user.Id === userIdMe);
-            let color = this.colors[i % this.colors.length];
-            let currentHTML = "";
-            var syncHTML = thisIsMe ? 'you' : 'sync';
-            var syncHTMLMobile = thisIsMe ? 'you' : 'sync with ' + user.Name;
-            currentHTML =
-                `<div class="user_result_outer"> 
-                    <div class="user_result_block" style="background:${color};">${syncHTML}</div> 
-                    <span class="user_result_span"> ${user.Name} </span> 
-                </div>`;
-
-            var cur = $($.parseHTML(currentHTML));
-            var outer = cur.filter('.user_result_outer');
-
-            if (!thisIsMe) {
-                $(outer).click(() => this.callbacks.uiRequestSyncWithUser(user.Id));
-            }
-
-            outer.appendTo(userResults);
-        }
-
-    }
-
-    public userNameChange(name_input) {
-        name_input.hide();
-        $("#div_inner_user_results").show();
-        this.callbacks.uiNameChange(name_input.val());
-    }
-
-    public onChatMessage(userName: string, msg: string, color: string) {
-        //TODO: color stuff
-        var ul_chat = $("#ul_chat");
-        var html = '<li tabindex="1" class="chat"><span style="margin: 0; color: ' + color + ';">' + userName + ': </span><span>' + msg + '</span></li>';
-        ul_chat.append(html);
-        ul_chat.children().last().focus();
-    }
 }

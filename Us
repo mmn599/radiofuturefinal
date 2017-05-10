@@ -1,0 +1,125 @@
+[1mdiff --git a/src/RadioFutureFinal/TypeScripts/Room.ts b/src/RadioFutureFinal/TypeScripts/Room.ts[m
+[1mindex 958fc0b..1083b57 100644[m
+[1m--- a/src/RadioFutureFinal/TypeScripts/Room.ts[m
+[1m+++ b/src/RadioFutureFinal/TypeScripts/Room.ts[m
+[36m@@ -8,8 +8,10 @@[m [mclass RoomManager implements UICallbacks {[m
+     player: PodcastPlayer; [m
+     ui: UI;[m
+     mobileBrowser: boolean;[m
+[32m+[m[32m    queuePosition: number;[m
+ [m
+     constructor(mobileBrowser: boolean) {[m
+[32m+[m[32m        this.queuePosition = -1;[m
+         this.mobileBrowser = mobileBrowser;[m
+     }[m
+ [m
+[36m@@ -32,25 +34,24 @@[m [mclass RoomManager implements UICallbacks {[m
+ [m
+     clientSessionReady(msg) {[m
+         this.session = msg.session;[m
+[31m-        this.user = msg.user;[m
+         this.uiNextMedia();[m
+[31m-        this.ui.updateQueue(this.session.Queue, this.user.Id, this.user.State.QueuePosition);[m
+[31m-        this.ui.updateUsersList(this.session.Users, this.user.Id);[m
+[32m+[m[32m        this.ui.updateQueue(this.session.Queue, this.queuePosition);[m
+         this.ui.sessionReady();[m
+     }[m
+ [m
+[32m+[m[32m    clientSearchResults(msg) {[m
+[32m+[m[32m        this.ui.onSearchResults(msg.searchResults);[m
+[32m+[m[32m    }[m
+[32m+[m
+     clientUpdateQueue(msg) {[m
+         var wasWaiting = this.isUserWaiting();[m
+         this.session.Queue = msg.queue;[m
+         if (wasWaiting) {[m
+             this.uiNextMedia();[m
+         }[m
+[31m-        this.ui.updateQueue(this.session.Queue, this.user.Id, this.user.State.QueuePosition);[m
+[32m+[m[32m        this.ui.updateQueue(this.session.Queue, this.queuePosition);[m
+     }[m
+ [m
+[31m-    clientSearchResults(msg) {[m
+[31m-        this.ui.onSearchResults(msg.searchResults);[m
+[31m-    }[m
+ [m
+     //[m
+     // Mostly UI callback functions[m
+[36m@@ -61,16 +62,14 @@[m [mclass RoomManager implements UICallbacks {[m
+     }[m
+ [m
+     uiGoToMedia(newQueuePosition: number) {[m
+[31m-        this.user.State.QueuePosition = newQueuePosition;[m
+[31m-        this.user.State.Time = 0;[m
+[32m+[m[32m        this.queuePosition = newQueuePosition;[m
+         this.onUserStateChange();[m
+     }[m
+ [m
+     uiNextMedia = () => {[m
+         var queue = this.session.Queue;[m
+[31m-        if(this.user.State.QueuePosition + 1 < queue.length) {[m
+[31m-            this.user.State.Time = 0;[m
+[31m-            this.user.State.QueuePosition += 1;[m
+[32m+[m[32m        if(this.queuePosition + 1 < queue.length) {[m
+[32m+[m[32m            this.queuePosition += 1;[m
+             this.onUserStateChange();[m
+         }[m
+     }[m
+[36m@@ -84,30 +83,24 @@[m [mclass RoomManager implements UICallbacks {[m
+     }[m
+ [m
+     uiPreviousMedia = () => {[m
+[31m-        this.user.State.Time = 0;[m
+         var queue = this.session.Queue;[m
+[31m-        if(this.user.State.QueuePosition > 0) {[m
+[31m-            this.user.State.QueuePosition = this.user.State.QueuePosition - 1;[m
+[32m+[m[32m        if(this.queuePosition > 0) {[m
+[32m+[m[32m            this.queuePosition = this.queuePosition - 1;[m
+             this.onUserStateChange();[m
+         }[m
+     }[m
+ [m
+     uiQueueMedia = (media: Media) => {[m
+[31m-        // TODO: awkward[m
+[31m-        media.UserId = this.user.Id;[m
+[31m-        media.UserName = this.user.Name;[m
+         this.socket.AddMediaToSession(media);[m
+     }[m
+ [m
+     uiDeleteMedia = (mediaId: number, position: number) => {[m
+[31m-        // TODO: important: this should be done once the update is sent from server[m
+         this.session.Queue.splice(position, 1);[m
+[31m-        if (this.user.State.QueuePosition >= position) {[m
+[31m-            this.user.State.QueuePosition -= 1;[m
+[32m+[m[32m        if (this.queuePosition >= position) {[m
+[32m+[m[32m            this.queuePosition -= 1;[m
+             this.onUserStateChange();[m
+         }[m
+[31m-        this.ui.updateQueue(this.session.Queue, this.user.Id, this.user.State.QueuePosition);[m
+[31m-[m
+[32m+[m[32m        this.ui.updateQueue(this.session.Queue, this.queuePosition);[m
+         this.socket.DeleteMediaFromSession(mediaId);[m
+     }[m
+ [m
+[36m@@ -117,15 +110,15 @@[m [mclass RoomManager implements UICallbacks {[m
+     //[m
+ [m
+     onUserStateChange() {[m
+[31m-        if (this.user.State.QueuePosition >= 0 && this.user.State.QueuePosition < this.session.Queue.length) {[m
+[31m-            this.player.setPlayerContent(this.session.Queue[this.user.State.QueuePosition], this.user.State.Time);[m
+[31m-            this.ui.updateQueue(this.session.Queue, this.user.Id, this.user.State.QueuePosition);[m
+[32m+[m[32m        if (this.queuePosition >= 0 && this.queuePosition < this.session.Queue.length) {[m
+[32m+[m[32m            this.player.setPlayerContent(this.session.Queue[this.queuePosition]);[m
+[32m+[m[32m            this.ui.updateQueue(this.session.Queue, this.queuePosition);[m
+         }[m
+[31m-        else if (this.user.State.QueuePosition < 0) {[m
+[32m+[m[32m        else if (this.queuePosition < 0) {[m
+             this.player.nothingPlaying();[m
+         }[m
+[31m-        else if (this.user.State.QueuePosition >= this.session.Queue.length) {[m
+[31m-            this.user.State.QueuePosition = this.session.Queue.length;[m
+[32m+[m[32m        else if (this.queuePosition >= this.session.Queue.length) {[m
+[32m+[m[32m            this.queuePosition = this.session.Queue.length;[m
+         }[m
+     }[m
+ [m

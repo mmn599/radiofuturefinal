@@ -18,10 +18,7 @@
     <Content Include="wwwroot\css\room.css" />
     <Content Include="wwwroot\css\room.min.css" />
     <Content Include="wwwroot\css\roommobile.min.css" />
-    <Content Include="wwwroot\css\ytroom.css" />
-    <Content Include="wwwroot\css\ytroom.min.css" />
     <Content Include="wwwroot\css\roommobile.css" />
-    <Content Include="wwwroot\css\ytroommobile.min.css" />
   </ItemGroup>
 
   <ItemGroup>
@@ -72,15 +69,6 @@
     <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="1.0.0" />
     <DotNetCliToolReference Include="Microsoft.Extensions.SecretManager.Tools" Version="1.0.0" />
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="1.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="TypeScripts\IPlayer.js">
-      <DependentUpon>IPlayer.ts</DependentUpon>
-    </None>
-    <None Update="TypeScripts\IPlayer.js.map">
-      <DependentUpon>IPlayer.js</DependentUpon>
-    </None>
   </ItemGroup>
 
 </Project>

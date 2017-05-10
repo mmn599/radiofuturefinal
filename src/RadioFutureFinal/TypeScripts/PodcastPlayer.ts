@@ -8,7 +8,7 @@ export class PodcastPlayer {
     private ui: UI;
     private canvas: HTMLCanvasElement;
 
-    constructor(ui: UI, mobileBrowser: boolean, nextMedia, previousMedia) {
+    constructor(ui: UI, mobileBrowser: boolean, nextMedia, previousMedia, onPlayerStateChange) {
         this.ui = ui;
         this.mobileBrowser = mobileBrowser;
         this.audio = <HTMLAudioElement>document.getElementById('html5audio');
@@ -17,6 +17,7 @@ export class PodcastPlayer {
         $("#div_podcast_player").show();
         $("#btn_next").click(nextMedia);
         $("#btn_previous").click(previousMedia);
+        this.initPlayer(onPlayerStateChange);
     };
 
     initPlayer = (onPlayerStateChange) => {
@@ -45,7 +46,7 @@ export class PodcastPlayer {
         }
     }
 
-    public updatePlayerTime = (time: number) => {
+    private updatePlayerTime = (time: number) => {
         if (time != NaN) {
             this.audio.currentTime = time;
         }
@@ -64,7 +65,7 @@ export class PodcastPlayer {
         }, 100);
     }
 
-    audioTimeUpdate() {
+    audioTimeUpdate = () => {
         var duration = this.audio.duration == 0 ? 1 : this.audio.duration;
         var percentage = this.audio.currentTime / this.audio.duration;
         this.updateProgressUI(this.audio.currentTime, this.audio.duration);
@@ -143,7 +144,7 @@ export class PodcastPlayer {
         mp3.remove();
     }
 
-    setPlayerContent = (media: Media, time: number) => {
+    setPlayerContent = (media: Media) => {
         this.removeSource();
         let newmp3 = $(document.createElement('source'));
         newmp3.attr('id', 'mp3Source');
@@ -151,7 +152,6 @@ export class PodcastPlayer {
         newmp3.appendTo(this.audio);
         newmp3.attr('src', media.MP3Source);
         this.audio.load();
-        this.audio.currentTime = time;
         $("#cc_title").text('loading...');
         $("#cc_show").text('');
         this.audio.oncanplay = () => {

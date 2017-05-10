@@ -1,6 +1,6 @@
 "use strict";
 var PodcastPlayer = (function () {
-    function PodcastPlayer(ui, mobileBrowser, nextMedia, previousMedia) {
+    function PodcastPlayer(ui, mobileBrowser, nextMedia, previousMedia, onPlayerStateChange) {
         var _this = this;
         this.initPlayer = function (onPlayerStateChange) {
             _this.canvas.width = _this.canvas.offsetWidth;
@@ -41,6 +41,11 @@ var PodcastPlayer = (function () {
             setTimeout(function () {
                 _this.updateProgressUI(0, 0);
             }, 100);
+        };
+        this.audioTimeUpdate = function () {
+            var duration = _this.audio.duration == 0 ? 1 : _this.audio.duration;
+            var percentage = _this.audio.currentTime / _this.audio.duration;
+            _this.updateProgressUI(_this.audio.currentTime, _this.audio.duration);
         };
         // Maybe move this seperate player ui class
         this.uiBtnPlay = function () {
@@ -88,7 +93,7 @@ var PodcastPlayer = (function () {
             $("#cc_time").text(_this.format(time));
             $("#cc_duration").text(_this.format(duration));
         };
-        this.setPlayerContent = function (media, time) {
+        this.setPlayerContent = function (media) {
             _this.removeSource();
             var newmp3 = $(document.createElement('source'));
             newmp3.attr('id', 'mp3Source');
@@ -96,7 +101,6 @@ var PodcastPlayer = (function () {
             newmp3.appendTo(_this.audio);
             newmp3.attr('src', media.MP3Source);
             _this.audio.load();
-            _this.audio.currentTime = time;
             $("#cc_title").text('loading...');
             $("#cc_show").text('');
             _this.audio.oncanplay = function () {
@@ -141,13 +145,9 @@ var PodcastPlayer = (function () {
         $("#div_podcast_player").show();
         $("#btn_next").click(nextMedia);
         $("#btn_previous").click(previousMedia);
+        this.initPlayer(onPlayerStateChange);
     }
     ;
-    PodcastPlayer.prototype.audioTimeUpdate = function () {
-        var duration = this.audio.duration == 0 ? 1 : this.audio.duration;
-        var percentage = this.audio.currentTime / this.audio.duration;
-        this.updateProgressUI(this.audio.currentTime, this.audio.duration);
-    };
     PodcastPlayer.prototype.format = function (seconds) {
         if (!seconds || seconds == NaN) {
             seconds = 0;

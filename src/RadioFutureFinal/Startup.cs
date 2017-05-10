@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using RadioFutureFinal.Messaging;
 using RadioFutureFinal.DAL;
 using RadioFutureFinal.Search;
 
@@ -38,10 +37,6 @@ namespace RadioFutureFinal
             services.AddSingleton(Configuration);
             services.AddSingleton<IDbRepository, DbRepository>();
 
-            services.AddSingleton<MessageSenderFactory>();
-            services.AddSingleton<IMyContext, MyContext>();
-            services.AddSingleton<IMessageReceiver, MessageReceiver>();
-
             services.AddSingleton(Searcher);
         }
         
@@ -63,8 +58,6 @@ namespace RadioFutureFinal
             }
 
             app.UseStaticFiles();
-            app.UseWebSockets();
-            app.Map("/ws", (_app) => _app.UseMiddleware<WebSocketMiddleware>(serviceProvider.GetService<IMessageReceiver>()));
 
             app.UseMvc(routes =>
             {

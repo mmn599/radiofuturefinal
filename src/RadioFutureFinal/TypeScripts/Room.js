@@ -1,15 +1,14 @@
 "use strict";
-var Contracts_1 = require("./Contracts");
 var UI_1 = require("./UI");
 var PodcastPlayer_1 = require("./PodcastPlayer");
+var Requestor_1 = require("./Requestor");
 var RoomManager = (function () {
     function RoomManager(mobileBrowser) {
         var _this = this;
         this.uiNextMedia = function () {
             var queue = _this.session.Queue;
-            if (_this.user.State.QueuePosition + 1 < queue.length) {
-                _this.user.State.Time = 0;
-                _this.user.State.QueuePosition += 1;
+            if (_this.queuePosition + 1 < queue.length) {
+                _this.queuePosition += 1;
                 _this.onUserStateChange();
             }
         };
@@ -20,28 +19,31 @@ var RoomManager = (function () {
             _this.player.play();
         };
         this.uiPreviousMedia = function () {
-            _this.user.State.Time = 0;
             var queue = _this.session.Queue;
-            if (_this.user.State.QueuePosition > 0) {
-                _this.user.State.QueuePosition = _this.user.State.QueuePosition - 1;
+            if (_this.queuePosition > 0) {
+                _this.queuePosition = _this.queuePosition - 1;
                 _this.onUserStateChange();
             }
         };
         this.uiQueueMedia = function (media) {
-            // TODO: awkward
-            media.UserId = _this.user.Id;
-            media.UserName = _this.user.Name;
-            _this.socket.AddMediaToSession(media);
+            _this.requestor.AddMediaToSession(media, _this.clientUpdateQueue);
         };
         this.uiDeleteMedia = function (mediaId, position) {
-            // TODO: important: this should be done once the update is sent from server
             _this.session.Queue.splice(position, 1);
-            if (_this.user.State.QueuePosition >= position) {
-                _this.user.State.QueuePosition -= 1;
+            if (_this.queuePosition >= position) {
+                _this.queuePosition -= 1;
                 _this.onUserStateChange();
             }
-            _this.ui.updateQueue(_this.session.Queue, _this.user.Id, _this.user.State.QueuePosition);
-            _this.socket.DeleteMediaFromSession(mediaId);
+            _this.ui.updateQueue(_this.session.Queue, _this.queuePosition);
+            _this.requestor.DeleteMediaFromSession(mediaId, _this.clientUpdateQueue);
+        };
+        //
+        // Misc
+        //
+        this.isUserWaiting = function () {
+            var pos = _this.queuePosition;
+            var length = _this.session.Queue.length;
+            return pos < 0 || ((pos == (length - 1)) && _this.player.isStopped());
         };
         this.onPlayerStateChange = function (event) {
             if (event.data == 0) {
@@ -52,65 +54,56 @@ var RoomManager = (function () {
             $("#div_everything").hide();
             $("#div_error").show();
         };
+        this.queuePosition = -1;
         this.mobileBrowser = mobileBrowser;
+        this.ui = new UI_1.UI(this.mobileBrowser, this);
+        this.player = new PodcastPlayer_1.PodcastPlayer(this.ui, this.mobileBrowser, this.uiNextMedia, this.uiPreviousMedia, this.onPlayerStateChange);
+        this.requestor = new Requestor_1.Requestor();
     }
     RoomManager.prototype.init = function (encodedSessionName) {
-        this.session = new Contracts_1.Session();
-        this.ui = new UI_1.UI(this.mobileBrowser, this);
-        this.player = new PodcastPlayer_1.PodcastPlayer(this.ui, this.mobileBrowser, this.uiNextMedia, this.uiPreviousMedia);
-        this.setupJamSession(encodedSessionName);
-        this.player.initPlayer(this.onPlayerStateChange);
-    };
-    RoomManager.prototype.setupJamSession = function (encodedSessionName) {
-        this.session.Name = decodeURI(encodedSessionName);
-        this.socket.JoinSession(this.session.Name);
+        var sessionName = decodeURI(encodedSessionName);
+        this.requestor.JoinSession(sessionName, this.clientSessionReady);
     };
     //==================================================================
-    // WebSocket message response functions
+    // Webrequestor message response functions
     //==================================================================
-    RoomManager.prototype.clientSessionReady = function (msg) {
-        this.session = msg.session;
-        this.user = msg.user;
+    RoomManager.prototype.clientSessionReady = function (session) {
+        this.session = session;
         this.uiNextMedia();
-        this.ui.updateQueue(this.session.Queue, this.user.Id, this.user.State.QueuePosition);
-        this.ui.updateUsersList(this.session.Users, this.user.Id);
+        this.ui.updateQueue(this.session.Queue, this.queuePosition);
         this.ui.sessionReady();
     };
-    RoomManager.prototype.clientUpdateQueue = function (msg) {
+    RoomManager.prototype.clientSearchResults = function (searchResults) {
+        this.ui.onSearchResults(searchResults);
+    };
+    RoomManager.prototype.clientUpdateQueue = function (updatedQueue) {
         var wasWaiting = this.isUserWaiting();
-        this.session.Queue = msg.queue;
+        this.session.Queue = updatedQueue;
         if (wasWaiting) {
             this.uiNextMedia();
         }
-        this.ui.updateQueue(this.session.Queue, this.user.Id, this.user.State.QueuePosition);
-    };
-    RoomManager.prototype.clientSearchResults = function (msg) {
-        this.ui.onSearchResults(msg.searchResults);
+        this.ui.updateQueue(this.session.Queue, this.queuePosition);
     };
     //
     // Mostly UI callback functions
     //
     RoomManager.prototype.uiSearch = function (query, page) {
-        this.socket.Search(query, page);
+        this.requestor.Search(query, page, this.clientSearchResults);
     };
     RoomManager.prototype.uiGoToMedia = function (newQueuePosition) {
-        this.user.State.QueuePosition = newQueuePosition;
-        this.user.State.Time = 0;
+        this.queuePosition = newQueuePosition;
         this.onUserStateChange();
     };
-    //
-    // Misc
-    //
     RoomManager.prototype.onUserStateChange = function () {
-        if (this.user.State.QueuePosition >= 0 && this.user.State.QueuePosition < this.session.Queue.length) {
-            this.player.setPlayerContent(this.session.Queue[this.user.State.QueuePosition], this.user.State.Time);
-            this.ui.updateQueue(this.session.Queue, this.user.Id, this.user.State.QueuePosition);
+        if (this.queuePosition >= 0 && this.queuePosition < this.session.Queue.length) {
+            this.player.setPlayerContent(this.session.Queue[this.queuePosition]);
+            this.ui.updateQueue(this.session.Queue, this.queuePosition);
         }
-        else if (this.user.State.QueuePosition < 0) {
+        else if (this.queuePosition < 0) {
             this.player.nothingPlaying();
         }
-        else if (this.user.State.QueuePosition >= this.session.Queue.length) {
-            this.user.State.QueuePosition = this.session.Queue.length;
+        else if (this.queuePosition >= this.session.Queue.length) {
+            this.queuePosition = this.session.Queue.length;
         }
     };
     return RoomManager;
