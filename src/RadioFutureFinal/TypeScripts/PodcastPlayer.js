@@ -111,7 +111,7 @@ var PodcastPlayer = (function () {
             $("#cc_title").text('loading...');
             $("#cc_show").text('');
             _this.audio.oncanplay = function () {
-                $("#cc_show").text(media.Show);
+                $("#cc_show").text(media.show);
                 $("#cc_title").text(media.title);
             };
             if (_this.mobileBrowser) {

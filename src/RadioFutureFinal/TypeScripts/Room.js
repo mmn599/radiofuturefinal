@@ -71,6 +71,9 @@ var RoomManager = (function () {
             // Notify the server
             _this.requestor.DeleteMediaFromSession(_this.session.id, mediaId, _this.clientUpdateQueue);
         };
+        this.uiLock = function () {
+            console.log('locking');
+        };
         //
         // Misc
         //

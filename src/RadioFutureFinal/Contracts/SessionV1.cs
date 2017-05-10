@@ -24,9 +24,12 @@ namespace RadioFutureFinal.Contracts
         [JsonProperty(PropertyName = "locked")]
         public bool Locked { get; set; }
 
+        [JsonProperty(PropertyName = "userCanLock")]
+        public bool UserCanLock { get; set; }
+
         public SessionV1()
         {
-            
+            UserCanLock = false;
         }
 
     }

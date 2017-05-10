@@ -125,6 +125,10 @@ class RoomManager implements UICallbacks {
 
     }
 
+    uiLock = () => {
+        console.log('locking');
+    }
+
     //
     // Misc
     //

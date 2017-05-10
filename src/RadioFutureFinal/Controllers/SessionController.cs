@@ -33,24 +33,27 @@ namespace RadioFutureFinal.Controllers
 
             try
             {
+                bool newlyCreated = false;
                 bool sessionFound = _db.GetSessionByName(sessionName, out session);
                 if (!sessionFound)
                 {
+                    newlyCreated = true;
                     session = await _db.CreateSessionAsync(sessionName);
                 }
+
+                session.Hits += 1;
+                await _db.SaveSessionHitsAsync(session);
+
+                var contract = session.ToContract();
+                contract.UserCanLock = newlyCreated;
+
+                return Ok(contract);
             }
             catch
             {
                 return NotFound();
             }
 
-            session.Hits += 1;
-            var sessionContract = session.ToContract();
-
-            // TODO: do this in background
-            await _db.SaveSessionHitsAsync(session);
-
-            return Ok(sessionContract);
         }
 
         [HttpPost]

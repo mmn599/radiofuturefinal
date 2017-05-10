@@ -461,4 +461,7 @@ li:focus {
     color: black;
 }
 
-
+#p_lock {
+    display: none;
+    text-align: center;
+}

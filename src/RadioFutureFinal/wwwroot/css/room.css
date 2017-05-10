@@ -478,3 +478,12 @@ li:focus {
 #make_your_own:hover {
     background: grey;
 }
+
+#p_lock {
+    display: none;
+    cursor: pointer;
+}
+
+#p_lock:hover {
+    background: grey;
+}

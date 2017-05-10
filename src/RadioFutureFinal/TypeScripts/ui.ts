@@ -9,6 +9,7 @@ export interface UICallbacks {
     uiQueueMedia: (media: Media) => void;
     uiGoToMedia: (newQueuePosition: number) => void;
     uiDeleteMedia: (mediaId: number, position: number) => void;
+    uiLock: () => void;
 }
 
 export class UI {
@@ -75,6 +76,10 @@ export class UI {
         });
     } 
 
+    public lockUI = () => {
+        $("#p_lock").text('this playlist is locked');
+    }
+
     public sessionReady = (session: Session) => {
         $("#div_loading").hide();
         this.spinner.stop();
@@ -92,6 +97,25 @@ export class UI {
         var hitsString = session.hits == 1 ? "1 playlist view" :
                 `${session.hits} playlist views`;
         $("#p_session_hits").text(hitsString);
+
+        if (session.locked) {
+            this.lockUI();
+        }
+        else {
+            if (session.userCanLock) {
+                $("#p_lock").click(() => {
+                    this.callbacks.uiLock();
+                    this.lockUI();
+                });
+                $("#p_lock").text('lock this playlist');
+                $("#p_lock").show();
+            }
+            else {
+                $("#p_lock").hide();
+                $("#p_lock").click(() => { });
+            }
+        }
+
     } 
 
     private setupSpinnerUI() {
@@ -323,7 +347,7 @@ export class UI {
                 var media = new Media();
                 media.mp3Source = mp3url.val();
                 media.title = episode.val();
-                media.Show = show.val();
+                media.show = show.val();
                 this.callbacks.uiQueueMedia(media);
                 divResults.fadeOut();
             }

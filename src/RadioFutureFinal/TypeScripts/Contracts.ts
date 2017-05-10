@@ -14,4 +14,5 @@ export class Session {
     queue: Media[];
     hits: number;
     locked: boolean;
+    userCanLock: boolean;
 }

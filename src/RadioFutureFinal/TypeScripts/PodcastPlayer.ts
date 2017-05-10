@@ -157,7 +157,7 @@ export class PodcastPlayer {
         $("#cc_title").text('loading...');
         $("#cc_show").text('');
         this.audio.oncanplay = () => {
-            $("#cc_show").text(media.Show);
+            $("#cc_show").text(media.show);
             $("#cc_title").text(media.title);
         }
         if (this.mobileBrowser) {
