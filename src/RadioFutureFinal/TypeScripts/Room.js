@@ -26,7 +26,7 @@ var RoomManager = (function () {
             }
         };
         this.uiQueueMedia = function (media) {
-            _this.requestor.AddMediaToSession(media, _this.clientUpdateQueue);
+            _this.requestor.AddMediaToSession(_this.session.Id, media, _this.clientUpdateQueue);
         };
         this.uiDeleteMedia = function (mediaId, position) {
             _this.session.Queue.splice(position, 1);
@@ -35,7 +35,7 @@ var RoomManager = (function () {
                 _this.onUserStateChange();
             }
             _this.ui.updateQueue(_this.session.Queue, _this.queuePosition);
-            _this.requestor.DeleteMediaFromSession(mediaId, _this.clientUpdateQueue);
+            _this.requestor.DeleteMediaFromSession(_this.session.Id, mediaId, _this.clientUpdateQueue);
         };
         //
         // Misc

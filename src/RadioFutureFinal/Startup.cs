@@ -62,13 +62,33 @@ namespace RadioFutureFinal
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
+                    name: "joinSession",
+                    template: "session/JoinSession/{sessionName}", 
+                    defaults: new { controller = "Session", action = "JoinSession" });
+
+                routes.MapRoute(
+                    name: "deleteMedia",
+                    template: "session/DeleteMedia/{sessionId}/{mediaId}", 
+                    defaults: new { controller = "Session", action = "DeleteMedia" });
+
+                routes.MapRoute(
+                    name: "addMedia",
+                    template: "session/AddMedia/{sessionId}", 
+                    defaults: new { controller = "Session", action = "AddMedia" });
+
+                routes.MapRoute(
+                    name: "search",
+                    template: "session/Search", 
+                    defaults: new { controller = "Session", action = "Search" });
+
+                routes.MapRoute(
+                    name: "room",
+                    template: "rooms/{roomName}",
+                    defaults: new { controller = "Room", action = "EnterRoom" });
+
+                routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
-
-            routes.MapRoute(
-                name: "room",
-                template: "rooms/{roomName}",
-                defaults: new { controller = "Room", action = "EnterRoom" });
             });
         }
 

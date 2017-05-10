@@ -90,7 +90,7 @@ class RoomManager implements UICallbacks {
     }
 
     uiQueueMedia = (media: Media) => {
-        this.requestor.AddMediaToSession(media, this.clientUpdateQueue);
+        this.requestor.AddMediaToSession(this.session.Id, media, this.clientUpdateQueue);
     }
 
     uiDeleteMedia = (mediaId: number, position: number) => {
@@ -100,7 +100,7 @@ class RoomManager implements UICallbacks {
             this.onUserStateChange();
         }
         this.ui.updateQueue(this.session.Queue, this.queuePosition);
-        this.requestor.DeleteMediaFromSession(mediaId, this.clientUpdateQueue);
+        this.requestor.DeleteMediaFromSession(this.session.Id, mediaId, this.clientUpdateQueue);
     }
 
 
