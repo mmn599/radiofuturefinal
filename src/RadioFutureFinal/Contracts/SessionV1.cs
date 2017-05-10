@@ -21,6 +21,9 @@ namespace RadioFutureFinal.Contracts
         [JsonProperty(PropertyName = "hits")]
         public int Hits { get; set; }
 
+        [JsonProperty(PropertyName = "locked")]
+        public bool Locked { get; set; }
+
         public SessionV1()
         {
             

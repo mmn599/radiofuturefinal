@@ -12,7 +12,8 @@ namespace RadioFutureFinal.Contracts
                 Id = session.SessionID,
                 Name = session.Name,
                 Hits = session.Hits,
-                Queue = new List<MediaV1>()
+                Queue = new List<MediaV1>(),
+                Locked = session.Locked
             };
             foreach(var media in session.Queue)
             {

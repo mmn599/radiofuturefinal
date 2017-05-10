@@ -5,7 +5,7 @@
     title: string;
     thumbURL: string;
     description: string;
-    Show: string;
+    show: string;
 }
 
 export class Session {
@@ -13,4 +13,5 @@ export class Session {
     name: string;
     queue: Media[];
     hits: number;
+    locked: boolean;
 }
