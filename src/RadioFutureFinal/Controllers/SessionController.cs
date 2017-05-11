@@ -33,11 +33,9 @@ namespace RadioFutureFinal.Controllers
 
             try
             {
-                bool newlyCreated = false;
                 bool sessionFound = _db.GetSessionByName(sessionName, out session);
                 if (!sessionFound)
                 {
-                    newlyCreated = true;
                     session = await _db.CreateSessionAsync(sessionName);
                 }
 
@@ -45,7 +43,7 @@ namespace RadioFutureFinal.Controllers
                 await _db.SaveSessionHitsAsync(session);
 
                 var contract = session.ToContract();
-                contract.UserCanLock = newlyCreated;
+                contract.UserCanLock = !session.Locked;
 
                 return Ok(contract);
             }

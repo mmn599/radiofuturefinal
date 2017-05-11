@@ -22,9 +22,7 @@ $(document).ready(function(){
                 $("#txt_group_join").val("");
             }
             else {
-                $(".wrapper").fadeOut(700, function() {
-                    window.location.href = "/playlists/" + playlistName;
-                });
+                window.location.href = "/playlists/" + playlistName;
             }
 
     }
