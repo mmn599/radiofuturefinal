@@ -89,7 +89,7 @@ namespace RadioFutureFinal.DAL
             }
         }
 
-        public async Task SaveSessionQueueAsync(Session updatedSession)
+        public async Task AddMediaToSessionAsync(Session updatedSession)
         {
             using (var context = ContextFactory())
             {
@@ -99,7 +99,7 @@ namespace RadioFutureFinal.DAL
             }
         }
 
-        public async Task SaveSessionLockedAsync(Session updatedSession)
+        public async Task AddMediaToSession(Session updatedSession)
         {
             using (var context = ContextFactory())
             {
@@ -107,6 +107,16 @@ namespace RadioFutureFinal.DAL
                 context.Entry(updatedSession).Property(s => s.Locked).IsModified = true;
                 await context.SaveChangesAsync();
             }
+        }
+
+        public async Task DeleteMedia(Media mediaToDelete)
+        {
+            using (var context = ContextFactory())
+            {
+                context.Media.Remove(mediaToDelete);
+                await context.SaveChangesAsync();
+            }
+
         }
 
     }

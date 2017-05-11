@@ -18,16 +18,12 @@ var RoomManager = (function () {
             _this.ui.onSearchResults(searchResults);
         };
         this.clientUpdateQueue = function (updatedQueue) {
-            // Checks for redundant updates because queue is locally updated
-            // TODO: more robust equality check (this just checks if someone else added something)
-            if (updatedQueue.length != _this.session.queue.length) {
-                var wasWaiting = _this.isUserWaiting();
-                _this.session.queue = updatedQueue;
-                if (wasWaiting) {
-                    _this.uiNextMedia();
-                }
-                _this.ui.updateQueue(_this.session.queue, _this.queuePosition);
+            _this.session.queue = updatedQueue;
+            var wasWaiting = _this.isUserWaiting();
+            if (wasWaiting) {
+                _this.uiNextMedia();
             }
+            _this.ui.updateQueue(_this.session.queue, _this.queuePosition);
         };
         this.uiNextMedia = function () {
             var queue = _this.session.queue;
@@ -51,12 +47,14 @@ var RoomManager = (function () {
         };
         this.uiQueueMedia = function (media) {
             // Local add
-            _this.session.queue.push(media);
-            var wasWaiting = _this.isUserWaiting();
+            /*
+            this.session.queue.push(media);
+            var wasWaiting = this.isUserWaiting();
             if (wasWaiting) {
-                _this.uiNextMedia();
+                this.uiNextMedia();
             }
-            _this.ui.updateQueue(_this.session.queue, _this.queuePosition);
+            this.ui.updateQueue(this.session.queue, this.queuePosition);
+            */
             // Notify the server
             _this.requestor.AddMediaToSession(_this.session.id, media, _this.clientUpdateQueue);
         };

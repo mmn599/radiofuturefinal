@@ -46,16 +46,12 @@ class RoomManager implements UICallbacks {
 
     clientUpdateQueue = (updatedQueue: Media[]) => {
 
-        // Checks for redundant updates because queue is locally updated
-        // TODO: more robust equality check (this just checks if someone else added something)
-        if (updatedQueue.length != this.session.queue.length) {
-            var wasWaiting = this.isUserWaiting();
-            this.session.queue = updatedQueue;
-            if (wasWaiting) {
-                this.uiNextMedia();
-            }
-            this.ui.updateQueue(this.session.queue, this.queuePosition);
+        this.session.queue = updatedQueue;
+        var wasWaiting = this.isUserWaiting();
+        if (wasWaiting) {
+            this.uiNextMedia();
         }
+        this.ui.updateQueue(this.session.queue, this.queuePosition);
 
     }
 
@@ -99,12 +95,14 @@ class RoomManager implements UICallbacks {
     uiQueueMedia = (media: Media) => {
 
         // Local add
+        /*
         this.session.queue.push(media);
         var wasWaiting = this.isUserWaiting();
         if (wasWaiting) {
             this.uiNextMedia();
         }
         this.ui.updateQueue(this.session.queue, this.queuePosition);
+        */
 
         // Notify the server
         this.requestor.AddMediaToSession(this.session.id, media, this.clientUpdateQueue);

@@ -83,7 +83,7 @@ namespace RadioFutureFinal.Controllers
             try
             {
                 session.Queue.Add(mediaToQueue.ToModel());
-                await _db.SaveSessionQueueAsync(session);
+                await _db.AddMediaToSessionAsync(session);
                 return Ok(session.ToContract().Queue);
             }
             catch(Exception e)
@@ -114,7 +114,14 @@ namespace RadioFutureFinal.Controllers
                 return NotFound();
             }
             session.Queue.Remove(media);
-            await _db.SaveSessionQueueAsync(session);
+            try
+            {
+                await _db.DeleteMedia(media);
+            }
+            catch
+            {
+                return NotFound();
+            }
             return Ok(session.ToContract().Queue);
         }
 
@@ -142,7 +149,7 @@ namespace RadioFutureFinal.Controllers
             }
 
             session.Locked = true;
-            await _db.SaveSessionLockedAsync(session);
+            await _db.AddMediaToSession(session);
 
             return Ok();
         }
